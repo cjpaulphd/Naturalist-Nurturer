@@ -1,0 +1,287 @@
+[
+  {
+    "id": 47633,
+    "category": "tree",
+    "commonName": "Tulip Tree",
+    "scientificName": "Liriodendron tulipifera",
+    "family": "Magnoliaceae",
+    "observationCount": 342,
+    "prevalenceRank": 1,
+    "nativeStatus": "native",
+    "photos": [],
+    "sounds": [],
+    "keyFacts": [
+      "Tallest eastern hardwood, reaching 150+ feet.",
+      "Distinctive tulip-shaped leaves with four lobes and a flat or slightly notched tip.",
+      "Yellow-green tulip-shaped flowers appear in late spring."
+    ],
+    "habitat": "Rich, moist soils of coves and lower slopes in the Blue Ridge.",
+    "identificationTips": "Look for the unique four-lobed leaf shape — no other eastern tree has it."
+  },
+  {
+    "id": 48734,
+    "category": "tree",
+    "commonName": "Eastern White Pine",
+    "scientificName": "Pinus strobus",
+    "family": "Pinaceae",
+    "observationCount": 280,
+    "prevalenceRank": 2,
+    "nativeStatus": "native",
+    "photos": [],
+    "sounds": [],
+    "keyFacts": [
+      "Five needles per bundle (mnemonic: W-H-I-T-E has 5 letters).",
+      "Tallest native conifer in eastern North America.",
+      "Soft, flexible needles 2-5 inches long."
+    ],
+    "habitat": "Moist, well-drained soils; coves and ridges.",
+    "identificationTips": "Count the needles in each bundle — 5 means white pine."
+  },
+  {
+    "id": 54327,
+    "category": "tree",
+    "commonName": "Red Maple",
+    "scientificName": "Acer rubrum",
+    "family": "Sapindaceae",
+    "observationCount": 245,
+    "prevalenceRank": 3,
+    "nativeStatus": "native",
+    "photos": [],
+    "sounds": [],
+    "keyFacts": [
+      "One of the first trees to flower in spring with small red blossoms.",
+      "Leaves have three main lobes with serrated margins.",
+      "Brilliant red fall color gives this tree its name."
+    ],
+    "habitat": "Adaptable to wet or dry soils; found throughout the eastern forest.",
+    "identificationTips": "Three-lobed leaves with V-shaped sinuses (vs. sugar maple's U-shaped)."
+  },
+  {
+    "id": 49088,
+    "category": "tree",
+    "commonName": "Eastern Hemlock",
+    "scientificName": "Tsuga canadensis",
+    "family": "Pinaceae",
+    "observationCount": 198,
+    "prevalenceRank": 4,
+    "nativeStatus": "native",
+    "photos": [],
+    "sounds": [],
+    "keyFacts": [
+      "Short, flat needles with two white stripes on the underside.",
+      "Tiny cones only 3/4 inch long.",
+      "Threatened by hemlock woolly adelgid, an invasive insect."
+    ],
+    "habitat": "Cool, moist ravines and north-facing slopes; often along streams.",
+    "identificationTips": "Flat needles attached by a tiny stem; small cones hanging from branch tips."
+  },
+  {
+    "id": 47851,
+    "category": "tree",
+    "commonName": "White Oak",
+    "scientificName": "Quercus alba",
+    "family": "Fagaceae",
+    "observationCount": 175,
+    "prevalenceRank": 5,
+    "nativeStatus": "native",
+    "photos": [],
+    "sounds": [],
+    "keyFacts": [
+      "Leaves have rounded lobes without bristle tips.",
+      "Can live 600+ years; one of the most important hardwoods in eastern forests.",
+      "Acorns mature in one season and are less bitter than red oak group."
+    ],
+    "habitat": "Well-drained upland soils; mixed hardwood forests.",
+    "identificationTips": "Rounded leaf lobes (vs. pointed lobes in red oak group); light gray flaky bark."
+  },
+  {
+    "id": 62340,
+    "category": "plant",
+    "commonName": "Christmas Fern",
+    "scientificName": "Polystichum acrostichoides",
+    "family": "Dryopteridaceae",
+    "observationCount": 310,
+    "prevalenceRank": 1,
+    "nativeStatus": "native",
+    "photos": [],
+    "sounds": [],
+    "keyFacts": [
+      "Evergreen fern; stays green through winter (hence 'Christmas').",
+      "Individual leaflets shaped like a Christmas stocking.",
+      "One of the most common ferns in eastern North American forests."
+    ],
+    "habitat": "Shaded slopes, stream banks, and rocky woods.",
+    "identificationTips": "Look for the 'ear' or 'thumb' at the base of each leaflet — shaped like a stocking."
+  },
+  {
+    "id": 73450,
+    "category": "plant",
+    "commonName": "Jack-in-the-Pulpit",
+    "scientificName": "Arisaema triphyllum",
+    "family": "Araceae",
+    "observationCount": 185,
+    "prevalenceRank": 2,
+    "nativeStatus": "native",
+    "photos": [],
+    "sounds": [],
+    "keyFacts": [
+      "Distinctive hooded flower (spathe) sheltering a club-shaped spadix.",
+      "Can change sex from year to year depending on stored energy.",
+      "Produces bright red berry clusters in fall."
+    ],
+    "habitat": "Rich, moist deciduous woods and floodplains.",
+    "identificationTips": "Unmistakable hooded flower structure; compound leaves with three leaflets."
+  },
+  {
+    "id": 81560,
+    "category": "plant",
+    "commonName": "Bloodroot",
+    "scientificName": "Sanguinaria canadensis",
+    "family": "Papaveraceae",
+    "observationCount": 142,
+    "prevalenceRank": 3,
+    "nativeStatus": "native",
+    "photos": [],
+    "sounds": [],
+    "keyFacts": [
+      "One of the earliest spring wildflowers, blooming March-April.",
+      "Stem and root exude bright orange-red sap when broken.",
+      "Single white flower with 8-12 petals wrapping around a single basal leaf."
+    ],
+    "habitat": "Rich deciduous woods, often on slopes and near streams.",
+    "identificationTips": "White flower emerges wrapped in a large, lobed leaf; orange sap in stem."
+  },
+  {
+    "id": 91220,
+    "category": "plant",
+    "commonName": "Wild Ginger",
+    "scientificName": "Asarum canadense",
+    "family": "Aristolochiaceae",
+    "observationCount": 120,
+    "prevalenceRank": 4,
+    "nativeStatus": "native",
+    "photos": [],
+    "sounds": [],
+    "keyFacts": [
+      "Heart-shaped velvety leaves growing low to the ground.",
+      "Hidden brownish-purple flower at ground level between two leaf stalks.",
+      "Root has a ginger-like fragrance (not related to culinary ginger)."
+    ],
+    "habitat": "Rich, moist deciduous forests in partial to full shade.",
+    "identificationTips": "Paired heart-shaped fuzzy leaves; crush a leaf for the ginger scent."
+  },
+  {
+    "id": 95660,
+    "category": "plant",
+    "commonName": "Trillium",
+    "scientificName": "Trillium grandiflorum",
+    "family": "Melanthiaceae",
+    "observationCount": 108,
+    "prevalenceRank": 5,
+    "nativeStatus": "native",
+    "photos": [],
+    "sounds": [],
+    "keyFacts": [
+      "Everything in threes: three leaves, three petals, three sepals.",
+      "Large white flowers turn pink as they age.",
+      "Takes 7-10 years to reach flowering maturity from seed."
+    ],
+    "habitat": "Rich, mesic deciduous forests, especially cove hardwoods.",
+    "identificationTips": "The 'rule of three' — if all parts come in threes, it's a trillium."
+  },
+  {
+    "id": 9083,
+    "category": "bird",
+    "commonName": "Carolina Wren",
+    "scientificName": "Thryothorus ludovicianus",
+    "family": "Troglodytidae",
+    "observationCount": 425,
+    "prevalenceRank": 1,
+    "nativeStatus": "native",
+    "photos": [],
+    "sounds": [],
+    "keyFacts": [
+      "Loud, ringing 'teakettle-teakettle-teakettle' song.",
+      "Warm brown above, buffy below, with a bold white eyebrow stripe.",
+      "Pairs bond for life and often roost together in winter."
+    ],
+    "habitat": "Dense underbrush, thickets, and forest edges.",
+    "identificationTips": "Bold white eyebrow stripe; upturned tail; loud song disproportionate to small size."
+  },
+  {
+    "id": 7453,
+    "category": "bird",
+    "commonName": "Eastern Towhee",
+    "scientificName": "Pipilo erythrophthalmus",
+    "family": "Passerellidae",
+    "observationCount": 380,
+    "prevalenceRank": 2,
+    "nativeStatus": "native",
+    "photos": [],
+    "sounds": [],
+    "keyFacts": [
+      "Distinctive 'drink-your-tea' song.",
+      "Males have black head and back, rufous sides, white belly.",
+      "Scratches the ground with both feet simultaneously to find food."
+    ],
+    "habitat": "Dense shrubby areas, forest edges, and overgrown fields.",
+    "identificationTips": "Large sparrow with bold black, rufous, and white coloring; red eye in eastern birds."
+  },
+  {
+    "id": 14886,
+    "category": "bird",
+    "commonName": "Red-eyed Vireo",
+    "scientificName": "Vireo olivaceus",
+    "family": "Vireonidae",
+    "observationCount": 298,
+    "prevalenceRank": 3,
+    "nativeStatus": "native",
+    "photos": [],
+    "sounds": [],
+    "keyFacts": [
+      "One of the most common songbirds in eastern forests — sings nearly constantly.",
+      "Can sing over 20,000 songs per day.",
+      "Olive-green back, white below, with gray crown and white eyebrow bordered by black."
+    ],
+    "habitat": "Deciduous and mixed forest canopy.",
+    "identificationTips": "Plain olive-green bird that sings persistent, robin-like phrases from the canopy."
+  },
+  {
+    "id": 18205,
+    "category": "bird",
+    "commonName": "Wood Thrush",
+    "scientificName": "Hylocichla mustelina",
+    "family": "Turdidae",
+    "observationCount": 256,
+    "prevalenceRank": 4,
+    "nativeStatus": "native",
+    "photos": [],
+    "sounds": [],
+    "keyFacts": [
+      "Considered to have one of the most beautiful songs of any North American bird.",
+      "Warm brown above with bold dark spots on white breast.",
+      "Populations declining due to habitat fragmentation and cowbird parasitism."
+    ],
+    "habitat": "Interior of mature deciduous and mixed forests.",
+    "identificationTips": "Pot-bellied thrush with bold, round breast spots (not streaks); flute-like song at dusk."
+  },
+  {
+    "id": 11935,
+    "category": "bird",
+    "commonName": "Scarlet Tanager",
+    "scientificName": "Piranga olivacea",
+    "family": "Cardinalidae",
+    "observationCount": 210,
+    "prevalenceRank": 5,
+    "nativeStatus": "native",
+    "photos": [],
+    "sounds": [],
+    "keyFacts": [
+      "Breeding male is brilliant red with jet-black wings and tail.",
+      "Song sounds like a robin with a sore throat.",
+      "Females and non-breeding males are olive-yellow with darker wings."
+    ],
+    "habitat": "Canopy of mature deciduous forests, especially oak-dominated stands.",
+    "identificationTips": "Male's red body with black wings is unmistakable; listen for hoarse robin-like song."
+  }
+]
