@@ -1,0 +1,10 @@
+# Don't commit downloaded/generated data (large binary files)
+photos/*/
+sounds/*/
+raw/*.json
+raw/taxa/
+species_data.json
+
+# Keep directory structure
+!.gitkeep
+!.gitignore
