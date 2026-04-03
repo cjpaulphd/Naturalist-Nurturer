@@ -523,12 +523,25 @@ function StudyContent() {
                       {choices.map((choice) => (
                         <button
                           key={choice.id}
-                          onClick={() => setSelectedAnswer(choice.id)}
+                          onClick={() => {
+                            if (answerSubmitted) return;
+                            setSelectedAnswer(choice.id);
+                            const result = choice.id === currentSpecies?.id ? "correct" : "incorrect";
+                            setIsCorrect(result);
+                            setAnswerSubmitted(true);
+                            setFlipped(true);
+                            setSessionStats((s) => ({
+                              ...s,
+                              correct: result === "correct" ? s.correct + 1 : s.correct,
+                              incorrect: result === "incorrect" ? s.incorrect + 1 : s.incorrect,
+                            }));
+                          }}
+                          disabled={answerSubmitted}
                           className={`p-3 rounded-lg text-center text-sm transition-colors border ${
                             selectedAnswer === choice.id
                               ? "bg-green-50 border-green-400 text-green-800"
                               : "bg-white border-stone-200 text-stone-700 hover:border-stone-400"
-                          }`}
+                          }${answerSubmitted ? " cursor-not-allowed opacity-75" : ""}`}
                         >
                           <span>{formatName(choice, nameDisplay)}</span>
                           {formatNameSecondary(choice, nameDisplay) && (
@@ -587,10 +600,10 @@ function StudyContent() {
                     </div>
                   )}
 
+                  {quizMode !== "multiple-choice" && (
                   <button
                     onClick={handleSubmitAnswer}
                     disabled={
-                      (quizMode === "multiple-choice" && selectedAnswer === null) ||
                       (quizMode === "dropdown" && !dropdownValue) ||
                       (quizMode === "free-response" && !freeResponseInput.trim())
                     }
@@ -598,6 +611,7 @@ function StudyContent() {
                   >
                     Submit Answer
                   </button>
+                  )}
                 </div>
               )}
 
