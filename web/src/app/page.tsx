@@ -243,7 +243,7 @@ export default function HomePage() {
             href="https://www.greenriverpreserve.org"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-green-700 transition-colors"
+            className="text-green-700 underline hover:text-green-800 transition-colors"
           >
             Green River Preserve
           </a>
