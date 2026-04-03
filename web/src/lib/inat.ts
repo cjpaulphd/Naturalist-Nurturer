@@ -377,7 +377,7 @@ async function fetchSeasonalData(
  * Fetch bird sounds from Xeno-canto API.
  * Returns a map of scientific name -> sounds array.
  */
-async function fetchBirdSounds(
+export async function fetchBirdSounds(
   birdNames: { id: number; scientificName: string }[]
 ): Promise<Map<number, SpeciesSound[]>> {
   const result = new Map<number, SpeciesSound[]>();
@@ -402,7 +402,7 @@ async function fetchBirdSounds(
           lic: string;
           length: string;
         }) => ({
-          url: rec.file || "",
+          url: rec.file ? (rec.file.startsWith("//") ? "https:" + rec.file : rec.file) : "",
           attribution: `${rec.rec || "Unknown"} (${rec.lic || "CC"}) via Xeno-canto`,
           filename: "",
           duration: parseXenoCantoDuration(rec.length),

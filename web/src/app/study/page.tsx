@@ -12,7 +12,7 @@ import {
   Rating,
 } from "@/lib/types";
 import { loadSpeciesData, getSpeciesById } from "@/lib/species";
-import { getCachedLocationSpecies } from "@/lib/inat";
+import { getCachedLocationSpecies, fetchBirdSounds } from "@/lib/inat";
 import {
   getNewCards,
   getDueCards,
@@ -108,7 +108,28 @@ function StudyContent() {
   useEffect(() => {
     const loadData = async () => {
       const cached = getCachedLocationSpecies();
-      return cached && cached.length > 0 ? cached : await loadSpeciesData();
+      const data = cached && cached.length > 0 ? cached : await loadSpeciesData();
+
+      // Fetch sounds for birds that don't have any
+      const birdsWithoutSounds = data
+        .filter((s) => s.category === "bird" && (!s.sounds || s.sounds.length === 0))
+        .map((s) => ({ id: s.id, scientificName: s.scientificName }));
+
+      if (birdsWithoutSounds.length > 0) {
+        try {
+          const soundMap = await fetchBirdSounds(birdsWithoutSounds);
+          for (const species of data) {
+            const sounds = soundMap.get(species.id);
+            if (sounds && sounds.length > 0) {
+              species.sounds = sounds;
+            }
+          }
+        } catch {
+          // Sounds are optional; continue without them
+        }
+      }
+
+      return data;
     };
 
     loadData().then((data) => {
