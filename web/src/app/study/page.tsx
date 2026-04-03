@@ -92,7 +92,7 @@ function StudyContent() {
   const [answerSubmitted, setAnswerSubmitted] = useState(false);
   const [freeResponseInput, setFreeResponseInput] = useState("");
   const [dropdownValue, setDropdownValue] = useState("");
-  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+  const [isCorrect, setIsCorrect] = useState<"correct" | "partial" | "incorrect" | null>(null);
 
   const [sessionStats, setSessionStats] = useState({
     total: 0,
@@ -101,6 +101,7 @@ function StudyContent() {
     good: 0,
     easy: 0,
     correct: 0,
+    partial: 0,
     incorrect: 0,
   });
 
@@ -181,29 +182,46 @@ function StudyContent() {
     setIsCorrect(null);
   };
 
+  // Check if user input shares any significant word (3+ chars) with the answer
+  const hasPartialWordMatch = (input: string, answer: string): boolean => {
+    const normalize = (s: string) =>
+      s.toLowerCase().replace(/[-]/g, " ").split(/\s+/).filter((w) => w.length >= 3);
+    const inputWords = normalize(input);
+    const answerWords = normalize(answer);
+    return inputWords.some((iw) => answerWords.some((aw) => iw === aw));
+  };
+
   const handleSubmitAnswer = () => {
     if (!currentSpecies) return;
 
-    let correct = false;
+    let result: "correct" | "partial" | "incorrect" = "incorrect";
     if (quizMode === "multiple-choice") {
-      correct = selectedAnswer === currentSpecies.id;
+      result = selectedAnswer === currentSpecies.id ? "correct" : "incorrect";
     } else if (quizMode === "dropdown") {
-      correct = dropdownValue === String(currentSpecies.id);
+      result = dropdownValue === String(currentSpecies.id) ? "correct" : "incorrect";
     } else if (quizMode === "free-response") {
       const input = freeResponseInput.trim().toLowerCase();
-      correct =
-        input === currentSpecies.commonName.toLowerCase() ||
-        input === currentSpecies.scientificName.toLowerCase();
+      const commonName = currentSpecies.commonName.toLowerCase();
+      const sciName = currentSpecies.scientificName.toLowerCase();
+      if (input === commonName || input === sciName) {
+        result = "correct";
+      } else if (
+        hasPartialWordMatch(input, currentSpecies.commonName) ||
+        hasPartialWordMatch(input, currentSpecies.scientificName)
+      ) {
+        result = "partial";
+      }
     }
 
-    setIsCorrect(correct);
+    setIsCorrect(result);
     setAnswerSubmitted(true);
     setFlipped(true);
 
     setSessionStats((s) => ({
       ...s,
-      correct: correct ? s.correct + 1 : s.correct,
-      incorrect: correct ? s.incorrect : s.incorrect + 1,
+      correct: result === "correct" ? s.correct + 1 : s.correct,
+      partial: result === "partial" ? s.partial + 1 : s.partial,
+      incorrect: result === "incorrect" ? s.incorrect + 1 : s.incorrect,
     }));
   };
 
@@ -293,6 +311,12 @@ function StudyContent() {
                   <span className="text-green-600">Correct:</span>
                   <span className="ml-2 font-semibold">{sessionStats.correct}</span>
                 </div>
+                {sessionStats.partial > 0 && (
+                  <div>
+                    <span className="text-yellow-600">Partial:</span>
+                    <span className="ml-2 font-semibold">{sessionStats.partial}</span>
+                  </div>
+                )}
                 <div>
                   <span className="text-red-500">Incorrect:</span>
                   <span className="ml-2 font-semibold">{sessionStats.incorrect}</span>
@@ -302,7 +326,7 @@ function StudyContent() {
                   <span className="ml-2 font-semibold">
                     {sessionStats.total > 0
                       ? Math.round(
-                          (sessionStats.correct / sessionStats.total) * 100
+                          ((sessionStats.correct + sessionStats.partial * 0.5) / sessionStats.total) * 100
                         )
                       : 0}
                     %
@@ -387,9 +411,10 @@ function StudyContent() {
               ? "Dropdown"
               : "Free Response"}
           </span>
-          {isHardMode && sessionStats.correct + sessionStats.incorrect > 0 && (
+          {isHardMode && sessionStats.correct + sessionStats.partial + sessionStats.incorrect > 0 && (
             <span className="text-xs text-stone-400">
-              {sessionStats.correct}/{sessionStats.correct + sessionStats.incorrect} correct
+              {sessionStats.correct}/{sessionStats.correct + sessionStats.partial + sessionStats.incorrect} correct
+              {sessionStats.partial > 0 && `, ${sessionStats.partial} partial`}
             </span>
           )}
         </div>
@@ -571,12 +596,18 @@ function StudyContent() {
               {isHardMode && answerSubmitted && (
                 <div
                   className={`px-4 py-3 text-center font-semibold text-sm ${
-                    isCorrect
+                    isCorrect === "correct"
                       ? "bg-green-100 text-green-800"
+                      : isCorrect === "partial"
+                      ? "bg-yellow-100 text-yellow-800"
                       : "bg-red-100 text-red-800"
                   }`}
                 >
-                  {isCorrect ? "Correct!" : "Incorrect"}
+                  {isCorrect === "correct"
+                    ? "Correct!"
+                    : isCorrect === "partial"
+                    ? "Partially Correct"
+                    : "Incorrect"}
                 </div>
               )}
 
@@ -673,7 +704,7 @@ function StudyContent() {
                 {isHardMode ? (
                   <div>
                     <button
-                      onClick={() => handleRate(isCorrect ? "good" : "again")}
+                      onClick={() => handleRate(isCorrect === "correct" ? "good" : isCorrect === "partial" ? "hard" : "again")}
                       className="w-full py-2.5 rounded-lg text-white text-sm font-medium bg-green-700 hover:bg-green-800 transition-colors"
                     >
                       Next
