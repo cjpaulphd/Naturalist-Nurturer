@@ -10,6 +10,7 @@ import {
   Rating,
 } from "@/lib/types";
 import { loadSpeciesData, getSpeciesById } from "@/lib/species";
+import { getCachedLocationSpecies } from "@/lib/inat";
 import {
   getNewCards,
   getDueCards,
@@ -56,7 +57,13 @@ function StudyContent() {
   });
 
   useEffect(() => {
-    loadSpeciesData().then((data) => {
+    // Prefer location-based species if available
+    const loadData = async () => {
+      const cached = getCachedLocationSpecies();
+      return cached && cached.length > 0 ? cached : await loadSpeciesData();
+    };
+
+    loadData().then((data) => {
       setAllSpecies(data);
 
       let ids: number[];
