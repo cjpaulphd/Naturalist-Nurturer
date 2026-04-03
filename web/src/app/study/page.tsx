@@ -5,14 +5,13 @@ import { useSearchParams, useRouter } from "next/navigation";
 import {
   Species,
   Category,
-  Season,
   SessionType,
   StudyMode,
   QuizMode,
   NameDisplay,
   Rating,
 } from "@/lib/types";
-import { loadSpeciesData, getSpeciesById, filterBySeason } from "@/lib/species";
+import { loadSpeciesData, getSpeciesById } from "@/lib/species";
 import { getCachedLocationSpecies } from "@/lib/inat";
 import {
   getNewCards,
@@ -75,7 +74,6 @@ function StudyContent() {
   const studyMode = (searchParams.get("mode") || "mixed") as StudyMode;
   const quizMode = (searchParams.get("quizMode") || "flashcard") as QuizMode;
   const nameDisplay = (searchParams.get("nameDisplay") || "both") as NameDisplay;
-  const seasonParam = searchParams.get("season") as Season | null;
   const categoryParam = searchParams.get("categories");
   const categories: Category[] = categoryParam
     ? (categoryParam.split(",") as Category[])
@@ -113,22 +111,21 @@ function StudyContent() {
     };
 
     loadData().then((data) => {
-      const filtered = filterBySeason(data, seasonParam);
       setAllSpecies(data);
 
       let ids: number[];
       switch (sessionType) {
         case "learn":
-          ids = getNewCards(filtered, categories, LEARN_COUNT);
+          ids = getNewCards(data, categories, LEARN_COUNT);
           break;
         case "review":
-          ids = getDueCards(filtered, categories);
+          ids = getDueCards(data, categories);
           break;
         case "quiz":
-          ids = getQuizCards(filtered, categories, QUIZ_COUNT);
+          ids = getQuizCards(data, categories, QUIZ_COUNT);
           break;
         default:
-          ids = getNewCards(filtered, categories, LEARN_COUNT);
+          ids = getNewCards(data, categories, LEARN_COUNT);
       }
 
       setCardIds(ids);
@@ -146,7 +143,8 @@ function StudyContent() {
     (species: Species[], speciesId: number): StudyMode => {
       const sp = getSpeciesById(species, speciesId);
       const modes: StudyMode[] = ["photo", "name"];
-      if (sp?.sounds && sp.sounds.length > 0) {
+      // Sound mode only for birds with sounds
+      if (sp?.category === "bird" && sp?.sounds && sp.sounds.length > 0) {
         modes.push("sound");
       }
       return modes[Math.floor(Math.random() * modes.length)];
@@ -263,11 +261,6 @@ function StudyContent() {
           {sessionType === "review"
             ? "Great job! Come back later for more reviews."
             : "You've learned all available cards in this category."}
-          {seasonParam && (
-            <span className="block mt-1">
-              Try a different season or clear the season filter.
-            </span>
-          )}
         </p>
         <button
           onClick={() => router.push("/")}
@@ -394,11 +387,6 @@ function StudyContent() {
               ? "Dropdown"
               : "Free Response"}
           </span>
-          {seasonParam && (
-            <span className="px-2 py-0.5 bg-amber-100 text-amber-700 rounded text-xs font-medium capitalize">
-              {seasonParam}
-            </span>
-          )}
           {isHardMode && sessionStats.correct + sessionStats.incorrect > 0 && (
             <span className="text-xs text-stone-400">
               {sessionStats.correct}/{sessionStats.correct + sessionStats.incorrect} correct
@@ -423,11 +411,13 @@ function StudyContent() {
                   />
                   <div className="p-4 text-center">
                     <p className="text-lg font-semibold text-stone-700">
-                      What species is this?
+                      Who is this?
                     </p>
-                    <p className="text-sm text-stone-400 mt-1">
-                      {isHardMode ? "Choose your answer below" : "Tap to reveal the answer"}
-                    </p>
+                    {isHardMode && (
+                      <p className="text-sm text-stone-400 mt-1">
+                        Choose your answer below
+                      </p>
+                    )}
                   </div>
                 </div>
               )}
@@ -455,7 +445,7 @@ function StudyContent() {
                 <div className="p-6 min-h-[300px] flex flex-col items-center justify-center text-center">
                   <p className="text-4xl mb-4">🔊</p>
                   <p className="text-lg font-semibold text-stone-700 mb-4">
-                    What bird is this?
+                    Who is this?
                   </p>
                   {currentSpecies.sounds.length > 0 ? (
                     <SoundPlayer
@@ -467,14 +457,17 @@ function StudyContent() {
                       No sound available for this species
                     </p>
                   )}
-                  <p className="text-sm text-stone-400 mt-4">
-                    {isHardMode ? "Choose your answer below" : "Listen and tap to reveal"}
-                  </p>
+                  {isHardMode && (
+                    <p className="text-sm text-stone-400 mt-4">
+                      Choose your answer below
+                    </p>
+                  )}
                 </div>
               )}
 
               {/* Quiz answer area */}
-              {isHardMode && activeMode !== "name" ? (
+              {/* Quiz answer area for hard modes (not name mode) */}
+              {isHardMode && activeMode !== "name" && (
                 <div className="p-4 border-t border-stone-100 space-y-3">
                   {/* Multiple Choice */}
                   {quizMode === "multiple-choice" && (
@@ -558,16 +551,10 @@ function StudyContent() {
                     Submit Answer
                   </button>
                 </div>
-              ) : !isHardMode ? (
-                <button
-                  onClick={handleFlip}
-                  className="w-full py-3 bg-green-700 text-white font-medium hover:bg-green-800 transition-colors"
-                >
-                  Show Answer
-                </button>
-              ) : null}
+              )}
 
-              {activeMode === "name" && !isHardMode && (
+              {/* Single Show Answer button for flashcard mode */}
+              {!isHardMode && (
                 <button
                   onClick={handleFlip}
                   className="w-full py-3 bg-green-700 text-white font-medium hover:bg-green-800 transition-colors"
