@@ -2,7 +2,7 @@
 
 **Know Your Neighbors. Learn the Species Where You Are.**
 
-A mobile-first web app for learning species identification through flashcards, spaced repetition, and interactive quizzes. Built for naturalists at Green River Preserve and beyond.
+A mobile-first web app for learning species identification through flashcards, spaced repetition, and interactive quizzes. Built for naturalists at <a href="https://www.greenriverpreserve.org">Green River Preserve</a> and beyond.
 
 ## Features
 
