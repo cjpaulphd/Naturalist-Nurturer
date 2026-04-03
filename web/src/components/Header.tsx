@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 const NAV_ITEMS = [
+  { href: "/", label: "Learn" },
   { href: "/browse", label: "Browse" },
   { href: "/progress", label: "Progress" },
 ];
