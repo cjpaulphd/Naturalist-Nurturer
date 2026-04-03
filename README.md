@@ -62,7 +62,8 @@ Each species includes:
 - Active seasons
 - Observation count and local prevalence rank
 - Key facts, habitat, and identification tips
-- Photos (iNaturalist CC-BY-NC) and sounds (Xeno-canto CC-BY-NC 4.0)
+- Photos from [iNaturalist](https://www.inaturalist.org) (CC-BY-NC)
+- Bird sounds from [Xeno-canto](https://xeno-canto.org) (CC-BY-NC 4.0)
 
 ## Tech Stack
 
@@ -71,9 +72,9 @@ Each species includes:
 - **Tailwind CSS 4** for styling
 - **localStorage** for progress persistence (no account needed)
 - **PWA** with service worker for offline use
-- **iNaturalist API** for species data
-- **OpenStreetMap Nominatim** for geocoding
-- **Xeno-canto API** for bird sounds
+- **[iNaturalist API](https://www.inaturalist.org)** for species data
+- **[OpenStreetMap Nominatim](https://nominatim.openstreetmap.org)** for geocoding
+- **[Xeno-canto API](https://xeno-canto.org)** for bird sounds
 
 ## Getting Started
 
@@ -120,6 +121,16 @@ web/
 └── scripts/           # Python data pipeline
 ```
 
+## Data Attribution
+
+This app is built on the following open source data and APIs:
+
+- **[iNaturalist](https://www.inaturalist.org)** — Species observations, taxonomy, and photos (CC-BY-NC). iNaturalist is a joint initiative of the California Academy of Sciences and the National Geographic Society.
+- **[Xeno-canto](https://xeno-canto.org)** — Bird sound recordings (CC-BY-NC 4.0). Xeno-canto is a citizen science project for sharing bird sounds from around the world.
+- **[OpenStreetMap Nominatim](https://nominatim.openstreetmap.org)** — Geocoding and location search (ODbL).
+
 ## License
+
+MIT License — see [LICENSE](LICENSE) for details.
 
 Built by [cjpaulphd](https://github.com/cjpaulphd)
