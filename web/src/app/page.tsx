@@ -86,6 +86,17 @@ export default function HomePage() {
         <p className="text-sm text-stone-500 mt-1">
           Know Your Neighbors. Learn the Species Where You Are.
         </p>
+        <p className="text-xs text-stone-400 mt-1 italic">
+          built on the open source{" "}
+          <a
+            href="https://www.inaturalist.org"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-green-700 transition-colors"
+          >
+            iNaturalist API
+          </a>
+        </p>
       </div>
 
       {/* Location Picker */}
@@ -257,23 +268,84 @@ export default function HomePage() {
       ) : null}
 
       {/* Footer */}
-      <footer className="text-center pt-4 pb-2 border-t border-stone-200 space-y-1">
-        <a
-          href="https://www.greenriverpreserve.org"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-green-700 hover:text-green-900 transition-colors block"
+      <footer className="text-center pt-4 pb-2 border-t border-stone-200 space-y-2">
+        {/* Share Button */}
+        <button
+          onClick={() => {
+            if (navigator.share) {
+              navigator.share({
+                title: "Naturalist Nurturer",
+                text: "Learn the species where you are!",
+                url: window.location.href,
+              });
+            } else {
+              navigator.clipboard.writeText(window.location.href);
+              alert("Link copied to clipboard!");
+            }
+          }}
+          className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-stone-100 hover:bg-stone-200 rounded-full text-xs text-stone-600 transition-colors"
         >
-          For Green River Preserve
-        </a>
-        <a
-          href="https://github.com/cjpaulphd/Naturalist-Nuturer"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-stone-400 hover:text-green-700 transition-colors block"
-        >
-          NaturalistNurturer by cjpaulphd
-        </a>
+          💚 Share This App
+        </button>
+
+        {/* App attribution */}
+        <p className="text-xs text-stone-400">
+          <a
+            href="https://github.com/cjpaulphd/Naturalist-Nuturer"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-green-700 transition-colors"
+          >
+            NaturalistNurturer
+          </a>
+          {" by "}
+          <a
+            href="https://github.com/cjpaulphd"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-green-700 transition-colors"
+          >
+            cjpaulphd
+          </a>
+        </p>
+
+        {/* Data attribution */}
+        <p className="text-xs text-stone-400">
+          Data:{" "}
+          <a href="https://www.inaturalist.org" target="_blank" rel="noopener noreferrer" className="hover:text-green-700 transition-colors">iNaturalist</a>
+          {" · "}
+          <a href="https://xeno-canto.org" target="_blank" rel="noopener noreferrer" className="hover:text-green-700 transition-colors">Xeno-canto</a>
+        </p>
+
+        {/* License / Open Source / Feedback */}
+        <p className="text-xs text-stone-400">
+          <a
+            href="https://github.com/cjpaulphd/Naturalist-Nuturer/blob/main/LICENSE"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-green-700 transition-colors"
+          >
+            MIT License
+          </a>
+          {" · "}
+          <a
+            href="https://github.com/cjpaulphd/Naturalist-Nuturer"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-green-700 transition-colors"
+          >
+            Open Source
+          </a>
+          {" · "}
+          <a
+            href="https://github.com/cjpaulphd/Naturalist-Nuturer/issues"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-green-700 transition-colors"
+          >
+            Feedback
+          </a>
+        </p>
       </footer>
     </div>
   );
