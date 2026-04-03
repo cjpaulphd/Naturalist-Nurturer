@@ -15,7 +15,7 @@ export default function HomePage() {
   const [species, setSpecies] = useState<Species[]>([]);
   const [loading, setLoading] = useState(true);
   const [locationLoading, setLocationLoading] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<Category[]>(["tree"]);
   const [quizMode, setQuizMode] = useState<QuizMode>("flashcard");
   const [studyMode, setStudyMode] = useState<StudyMode>("photo");
   const [nameDisplay, setNameDisplay] = useState<NameDisplay>("both");
@@ -88,7 +88,7 @@ export default function HomePage() {
           Know Your Neighbors. Learn the Species Where You Are.
         </p>
         <p className="text-xs text-stone-400 mt-1 italic">
-          built on the open source{" "}
+          Built on the open source{" "}
           <a
             href="https://www.inaturalist.org"
             target="_blank"
@@ -319,6 +319,17 @@ export default function HomePage() {
             className="hover:text-green-700 transition-colors"
           >
             cjpaulphd
+          </a>
+        </p>
+        <p className="text-xs text-stone-400">
+          For{" "}
+          <a
+            href="https://www.greenriverpreserve.org"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-green-700 transition-colors"
+          >
+            Green River Preserve
           </a>
         </p>
 
