@@ -241,8 +241,8 @@ async function fetchSpeciesCounts(
  */
 async function fetchTaxonDetails(
   taxonIds: number[]
-): Promise<Map<number, { order: string; family: string; genus: string; native: boolean }>> {
-  const result = new Map<number, { order: string; family: string; genus: string; native: boolean }>();
+): Promise<Map<number, { order: string; family: string; genus: string; native: boolean; wikipediaSummary: string }>> {
+  const result = new Map<number, { order: string; family: string; genus: string; native: boolean; wikipediaSummary: string }>();
   if (taxonIds.length === 0) return result;
 
   // Batch in groups of 30 (API limit)
@@ -275,7 +275,8 @@ async function fetchTaxonDetails(
           genus = taxon.name.split(" ")[0] || "";
         }
 
-        result.set(taxon.id, { order, family, genus, native });
+        const wikipediaSummary = (taxon.wikipedia_summary as string) || "";
+        result.set(taxon.id, { order, family, genus, native, wikipediaSummary });
       }
     } catch {
       // Continue with what we have
@@ -435,7 +436,7 @@ function parseXenoCantoDuration(length: string): number | null {
 function convertToSpecies(
   results: { count: number; taxon: Record<string, unknown> }[],
   iconicTaxa: string,
-  taxonomyMap: Map<number, { order: string; family: string; genus: string; native: boolean }>,
+  taxonomyMap: Map<number, { order: string; family: string; genus: string; native: boolean; wikipediaSummary: string }>,
   seasonMap: Map<number, Season[]>,
   soundMap: Map<number, SpeciesSound[]> = new Map()
 ): Species[] {
@@ -473,8 +474,10 @@ function convertToSpecies(
       : [];
 
     // Extract key facts from Wikipedia summary if available
+    // Prefer the summary from the /taxa endpoint (via taxonomyMap) as the species_counts
+    // endpoint often omits wikipedia_summary
     const keyFacts: string[] = [];
-    const summary = taxon.wikipedia_summary as string | undefined;
+    const summary = taxonomy?.wikipediaSummary || (taxon.wikipedia_summary as string | undefined);
     if (summary) {
       const clean = summary.replace(/<[^>]+>/g, "").trim();
       const sentences = clean.split(/(?<=[.!?])\s+/);
