@@ -1,15 +1,17 @@
 "use client";
 
-import { useState, useEffect, useCallback, Suspense } from "react";
+import { useState, useEffect, useCallback, useMemo, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   Species,
   Category,
+  Season,
   SessionType,
   StudyMode,
+  QuizMode,
   Rating,
 } from "@/lib/types";
-import { loadSpeciesData, getSpeciesById } from "@/lib/species";
+import { loadSpeciesData, getSpeciesById, filterBySeason } from "@/lib/species";
 import { getCachedLocationSpecies } from "@/lib/inat";
 import {
   getNewCards,
@@ -19,6 +21,7 @@ import {
 } from "@/lib/srs";
 import PhotoGallery from "@/components/PhotoGallery";
 import SoundPlayer from "@/components/SoundPlayer";
+import TaxonomyChart from "@/components/TaxonomyChart";
 
 const LEARN_COUNT = 10;
 const QUIZ_COUNT = 15;
@@ -30,12 +33,31 @@ const RATING_BUTTONS: { rating: Rating; label: string; color: string }[] = [
   { rating: "easy", label: "Easy", color: "bg-blue-600 hover:bg-blue-700" },
 ];
 
+// Generate multiple-choice options: correct answer + 3 distractors
+function generateChoices(
+  correctSpecies: Species,
+  allSpecies: Species[],
+  count: number = 4
+): Species[] {
+  const others = allSpecies.filter((s) => s.id !== correctSpecies.id);
+  // Prefer same-category distractors for harder questions
+  const sameCategory = others.filter((s) => s.category === correctSpecies.category);
+  const pool = sameCategory.length >= count - 1 ? sameCategory : others;
+
+  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  const distractors = shuffled.slice(0, count - 1);
+  const choices = [correctSpecies, ...distractors].sort(() => Math.random() - 0.5);
+  return choices;
+}
+
 function StudyContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
   const sessionType = (searchParams.get("type") || "learn") as SessionType;
   const studyMode = (searchParams.get("mode") || "mixed") as StudyMode;
+  const quizMode = (searchParams.get("quizMode") || "flashcard") as QuizMode;
+  const seasonParam = searchParams.get("season") as Season | null;
   const categoryParam = searchParams.get("categories");
   const categories: Category[] = categoryParam
     ? (categoryParam.split(",") as Category[])
@@ -48,37 +70,48 @@ function StudyContent() {
   const [loading, setLoading] = useState(true);
   const [sessionComplete, setSessionComplete] = useState(false);
   const [currentMode, setCurrentMode] = useState<StudyMode>(studyMode);
+
+  // Quiz mode state
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [answerSubmitted, setAnswerSubmitted] = useState(false);
+  const [freeResponseInput, setFreeResponseInput] = useState("");
+  const [dropdownValue, setDropdownValue] = useState("");
+  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+
   const [sessionStats, setSessionStats] = useState({
     total: 0,
     again: 0,
     hard: 0,
     good: 0,
     easy: 0,
+    correct: 0,
+    incorrect: 0,
   });
 
   useEffect(() => {
-    // Prefer location-based species if available
     const loadData = async () => {
       const cached = getCachedLocationSpecies();
       return cached && cached.length > 0 ? cached : await loadSpeciesData();
     };
 
     loadData().then((data) => {
-      setAllSpecies(data);
+      // Apply season filter
+      const filtered = filterBySeason(data, seasonParam);
+      setAllSpecies(data); // Keep all species for choices/dropdown
 
       let ids: number[];
       switch (sessionType) {
         case "learn":
-          ids = getNewCards(data, categories, LEARN_COUNT);
+          ids = getNewCards(filtered, categories, LEARN_COUNT);
           break;
         case "review":
-          ids = getDueCards(data, categories);
+          ids = getDueCards(filtered, categories);
           break;
         case "quiz":
-          ids = getQuizCards(data, categories, QUIZ_COUNT);
+          ids = getQuizCards(filtered, categories, QUIZ_COUNT);
           break;
         default:
-          ids = getNewCards(data, categories, LEARN_COUNT);
+          ids = getNewCards(filtered, categories, LEARN_COUNT);
       }
 
       setCardIds(ids);
@@ -109,7 +142,52 @@ function StudyContent() {
       ? getSpeciesById(allSpecies, cardIds[currentIndex])
       : undefined;
 
+  // Generate choices for current card (memoized)
+  const choices = useMemo(() => {
+    if (!currentSpecies || quizMode === "flashcard") return [];
+    return generateChoices(currentSpecies, allSpecies);
+  }, [currentSpecies, allSpecies, quizMode]);
+
+  // Sorted species list for dropdown
+  const dropdownOptions = useMemo(() => {
+    return [...allSpecies].sort((a, b) => a.commonName.localeCompare(b.commonName));
+  }, [allSpecies]);
+
   const handleFlip = () => setFlipped(true);
+
+  const resetQuizState = () => {
+    setSelectedAnswer(null);
+    setAnswerSubmitted(false);
+    setFreeResponseInput("");
+    setDropdownValue("");
+    setIsCorrect(null);
+  };
+
+  const handleSubmitAnswer = () => {
+    if (!currentSpecies) return;
+
+    let correct = false;
+    if (quizMode === "multiple-choice") {
+      correct = selectedAnswer === currentSpecies.id;
+    } else if (quizMode === "dropdown") {
+      correct = dropdownValue === String(currentSpecies.id);
+    } else if (quizMode === "free-response") {
+      const input = freeResponseInput.trim().toLowerCase();
+      correct =
+        input === currentSpecies.commonName.toLowerCase() ||
+        input === currentSpecies.scientificName.toLowerCase();
+    }
+
+    setIsCorrect(correct);
+    setAnswerSubmitted(true);
+    setFlipped(true);
+
+    setSessionStats((s) => ({
+      ...s,
+      correct: correct ? s.correct + 1 : s.correct,
+      incorrect: correct ? s.incorrect : s.incorrect + 1,
+    }));
+  };
 
   const handleRate = (rating: Rating) => {
     if (!currentSpecies) return;
@@ -123,6 +201,7 @@ function StudyContent() {
     } else {
       setCurrentIndex(nextIndex);
       setFlipped(false);
+      resetQuizState();
       if (studyMode === "mixed") {
         setCurrentMode(pickRandomMode(allSpecies, cardIds[nextIndex]));
       }
@@ -136,6 +215,7 @@ function StudyContent() {
     } else {
       setCurrentIndex(nextIndex);
       setFlipped(false);
+      resetQuizState();
       if (studyMode === "mixed") {
         setCurrentMode(pickRandomMode(allSpecies, cardIds[nextIndex]));
       }
@@ -163,6 +243,11 @@ function StudyContent() {
           {sessionType === "review"
             ? "Great job! Come back later for more reviews."
             : "You've learned all available cards in this category."}
+          {seasonParam && (
+            <span className="block mt-1">
+              Try a different season or clear the season filter.
+            </span>
+          )}
         </p>
         <button
           onClick={() => router.push("/")}
@@ -175,6 +260,7 @@ function StudyContent() {
   }
 
   if (sessionComplete) {
+    const showQuizStats = quizMode !== "flashcard";
     return (
       <div className="max-w-lg mx-auto px-4 py-12 text-center">
         <p className="text-4xl mb-4">🎉</p>
@@ -188,22 +274,48 @@ function StudyContent() {
               <span className="text-stone-500">Cards studied:</span>
               <span className="ml-2 font-semibold">{sessionStats.total}</span>
             </div>
-            <div>
-              <span className="text-green-600">Easy:</span>
-              <span className="ml-2 font-semibold">{sessionStats.easy}</span>
-            </div>
-            <div>
-              <span className="text-green-600">Good:</span>
-              <span className="ml-2 font-semibold">{sessionStats.good}</span>
-            </div>
-            <div>
-              <span className="text-orange-500">Hard:</span>
-              <span className="ml-2 font-semibold">{sessionStats.hard}</span>
-            </div>
-            <div>
-              <span className="text-red-500">Again:</span>
-              <span className="ml-2 font-semibold">{sessionStats.again}</span>
-            </div>
+            {showQuizStats ? (
+              <>
+                <div>
+                  <span className="text-green-600">Correct:</span>
+                  <span className="ml-2 font-semibold">{sessionStats.correct}</span>
+                </div>
+                <div>
+                  <span className="text-red-500">Incorrect:</span>
+                  <span className="ml-2 font-semibold">{sessionStats.incorrect}</span>
+                </div>
+                <div>
+                  <span className="text-stone-500">Score:</span>
+                  <span className="ml-2 font-semibold">
+                    {sessionStats.total > 0
+                      ? Math.round(
+                          (sessionStats.correct / sessionStats.total) * 100
+                        )
+                      : 0}
+                    %
+                  </span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <span className="text-green-600">Easy:</span>
+                  <span className="ml-2 font-semibold">{sessionStats.easy}</span>
+                </div>
+                <div>
+                  <span className="text-green-600">Good:</span>
+                  <span className="ml-2 font-semibold">{sessionStats.good}</span>
+                </div>
+                <div>
+                  <span className="text-orange-500">Hard:</span>
+                  <span className="ml-2 font-semibold">{sessionStats.hard}</span>
+                </div>
+                <div>
+                  <span className="text-red-500">Again:</span>
+                  <span className="ml-2 font-semibold">{sessionStats.again}</span>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
@@ -229,6 +341,7 @@ function StudyContent() {
 
   const activeMode = studyMode === "mixed" ? currentMode : studyMode;
   const progress = ((currentIndex + 1) / cardIds.length) * 100;
+  const isHardMode = quizMode !== "flashcard";
 
   return (
     <div className="max-w-lg mx-auto px-4 py-4">
@@ -251,6 +364,29 @@ function StudyContent() {
         </span>
       </div>
 
+      {/* Quiz mode badge */}
+      {isHardMode && (
+        <div className="flex items-center gap-2 mb-3">
+          <span className="px-2 py-0.5 bg-red-100 text-red-700 rounded text-xs font-medium">
+            {quizMode === "multiple-choice"
+              ? "Multiple Choice"
+              : quizMode === "dropdown"
+              ? "Dropdown"
+              : "Free Response"}
+          </span>
+          {seasonParam && (
+            <span className="px-2 py-0.5 bg-amber-100 text-amber-700 rounded text-xs font-medium capitalize">
+              {seasonParam}
+            </span>
+          )}
+          {isHardMode && sessionStats.correct + sessionStats.incorrect > 0 && (
+            <span className="text-xs text-stone-400 ml-auto">
+              {sessionStats.correct}/{sessionStats.correct + sessionStats.incorrect} correct
+            </span>
+          )}
+        </div>
+      )}
+
       {/* Flashcard */}
       <div className="card-flip">
         <div className={`card-flip-inner ${flipped ? "flipped" : ""}`}>
@@ -270,7 +406,7 @@ function StudyContent() {
                       What species is this?
                     </p>
                     <p className="text-sm text-stone-400 mt-1">
-                      Tap to reveal the answer
+                      {isHardMode ? "Choose your answer below" : "Tap to reveal the answer"}
                     </p>
                   </div>
                 </div>
@@ -310,24 +446,122 @@ function StudyContent() {
                     </p>
                   )}
                   <p className="text-sm text-stone-400 mt-4">
-                    Listen and tap to reveal
+                    {isHardMode ? "Choose your answer below" : "Listen and tap to reveal"}
                   </p>
                 </div>
               )}
 
-              {/* Tap to flip */}
-              <button
-                onClick={handleFlip}
-                className="w-full py-3 bg-green-700 text-white font-medium hover:bg-green-800 transition-colors"
-              >
-                Show Answer
-              </button>
+              {/* Quiz answer area */}
+              {isHardMode && activeMode !== "name" ? (
+                <div className="p-4 border-t border-stone-100 space-y-3">
+                  {/* Multiple Choice */}
+                  {quizMode === "multiple-choice" && (
+                    <div className="grid grid-cols-1 gap-2">
+                      {choices.map((choice) => (
+                        <button
+                          key={choice.id}
+                          onClick={() => setSelectedAnswer(choice.id)}
+                          className={`p-3 rounded-lg text-left text-sm transition-colors border ${
+                            selectedAnswer === choice.id
+                              ? "bg-green-50 border-green-400 text-green-800"
+                              : "bg-white border-stone-200 text-stone-700 hover:border-stone-400"
+                          }`}
+                        >
+                          {choice.commonName}
+                          <span className="text-xs text-stone-400 italic ml-2">
+                            {choice.scientificName}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Dropdown */}
+                  {quizMode === "dropdown" && (
+                    <select
+                      value={dropdownValue}
+                      onChange={(e) => setDropdownValue(e.target.value)}
+                      className="w-full p-3 rounded-lg border border-stone-300 bg-white text-stone-700 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
+                    >
+                      <option value="">Select a species...</option>
+                      {dropdownOptions.map((sp) => (
+                        <option key={sp.id} value={String(sp.id)}>
+                          {sp.commonName} ({sp.scientificName})
+                        </option>
+                      ))}
+                    </select>
+                  )}
+
+                  {/* Free Response */}
+                  {quizMode === "free-response" && (
+                    <div>
+                      <input
+                        type="text"
+                        value={freeResponseInput}
+                        onChange={(e) => setFreeResponseInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && freeResponseInput.trim()) {
+                            handleSubmitAnswer();
+                          }
+                        }}
+                        placeholder="Type common or scientific name..."
+                        className="w-full p-3 rounded-lg border border-stone-300 bg-white text-stone-700 text-sm placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-green-600"
+                        autoComplete="off"
+                        autoCapitalize="off"
+                      />
+                    </div>
+                  )}
+
+                  <button
+                    onClick={handleSubmitAnswer}
+                    disabled={
+                      (quizMode === "multiple-choice" && selectedAnswer === null) ||
+                      (quizMode === "dropdown" && !dropdownValue) ||
+                      (quizMode === "free-response" && !freeResponseInput.trim())
+                    }
+                    className="w-full py-3 bg-green-700 text-white font-medium hover:bg-green-800 transition-colors rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Submit Answer
+                  </button>
+                </div>
+              ) : !isHardMode ? (
+                /* Flashcard mode: show answer button */
+                <button
+                  onClick={handleFlip}
+                  className="w-full py-3 bg-green-700 text-white font-medium hover:bg-green-800 transition-colors"
+                >
+                  Show Answer
+                </button>
+              ) : null}
+
+              {/* Name mode with flashcard: show answer button */}
+              {activeMode === "name" && !isHardMode && (
+                <button
+                  onClick={handleFlip}
+                  className="w-full py-3 bg-green-700 text-white font-medium hover:bg-green-800 transition-colors"
+                >
+                  Show Answer
+                </button>
+              )}
             </div>
           </div>
 
           {/* Back */}
           <div className={`card-back ${!flipped ? "hidden" : ""}`}>
             <div className="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+              {/* Quiz result banner */}
+              {isHardMode && answerSubmitted && (
+                <div
+                  className={`px-4 py-3 text-center font-semibold text-sm ${
+                    isCorrect
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
+                >
+                  {isCorrect ? "Correct!" : "Incorrect"}
+                </div>
+              )}
+
               {/* Always show photo on back */}
               {currentSpecies.photos.length > 0 && activeMode !== "photo" && (
                 <PhotoGallery
@@ -363,7 +597,18 @@ function StudyContent() {
                   <span className="px-2 py-0.5 bg-stone-100 text-stone-600 rounded text-xs">
                     {currentSpecies.family}
                   </span>
+                  {currentSpecies.seasons && currentSpecies.seasons.length > 0 && (
+                    <span className="px-2 py-0.5 bg-amber-50 text-amber-700 rounded text-xs capitalize">
+                      {currentSpecies.seasons.join(", ")}
+                    </span>
+                  )}
                 </div>
+
+                {/* Taxonomy Chart */}
+                <TaxonomyChart
+                  species={currentSpecies}
+                  allSpecies={allSpecies}
+                />
 
                 {currentSpecies.keyFacts.length > 0 && (
                   <ul className="text-sm text-stone-600 space-y-1">
@@ -396,26 +641,41 @@ function StudyContent() {
 
               {/* Rating buttons */}
               <div className="p-3 border-t border-stone-100">
-                <p className="text-xs text-stone-500 text-center mb-2">
-                  How well did you know this?
-                </p>
-                <div className="grid grid-cols-4 gap-2">
-                  {RATING_BUTTONS.map((btn) => (
+                {isHardMode ? (
+                  /* Hard mode: auto-rate based on correctness, just show Next */
+                  <div>
                     <button
-                      key={btn.rating}
-                      onClick={() => handleRate(btn.rating)}
-                      className={`py-2.5 rounded-lg text-white text-sm font-medium ${btn.color} transition-colors`}
+                      onClick={() => handleRate(isCorrect ? "good" : "again")}
+                      className="w-full py-2.5 rounded-lg text-white text-sm font-medium bg-green-700 hover:bg-green-800 transition-colors"
                     >
-                      {btn.label}
+                      Next
                     </button>
-                  ))}
-                </div>
-                <button
-                  onClick={handleSkip}
-                  className="w-full mt-2 py-1.5 text-xs text-stone-400 hover:text-stone-600"
-                >
-                  Skip
-                </button>
+                  </div>
+                ) : (
+                  /* Flashcard mode: manual rating */
+                  <div>
+                    <p className="text-xs text-stone-500 text-center mb-2">
+                      How well did you know this?
+                    </p>
+                    <div className="grid grid-cols-4 gap-2">
+                      {RATING_BUTTONS.map((btn) => (
+                        <button
+                          key={btn.rating}
+                          onClick={() => handleRate(btn.rating)}
+                          className={`py-2.5 rounded-lg text-white text-sm font-medium ${btn.color} transition-colors`}
+                        >
+                          {btn.label}
+                        </button>
+                      ))}
+                    </div>
+                    <button
+                      onClick={handleSkip}
+                      className="w-full mt-2 py-1.5 text-xs text-stone-400 hover:text-stone-600"
+                    >
+                      Skip
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -268,15 +268,25 @@ function convertToSpecies(
       }
     }
 
+    // Extract order and genus from ancestors if available
+    const ancestors = (taxon.ancestors || []) as { rank?: string; name?: string }[];
+    const orderAncestor = ancestors.find((a) => a.rank === "order");
+    const genusAncestor = ancestors.find((a) => a.rank === "genus");
+    const scientificName = taxon.name || "";
+    const genus = genusAncestor?.name || scientificName.split(" ")[0] || "";
+
     return {
       id: taxon.id || index,
       category,
-      commonName: taxon.preferred_common_name || taxon.name || "Unknown",
-      scientificName: taxon.name || "",
+      commonName: taxon.preferred_common_name || scientificName || "Unknown",
+      scientificName,
+      order: orderAncestor?.name || "",
       family: extractFamily(taxon),
+      genus,
       observationCount: item.count,
       prevalenceRank: 0, // assigned after sorting
       nativeStatus: "unknown",
+      seasons: ["spring", "summer", "fall", "winter"], // default to all seasons for live data
       photos,
       sounds: [],
       keyFacts,

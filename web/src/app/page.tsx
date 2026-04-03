@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Species, Category, SessionType, StudyMode } from "@/lib/types";
-import { loadSpeciesData } from "@/lib/species";
+import { Species, Category, Season, SessionType, StudyMode, QuizMode } from "@/lib/types";
+import { loadSpeciesData, filterBySeason } from "@/lib/species";
 import { getCachedLocationSpecies } from "@/lib/inat";
 import { getDueCards, getNewCards } from "@/lib/srs";
 import CategorySelector from "@/components/CategorySelector";
+import SeasonChooser from "@/components/SeasonChooser";
 import ProgressDashboard from "@/components/ProgressDashboard";
 import LocationPicker from "@/components/LocationPicker";
 
@@ -16,6 +17,8 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [locationLoading, setLocationLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [season, setSeason] = useState<Season | null>(null);
+  const [quizMode, setQuizMode] = useState<QuizMode>("flashcard");
   const [locationName, setLocationName] = useState<string | null>(null);
 
   useEffect(() => {
@@ -37,9 +40,10 @@ export default function HomePage() {
     setLocationName(name);
   };
 
-  const dueCount = species.length > 0 ? getDueCards(species, categories).length : 0;
+  const seasonFiltered = filterBySeason(species, season);
+  const dueCount = seasonFiltered.length > 0 ? getDueCards(seasonFiltered, categories).length : 0;
   const newAvailable =
-    species.length > 0 ? getNewCards(species, categories, 1).length > 0 : false;
+    seasonFiltered.length > 0 ? getNewCards(seasonFiltered, categories, 1).length > 0 : false;
 
   const startSession = (type: SessionType, mode: StudyMode = "mixed") => {
     const params = new URLSearchParams();
@@ -47,6 +51,12 @@ export default function HomePage() {
     params.set("mode", mode);
     if (categories.length > 0) {
       params.set("categories", categories.join(","));
+    }
+    if (season) {
+      params.set("season", season);
+    }
+    if (quizMode !== "flashcard") {
+      params.set("quizMode", quizMode);
     }
     router.push(`/study?${params.toString()}`);
   };
@@ -115,6 +125,45 @@ export default function HomePage() {
               Categories
             </h3>
             <CategorySelector selected={categories} onChange={setCategories} />
+          </div>
+
+          {/* Season Selection */}
+          <SeasonChooser selected={season} onChange={setSeason} />
+          {season && (
+            <p className="text-xs text-stone-500 -mt-2">
+              {seasonFiltered.length} species active in{" "}
+              <span className="font-medium capitalize">{season}</span>
+            </p>
+          )}
+
+          {/* Quiz Mode Selection */}
+          <div>
+            <h3 className="text-sm font-semibold text-stone-600 mb-2">
+              Quiz Difficulty
+            </h3>
+            <div className="grid grid-cols-2 gap-2">
+              {([
+                ["flashcard", "Flashcard", "Flip to reveal"],
+                ["multiple-choice", "Multiple Choice", "Pick from 4 options"],
+                ["dropdown", "Dropdown", "Select from all species"],
+                ["free-response", "Free Response", "Type your answer"],
+              ] as [QuizMode, string, string][]).map(([mode, label, desc]) => (
+                <button
+                  key={mode}
+                  onClick={() => setQuizMode(mode)}
+                  className={`p-3 rounded-lg text-left transition-colors border ${
+                    quizMode === mode
+                      ? "bg-green-50 border-green-400"
+                      : "bg-white border-stone-200 hover:border-green-300"
+                  }`}
+                >
+                  <div className={`text-sm font-medium ${quizMode === mode ? "text-green-800" : "text-stone-700"}`}>
+                    {label}
+                  </div>
+                  <div className="text-xs text-stone-500 mt-0.5">{desc}</div>
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Session Options */}

@@ -67,6 +67,7 @@ export default function BrowsePage() {
       <div className="max-w-lg mx-auto px-4 py-4">
         <SpeciesDetail
           species={selectedSpecies}
+          allSpecies={allSpecies}
           onClose={() => setSelectedSpecies(null)}
         />
       </div>

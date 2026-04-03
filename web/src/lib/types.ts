@@ -15,15 +15,22 @@ export interface SpeciesSound {
 
 export type Category = "tree" | "plant" | "bird";
 
+export type Season = "spring" | "summer" | "fall" | "winter";
+
+export type QuizMode = "flashcard" | "multiple-choice" | "dropdown" | "free-response";
+
 export interface Species {
   id: number;
   category: Category;
   commonName: string;
   scientificName: string;
+  order: string;
   family: string;
+  genus: string;
   observationCount: number;
   prevalenceRank: number;
   nativeStatus: string;
+  seasons: Season[];
   photos: SpeciesPhoto[];
   sounds: SpeciesSound[];
   keyFacts: string[];

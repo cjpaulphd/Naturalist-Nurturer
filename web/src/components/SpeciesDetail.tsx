@@ -3,9 +3,11 @@
 import { Species } from "@/lib/types";
 import PhotoGallery from "./PhotoGallery";
 import SoundPlayer from "./SoundPlayer";
+import TaxonomyChart from "./TaxonomyChart";
 
 interface SpeciesDetailProps {
   species: Species;
+  allSpecies?: Species[];
   onClose?: () => void;
 }
 
@@ -15,7 +17,7 @@ const CATEGORY_LABELS = {
   bird: "Bird",
 };
 
-export default function SpeciesDetail({ species, onClose }: SpeciesDetailProps) {
+export default function SpeciesDetail({ species, allSpecies = [], onClose }: SpeciesDetailProps) {
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden max-w-lg mx-auto">
       <PhotoGallery speciesId={species.id} photos={species.photos} />
@@ -57,6 +59,26 @@ export default function SpeciesDetail({ species, onClose }: SpeciesDetailProps) 
             #{species.prevalenceRank} in area
           </span>
         </div>
+
+        {/* Taxonomy */}
+        {species.order && (
+          <TaxonomyChart species={species} allSpecies={allSpecies} />
+        )}
+
+        {/* Seasons */}
+        {species.seasons && species.seasons.length > 0 && (
+          <div className="flex gap-1 flex-wrap">
+            <span className="text-xs text-stone-500">Active:</span>
+            {species.seasons.map((season) => (
+              <span
+                key={season}
+                className="px-2 py-0.5 bg-amber-50 text-amber-700 rounded text-xs capitalize"
+              >
+                {season}
+              </span>
+            ))}
+          </div>
+        )}
 
         {species.keyFacts.length > 0 && (
           <div>

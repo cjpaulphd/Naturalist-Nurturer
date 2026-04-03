@@ -1,4 +1,4 @@
-import { Species, Category } from "./types";
+import { Species, Category, Season } from "./types";
 
 let speciesCache: Species[] | null = null;
 
@@ -56,7 +56,9 @@ export function searchSpecies(species: Species[], query: string): Species[] {
     (s) =>
       s.commonName.toLowerCase().includes(q) ||
       s.scientificName.toLowerCase().includes(q) ||
-      s.family.toLowerCase().includes(q)
+      s.family.toLowerCase().includes(q) ||
+      (s.order && s.order.toLowerCase().includes(q)) ||
+      (s.genus && s.genus.toLowerCase().includes(q))
   );
 }
 
@@ -65,6 +67,24 @@ export function getSpeciesById(
   id: number
 ): Species | undefined {
   return species.find((s) => s.id === id);
+}
+
+export function getCurrentSeason(): Season {
+  const month = new Date().getMonth(); // 0-11
+  if (month >= 2 && month <= 4) return "spring";
+  if (month >= 5 && month <= 7) return "summer";
+  if (month >= 8 && month <= 10) return "fall";
+  return "winter";
+}
+
+export function getRandomSeason(): Season {
+  const seasons: Season[] = ["spring", "summer", "fall", "winter"];
+  return seasons[Math.floor(Math.random() * seasons.length)];
+}
+
+export function filterBySeason(species: Species[], season: Season | null): Species[] {
+  if (!season) return species;
+  return species.filter((s) => s.seasons && s.seasons.includes(season));
 }
 
 export function getCategoryCount(
