@@ -304,7 +304,7 @@ export default function HomePage() {
         {/* App attribution */}
         <p className="text-xs text-stone-400">
           <a
-            href="https://github.com/cjpaulphd/Naturalist-Nuturer"
+            href="https://github.com/cjpaulphd/Naturalist-Nurturer"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-green-700 transition-colors"
@@ -333,7 +333,7 @@ export default function HomePage() {
         {/* License / Open Source / Feedback */}
         <p className="text-xs text-stone-400">
           <a
-            href="https://github.com/cjpaulphd/Naturalist-Nuturer/blob/main/LICENSE"
+            href="https://github.com/cjpaulphd/Naturalist-Nurturer/blob/main/LICENSE"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-green-700 transition-colors"
@@ -342,7 +342,7 @@ export default function HomePage() {
           </a>
           {" · "}
           <a
-            href="https://github.com/cjpaulphd/Naturalist-Nuturer"
+            href="https://github.com/cjpaulphd/Naturalist-Nurturer"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-green-700 transition-colors"
@@ -351,7 +351,7 @@ export default function HomePage() {
           </a>
           {" · "}
           <a
-            href="https://github.com/cjpaulphd/Naturalist-Nuturer/issues"
+            href="https://github.com/cjpaulphd/Naturalist-Nurturer/issues"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-green-700 transition-colors"
