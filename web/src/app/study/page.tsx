@@ -16,6 +16,7 @@ import { getCachedLocationSpecies, fetchBirdSounds } from "@/lib/inat";
 import {
   getNewCards,
   getDueCards,
+  getAllLearnedCards,
   getQuizCards,
   rateCard,
 } from "@/lib/srs";
@@ -145,6 +146,9 @@ function StudyContent() {
           break;
         case "review":
           ids = getDueCards(data, categories);
+          break;
+        case "review-all":
+          ids = getAllLearnedCards(data, categories);
           break;
         case "quiz":
           ids = getQuizCards(data, categories, QUIZ_COUNT);
@@ -295,12 +299,12 @@ function StudyContent() {
       <div className="max-w-lg mx-auto px-4 py-12 text-center">
         <p className="text-4xl mb-4">✅</p>
         <h2 className="text-xl font-bold text-stone-800 mb-2">
-          {sessionType === "review"
+          {sessionType === "review" || sessionType === "review-all"
             ? "No cards due for review!"
             : "No new cards available"}
         </h2>
         <p className="text-stone-500 text-sm mb-4">
-          {sessionType === "review"
+          {sessionType === "review" || sessionType === "review-all"
             ? "Great job! Come back later for more reviews."
             : "You've learned all available cards in this category."}
         </p>

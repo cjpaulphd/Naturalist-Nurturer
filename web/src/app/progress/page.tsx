@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Species, Category } from "@/lib/types";
 import { loadSpeciesData } from "@/lib/species";
 import { getCachedLocationSpecies } from "@/lib/inat";
-import { getDueCards } from "@/lib/srs";
+import { getDueCards, getAllLearnedCards } from "@/lib/srs";
 import ProgressDashboard from "@/components/ProgressDashboard";
 import CategorySelector from "@/components/CategorySelector";
 
@@ -29,10 +29,11 @@ export default function ProgressPage() {
   }, []);
 
   const dueCount = species.length > 0 ? getDueCards(species, categories).length : 0;
+  const learnedCount = species.length > 0 ? getAllLearnedCards(species, categories).length : 0;
 
   const startReview = () => {
     const params = new URLSearchParams();
-    params.set("type", "review");
+    params.set("type", dueCount > 0 ? "review" : "review-all");
     params.set("mode", "photo");
     if (categories.length > 0) {
       params.set("categories", categories.join(","));
@@ -55,9 +56,6 @@ export default function ProgressPage() {
     <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-stone-800">Progress</h2>
-        <p className="text-sm text-stone-500 mt-1">
-          Track your learning and review due cards
-        </p>
       </div>
 
       {species.length > 0 ? (
@@ -74,19 +72,20 @@ export default function ProgressPage() {
           <div className="text-center">
             <button
               onClick={startReview}
-              disabled={dueCount === 0}
+              disabled={dueCount === 0 && learnedCount === 0}
               className="px-6 py-3 bg-amber-600 text-white rounded-xl text-center hover:bg-amber-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed relative inline-block"
             >
               <span className="font-semibold">Review</span>
-              {dueCount > 0 && (
+              {dueCount > 0 ? (
                 <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white px-1.5 py-0.5 rounded-full text-[10px] font-bold">
                   {dueCount}
                 </span>
-              )}
+              ) : learnedCount > 0 ? (
+                <span className="absolute -top-1.5 -right-1.5 bg-amber-500 text-white px-1.5 py-0.5 rounded-full text-[10px] font-bold">
+                  {learnedCount}
+                </span>
+              ) : null}
             </button>
-            {dueCount === 0 && (
-              <p className="text-xs text-stone-400 mt-2">No cards due for review</p>
-            )}
           </div>
         </>
       ) : (

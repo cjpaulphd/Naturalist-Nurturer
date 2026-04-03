@@ -14,7 +14,7 @@ export default function QuizSettingsModal({
   onStart,
   onClose,
 }: QuizSettingsModalProps) {
-  const [quizMode, setQuizMode] = useState<QuizMode>("flashcard");
+  const [quizMode, setQuizMode] = useState<QuizMode>("multiple-choice");
   const [nameDisplay, setNameDisplay] = useState<NameDisplay>("both");
   const [studyMode, setStudyMode] = useState<StudyMode>("photo");
 

@@ -55,7 +55,7 @@ export type Rating = "again" | "hard" | "good" | "easy";
 
 export type StudyMode = "photo" | "name" | "sound" | "mixed";
 
-export type SessionType = "learn" | "review" | "quiz";
+export type SessionType = "learn" | "review" | "review-all" | "quiz";
 
 export interface StudySession {
   type: SessionType;

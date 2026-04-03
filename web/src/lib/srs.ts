@@ -124,6 +124,31 @@ export function getDueCards(
 }
 
 /**
+ * Get all species IDs that have been learned (regardless of review schedule).
+ */
+export function getAllLearnedCards(
+  allSpecies: Species[],
+  categories: Category[]
+): number[] {
+  const states = getAllCardStates();
+
+  return allSpecies
+    .filter((s) => {
+      if (categories.length > 0 && !categories.includes(s.category)) {
+        return false;
+      }
+      const state = states[String(s.id)];
+      return state && state.repetitions > 0;
+    })
+    .sort((a, b) => {
+      const stateA = states[String(a.id)]!;
+      const stateB = states[String(b.id)]!;
+      return stateA.nextReview - stateB.nextReview;
+    })
+    .map((s) => s.id);
+}
+
+/**
  * Get next unlearned species IDs in prevalence order.
  */
 export function getNewCards(

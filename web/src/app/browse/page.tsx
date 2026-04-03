@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Species, Category } from "@/lib/types";
 import { CATEGORY_ICONS } from "@/lib/categories";
 import {
@@ -19,6 +20,19 @@ import SpeciesDetail from "@/components/SpeciesDetail";
 type SortMode = "prevalence" | "alphabetical" | "family";
 
 export default function BrowsePage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="w-8 h-8 border-2 border-green-700 border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <BrowseContent />
+    </Suspense>
+  );
+}
+
+function BrowseContent() {
+  const searchParams = useSearchParams();
   const [allSpecies, setAllSpecies] = useState<Species[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,6 +40,11 @@ export default function BrowsePage() {
   const [sortMode, setSortMode] = useState<SortMode>("prevalence");
   const [selectedSpecies, setSelectedSpecies] = useState<Species | null>(null);
   const [locationName, setLocationName] = useState<string | null>(null);
+
+  // Reset selected species when nav header is clicked (searchParams change)
+  useEffect(() => {
+    setSelectedSpecies(null);
+  }, [searchParams]);
 
   useEffect(() => {
     const last = getLastLocation();
