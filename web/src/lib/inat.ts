@@ -2,7 +2,7 @@
  * iNaturalist API client for browser-side species lookup by location.
  */
 
-import { Species, Season, Category, SpeciesPhoto } from "./types";
+import { Species, Season, Category, SpeciesPhoto, SpeciesSound } from "./types";
 import { getStorage, setStorage } from "./storage";
 
 const INAT_API = "https://api.inaturalist.org/v1";
@@ -344,13 +344,70 @@ async function fetchSeasonalData(
 }
 
 /**
+ * Fetch bird sounds from Xeno-canto API.
+ * Returns a map of scientific name -> sounds array.
+ */
+async function fetchBirdSounds(
+  birdNames: { id: number; scientificName: string }[]
+): Promise<Map<number, SpeciesSound[]>> {
+  const result = new Map<number, SpeciesSound[]>();
+  const XENO_CANTO_API = "https://xeno-canto.org/api/2/recordings";
+
+  // Fetch in small batches to respect rate limits
+  for (const bird of birdNames.slice(0, 30)) {
+    try {
+      const res = await fetch(
+        `${XENO_CANTO_API}?query=${encodeURIComponent(bird.scientificName)}+q:A&page=1`,
+        { headers: { "User-Agent": "NaturalistNurturer/1.0" } }
+      );
+      if (!res.ok) continue;
+      const data = await res.json();
+      const recordings = data.recordings || [];
+
+      if (recordings.length > 0) {
+        // Take up to 2 best quality recordings
+        const sounds: SpeciesSound[] = recordings.slice(0, 2).map((rec: {
+          file: string;
+          rec: string;
+          lic: string;
+          length: string;
+        }) => ({
+          url: rec.file || "",
+          attribution: `${rec.rec || "Unknown"} (${rec.lic || "CC"}) via Xeno-canto`,
+          filename: "",
+          duration: parseXenoCantoDuration(rec.length),
+        }));
+        result.set(bird.id, sounds);
+      }
+    } catch {
+      // Skip this bird
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Parse Xeno-canto duration string (e.g. "0:15" or "1:30") to seconds.
+ */
+function parseXenoCantoDuration(length: string): number | null {
+  if (!length) return null;
+  const parts = length.split(":");
+  if (parts.length === 2) {
+    return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+  }
+  return null;
+}
+
+/**
  * Convert iNaturalist API results to our Species format.
  */
 function convertToSpecies(
   results: { count: number; taxon: Record<string, unknown> }[],
   defaultCategory: Category,
   taxonomyMap: Map<number, { order: string; family: string; genus: string; native: boolean }>,
-  seasonMap: Map<number, Season[]>
+  seasonMap: Map<number, Season[]>,
+  soundMap: Map<number, SpeciesSound[]> = new Map()
 ): Species[] {
   return results.map((item, index) => {
     const taxon = item.taxon as {
@@ -417,7 +474,7 @@ function convertToSpecies(
       nativeStatus: isNative ? "native" : "introduced",
       seasons,
       photos,
-      sounds: [],
+      sounds: soundMap.get(taxonId) || [],
       keyFacts,
       habitat: "",
       identificationTips: "",
@@ -457,15 +514,24 @@ export async function fetchSpeciesForLocation(
     .map((r) => (r.taxon as { id?: number }).id)
     .filter((id): id is number => id !== undefined);
 
-  // Fetch taxonomy details and seasonal data in parallel
-  const [taxonomyMap, seasonMap] = await Promise.all([
+  // Collect bird scientific names for sound fetching
+  const birdNames = avesResults
+    .map((r) => {
+      const t = r.taxon as { id?: number; name?: string };
+      return { id: t.id || 0, scientificName: t.name || "" };
+    })
+    .filter((b) => b.id && b.scientificName);
+
+  // Fetch taxonomy details, seasonal data, and bird sounds in parallel
+  const [taxonomyMap, seasonMap, soundMap] = await Promise.all([
     fetchTaxonDetails(taxonIds),
-    fetchSeasonalData(coords, taxonIds.slice(0, 50)), // Limit seasonal fetches to top 50 for speed
+    fetchSeasonalData(coords, taxonIds.slice(0, 50)),
+    fetchBirdSounds(birdNames),
   ]);
 
-  // Convert to Species format with real taxonomy and season data
+  // Convert to Species format with real taxonomy, season, and sound data
   const plantSpecies = convertToSpecies(plantaeResults, "plant", taxonomyMap, seasonMap);
-  const birdSpecies = convertToSpecies(avesResults, "bird", taxonomyMap, seasonMap);
+  const birdSpecies = convertToSpecies(avesResults, "bird", taxonomyMap, seasonMap, soundMap);
 
   // Assign prevalence ranks within each category
   const allSpecies = [...plantSpecies, ...birdSpecies];

@@ -2,12 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Species, Category, Season, SessionType, StudyMode, QuizMode, NameDisplay } from "@/lib/types";
-import { loadSpeciesData, filterBySeason } from "@/lib/species";
+import { Species, Category, SessionType, StudyMode, QuizMode, NameDisplay } from "@/lib/types";
+import { loadSpeciesData } from "@/lib/species";
 import { getCachedLocationSpecies } from "@/lib/inat";
 import { getDueCards, getNewCards } from "@/lib/srs";
 import CategorySelector from "@/components/CategorySelector";
-import SeasonChooser from "@/components/SeasonChooser";
 import ProgressDashboard from "@/components/ProgressDashboard";
 import LocationPicker from "@/components/LocationPicker";
 
@@ -17,7 +16,6 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [locationLoading, setLocationLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [season, setSeason] = useState<Season | null>(null);
   const [quizMode, setQuizMode] = useState<QuizMode>("flashcard");
   const [nameDisplay, setNameDisplay] = useState<NameDisplay>("both");
   const [locationName, setLocationName] = useState<string | null>(null);
@@ -40,10 +38,11 @@ export default function HomePage() {
     setLocationName(name);
   };
 
-  const seasonFiltered = filterBySeason(species, season);
-  const dueCount = seasonFiltered.length > 0 ? getDueCards(seasonFiltered, categories).length : 0;
+  const dueCount = species.length > 0 ? getDueCards(species, categories).length : 0;
   const newAvailable =
-    seasonFiltered.length > 0 ? getNewCards(seasonFiltered, categories, 1).length > 0 : false;
+    species.length > 0 ? getNewCards(species, categories, 1).length > 0 : false;
+
+  const hasBirds = species.some((s) => s.category === "bird");
 
   const startSession = (type: SessionType, mode: StudyMode = "mixed") => {
     const params = new URLSearchParams();
@@ -52,8 +51,9 @@ export default function HomePage() {
     if (categories.length > 0) {
       params.set("categories", categories.join(","));
     }
-    if (season) {
-      params.set("season", season);
+    // Sound mode forces birds category
+    if (mode === "sound") {
+      params.set("categories", "bird");
     }
     if (quizMode !== "flashcard") {
       params.set("quizMode", quizMode);
@@ -122,7 +122,15 @@ export default function HomePage() {
             </div>
           )}
 
-          {/* Start Session - moved to top */}
+          {/* Category Selection */}
+          <div className="text-center">
+            <h3 className="text-sm font-semibold text-stone-600 mb-2">
+              Categories
+            </h3>
+            <CategorySelector selected={categories} onChange={setCategories} />
+          </div>
+
+          {/* Start Session */}
           <div className="space-y-2">
             <div className="grid grid-cols-3 gap-2">
               <button
@@ -153,25 +161,6 @@ export default function HomePage() {
                 <div className="font-semibold text-sm">Quiz</div>
               </button>
             </div>
-          </div>
-
-          {/* Category Selection */}
-          <div className="text-center">
-            <h3 className="text-sm font-semibold text-stone-600 mb-2">
-              Categories
-            </h3>
-            <CategorySelector selected={categories} onChange={setCategories} />
-          </div>
-
-          {/* Season Selection */}
-          <div className="text-center">
-            <SeasonChooser selected={season} onChange={setSeason} />
-            {season && (
-              <p className="text-xs text-stone-500 mt-2">
-                {seasonFiltered.length} species active in{" "}
-                <span className="font-medium capitalize">{season}</span>
-              </p>
-            )}
           </div>
 
           {/* Name Display Toggle */}
@@ -235,7 +224,7 @@ export default function HomePage() {
             <h3 className="text-sm font-semibold text-stone-600 mb-2">
               Study Mode
             </h3>
-            <div className="grid grid-cols-3 gap-2">
+            <div className={`grid gap-2 ${hasBirds ? "grid-cols-3" : "grid-cols-2"}`}>
               <button
                 onClick={() => startSession("learn", "photo")}
                 className="p-3 bg-white rounded-lg border border-stone-200 text-center hover:border-green-400 transition-colors"
@@ -250,13 +239,15 @@ export default function HomePage() {
                 <div className="text-2xl mb-1">📝</div>
                 <div className="text-xs text-stone-600">Name Recall</div>
               </button>
-              <button
-                onClick={() => startSession("learn", "sound")}
-                className="p-3 bg-white rounded-lg border border-stone-200 text-center hover:border-green-400 transition-colors"
-              >
-                <div className="text-2xl mb-1">🔊</div>
-                <div className="text-xs text-stone-600">Sound ID</div>
-              </button>
+              {hasBirds && (
+                <button
+                  onClick={() => startSession("learn", "sound")}
+                  className="p-3 bg-white rounded-lg border border-stone-200 text-center hover:border-green-400 transition-colors"
+                >
+                  <div className="text-2xl mb-1">🔊</div>
+                  <div className="text-xs text-stone-600">Sound ID</div>
+                </button>
+              )}
             </div>
           </div>
 
@@ -266,12 +257,20 @@ export default function HomePage() {
       ) : null}
 
       {/* Footer */}
-      <footer className="text-center pt-4 pb-2 border-t border-stone-200">
+      <footer className="text-center pt-4 pb-2 border-t border-stone-200 space-y-1">
+        <a
+          href="https://www.greenriverpreserve.org"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-green-700 hover:text-green-900 transition-colors block"
+        >
+          For Green River Preserve
+        </a>
         <a
           href="https://github.com/cjpaulphd/Naturalist-Nuturer"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs text-stone-400 hover:text-green-700 transition-colors"
+          className="text-xs text-stone-400 hover:text-green-700 transition-colors block"
         >
           NaturalistNurturer by cjpaulphd
         </a>
