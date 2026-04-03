@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import Header from "@/components/Header";
 import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
@@ -32,6 +33,7 @@ export default function RootLayout({
         <Header />
         <main className="flex-1">{children}</main>
         <ServiceWorkerRegistrar />
+        <Analytics />
       </body>
     </html>
   );
