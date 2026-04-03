@@ -17,6 +17,7 @@ export default function HomePage() {
   const [locationLoading, setLocationLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [quizMode, setQuizMode] = useState<QuizMode>("flashcard");
+  const [studyMode, setStudyMode] = useState<StudyMode>("photo");
   const [nameDisplay, setNameDisplay] = useState<NameDisplay>("both");
   const [locationName, setLocationName] = useState<string | null>(null);
 
@@ -44,7 +45,7 @@ export default function HomePage() {
 
   const hasBirds = species.some((s) => s.category === "bird");
 
-  const startSession = (type: SessionType, mode: StudyMode = "mixed") => {
+  const startSession = (type: SessionType, mode: StudyMode = studyMode) => {
     const params = new URLSearchParams();
     params.set("type", type);
     params.set("mode", mode);
@@ -134,7 +135,7 @@ export default function HomePage() {
           <div className="space-y-2">
             <div className="grid grid-cols-3 gap-2">
               <button
-                onClick={() => startSession("learn", "photo")}
+                onClick={() => startSession("learn")}
                 disabled={!newAvailable}
                 className="p-3 bg-green-700 text-white rounded-xl text-center hover:bg-green-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -142,7 +143,7 @@ export default function HomePage() {
               </button>
 
               <button
-                onClick={() => startSession("review", "mixed")}
+                onClick={() => startSession("review")}
                 disabled={dueCount === 0}
                 className="p-3 bg-amber-600 text-white rounded-xl text-center hover:bg-amber-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed relative"
               >
@@ -155,7 +156,7 @@ export default function HomePage() {
               </button>
 
               <button
-                onClick={() => startSession("quiz", "mixed")}
+                onClick={() => startSession("quiz")}
                 className="p-3 bg-blue-600 text-white rounded-xl text-center hover:bg-blue-700 transition-colors"
               >
                 <div className="font-semibold text-sm">Quiz</div>
@@ -226,26 +227,38 @@ export default function HomePage() {
             </h3>
             <div className={`grid gap-2 ${hasBirds ? "grid-cols-3" : "grid-cols-2"}`}>
               <button
-                onClick={() => startSession("learn", "photo")}
-                className="p-3 bg-white rounded-lg border border-stone-200 text-center hover:border-green-400 transition-colors"
+                onClick={() => setStudyMode("photo")}
+                className={`p-3 rounded-lg text-center transition-colors border ${
+                  studyMode === "photo"
+                    ? "bg-green-50 border-green-400"
+                    : "bg-white border-stone-200 hover:border-green-300"
+                }`}
               >
                 <div className="text-2xl mb-1">📷</div>
-                <div className="text-xs text-stone-600">Photo ID</div>
+                <div className={`text-xs ${studyMode === "photo" ? "text-green-800 font-medium" : "text-stone-600"}`}>Photo ID</div>
               </button>
               <button
-                onClick={() => startSession("learn", "name")}
-                className="p-3 bg-white rounded-lg border border-stone-200 text-center hover:border-green-400 transition-colors"
+                onClick={() => setStudyMode("name")}
+                className={`p-3 rounded-lg text-center transition-colors border ${
+                  studyMode === "name"
+                    ? "bg-green-50 border-green-400"
+                    : "bg-white border-stone-200 hover:border-green-300"
+                }`}
               >
                 <div className="text-2xl mb-1">📝</div>
-                <div className="text-xs text-stone-600">Name Recall</div>
+                <div className={`text-xs ${studyMode === "name" ? "text-green-800 font-medium" : "text-stone-600"}`}>Name Recall</div>
               </button>
               {hasBirds && (
                 <button
-                  onClick={() => startSession("learn", "sound")}
-                  className="p-3 bg-white rounded-lg border border-stone-200 text-center hover:border-green-400 transition-colors"
+                  onClick={() => setStudyMode("sound")}
+                  className={`p-3 rounded-lg text-center transition-colors border ${
+                    studyMode === "sound"
+                      ? "bg-green-50 border-green-400"
+                      : "bg-white border-stone-200 hover:border-green-300"
+                  }`}
                 >
                   <div className="text-2xl mb-1">🔊</div>
-                  <div className="text-xs text-stone-600">Sound ID</div>
+                  <div className={`text-xs ${studyMode === "sound" ? "text-green-800 font-medium" : "text-stone-600"}`}>Sound ID</div>
                 </button>
               )}
             </div>
