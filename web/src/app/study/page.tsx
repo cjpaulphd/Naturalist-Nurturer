@@ -71,7 +71,10 @@ function StudyContent() {
   const router = useRouter();
 
   const sessionType = (searchParams.get("type") || "learn") as SessionType;
-  const studyMode = (searchParams.get("mode") || "mixed") as StudyMode;
+  // Learn mode always uses photo on the front (card shows photo, user identifies)
+  const studyMode = (sessionType === "learn"
+    ? "photo"
+    : searchParams.get("mode") || "mixed") as StudyMode;
   const quizMode = (searchParams.get("quizMode") || "flashcard") as QuizMode;
   const nameDisplay = (searchParams.get("nameDisplay") || "both") as NameDisplay;
   const categoryParam = searchParams.get("categories");

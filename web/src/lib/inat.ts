@@ -251,7 +251,7 @@ async function fetchTaxonDetails(
     const batch = taxonIds.slice(i, i + batchSize);
     try {
       const res = await fetch(
-        `${INAT_API}/taxa/${batch.join(",")}`,
+        `${INAT_API}/taxa/${batch.join(",")}?preferred_place_id=1&locale=en`,
         { headers: { "User-Agent": "NaturalistNurturer/1.0" } }
       );
       if (!res.ok) continue;
@@ -260,7 +260,16 @@ async function fetchTaxonDetails(
         let order = "";
         let family = "";
         let genus = "";
-        const native = taxon.native !== false; // default to true if not specified
+        // With preferred_place_id=1, iNaturalist returns establishment_means
+        // for the US (e.g. "native", "introduced", "endemic").
+        // Also check the conservation_statuses and listed_taxa for more detail.
+        let native = true;
+        if (taxon.establishment_means) {
+          // establishment_means includes: "native", "endemic", "introduced"
+          native = taxon.establishment_means === "native" || taxon.establishment_means === "endemic";
+        } else if (taxon.native === false || taxon.introduced === true) {
+          native = false;
+        }
 
         // Extract from ancestors array
         const ancestors = (taxon.ancestors || []) as { rank?: string; name?: string }[];

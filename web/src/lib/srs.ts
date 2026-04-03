@@ -141,7 +141,13 @@ export function getNewCards(
       const state = states[String(s.id)];
       return !state || state.repetitions === 0;
     })
-    .sort((a, b) => a.prevalenceRank - b.prevalenceRank)
+    .sort((a, b) => {
+      // Prioritize native species: natives first, then introduced/unknown
+      const aIsNative = a.nativeStatus === "native" || a.nativeStatus === "likely native" ? 0 : 1;
+      const bIsNative = b.nativeStatus === "native" || b.nativeStatus === "likely native" ? 0 : 1;
+      if (aIsNative !== bIsNative) return aIsNative - bIsNative;
+      return a.prevalenceRank - b.prevalenceRank;
+    })
     .slice(0, count)
     .map((s) => s.id);
 }
@@ -158,8 +164,17 @@ export function getQuizCards(
     (s) => categories.length === 0 || categories.includes(s.category)
   );
 
-  const shuffled = [...filtered].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, count).map((s) => s.id);
+  // Prioritize native species: pick from natives first, then fill with non-natives
+  const natives = filtered.filter(
+    (s) => s.nativeStatus === "native" || s.nativeStatus === "likely native"
+  );
+  const nonNatives = filtered.filter(
+    (s) => s.nativeStatus !== "native" && s.nativeStatus !== "likely native"
+  );
+  const shuffledNatives = [...natives].sort(() => Math.random() - 0.5);
+  const shuffledNonNatives = [...nonNatives].sort(() => Math.random() - 0.5);
+  const combined = [...shuffledNatives, ...shuffledNonNatives];
+  return combined.slice(0, count).map((s) => s.id);
 }
 
 /**
