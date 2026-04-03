@@ -19,6 +19,8 @@ export type Season = "spring" | "summer" | "fall" | "winter";
 
 export type QuizMode = "flashcard" | "multiple-choice" | "dropdown" | "free-response";
 
+export type NameDisplay = "common" | "scientific" | "both";
+
 export interface Species {
   id: number;
   category: Category;

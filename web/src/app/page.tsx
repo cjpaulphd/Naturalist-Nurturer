@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Species, Category, Season, SessionType, StudyMode, QuizMode } from "@/lib/types";
+import { Species, Category, Season, SessionType, StudyMode, QuizMode, NameDisplay } from "@/lib/types";
 import { loadSpeciesData, filterBySeason } from "@/lib/species";
 import { getCachedLocationSpecies } from "@/lib/inat";
 import { getDueCards, getNewCards } from "@/lib/srs";
@@ -19,10 +19,10 @@ export default function HomePage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [season, setSeason] = useState<Season | null>(null);
   const [quizMode, setQuizMode] = useState<QuizMode>("flashcard");
+  const [nameDisplay, setNameDisplay] = useState<NameDisplay>("both");
   const [locationName, setLocationName] = useState<string | null>(null);
 
   useEffect(() => {
-    // Try cached location species first, then fall back to static data
     const cached = getCachedLocationSpecies();
     if (cached && cached.length > 0) {
       setSpecies(cached);
@@ -57,6 +57,9 @@ export default function HomePage() {
     }
     if (quizMode !== "flashcard") {
       params.set("quizMode", quizMode);
+    }
+    if (nameDisplay !== "both") {
+      params.set("nameDisplay", nameDisplay);
     }
     router.push(`/study?${params.toString()}`);
   };
@@ -93,7 +96,7 @@ export default function HomePage() {
 
       {/* Loading overlay for location fetch */}
       {locationLoading && (
-        <div className="flex items-center gap-2 px-4 py-3 bg-green-50 rounded-lg border border-green-200">
+        <div className="flex items-center justify-center gap-2 px-4 py-3 bg-green-50 rounded-lg border border-green-200">
           <div className="w-4 h-4 border-2 border-green-700 border-t-transparent rounded-full animate-spin" />
           <span className="text-sm text-green-700">
             Discovering species near you...
@@ -104,7 +107,7 @@ export default function HomePage() {
       {species.length === 0 && !locationLoading ? (
         <div className="text-center py-8">
           <p className="text-stone-400 text-sm">
-            Share your location or tap &ldquo;Green River Preserve&rdquo; to load species.
+            Share your location or search for a place to load species.
           </p>
         </div>
       ) : species.length > 0 ? (
@@ -119,8 +122,41 @@ export default function HomePage() {
             </div>
           )}
 
+          {/* Start Session - moved to top */}
+          <div className="space-y-2">
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                onClick={() => startSession("learn", "photo")}
+                disabled={!newAvailable}
+                className="p-3 bg-green-700 text-white rounded-xl text-center hover:bg-green-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <div className="font-semibold text-sm">Learn</div>
+              </button>
+
+              <button
+                onClick={() => startSession("review", "mixed")}
+                disabled={dueCount === 0}
+                className="p-3 bg-amber-600 text-white rounded-xl text-center hover:bg-amber-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed relative"
+              >
+                <div className="font-semibold text-sm">Review</div>
+                {dueCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white px-1.5 py-0.5 rounded-full text-[10px] font-bold">
+                    {dueCount}
+                  </span>
+                )}
+              </button>
+
+              <button
+                onClick={() => startSession("quiz", "mixed")}
+                className="p-3 bg-blue-600 text-white rounded-xl text-center hover:bg-blue-700 transition-colors"
+              >
+                <div className="font-semibold text-sm">Quiz</div>
+              </button>
+            </div>
+          </div>
+
           {/* Category Selection */}
-          <div>
+          <div className="text-center">
             <h3 className="text-sm font-semibold text-stone-600 mb-2">
               Categories
             </h3>
@@ -128,16 +164,44 @@ export default function HomePage() {
           </div>
 
           {/* Season Selection */}
-          <SeasonChooser selected={season} onChange={setSeason} />
-          {season && (
-            <p className="text-xs text-stone-500 -mt-2">
-              {seasonFiltered.length} species active in{" "}
-              <span className="font-medium capitalize">{season}</span>
-            </p>
-          )}
+          <div className="text-center">
+            <SeasonChooser selected={season} onChange={setSeason} />
+            {season && (
+              <p className="text-xs text-stone-500 mt-2">
+                {seasonFiltered.length} species active in{" "}
+                <span className="font-medium capitalize">{season}</span>
+              </p>
+            )}
+          </div>
+
+          {/* Name Display Toggle */}
+          <div className="text-center">
+            <h3 className="text-sm font-semibold text-stone-600 mb-2">
+              Name Display
+            </h3>
+            <div className="inline-flex gap-1 bg-stone-100 p-1 rounded-lg">
+              {([
+                ["common", "Common"],
+                ["scientific", "Scientific"],
+                ["both", "Both"],
+              ] as [NameDisplay, string][]).map(([mode, label]) => (
+                <button
+                  key={mode}
+                  onClick={() => setNameDisplay(mode)}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                    nameDisplay === mode
+                      ? "bg-green-700 text-white"
+                      : "text-stone-600 hover:bg-stone-200"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
 
           {/* Quiz Mode Selection */}
-          <div>
+          <div className="text-center">
             <h3 className="text-sm font-semibold text-stone-600 mb-2">
               Quiz Difficulty
             </h3>
@@ -145,13 +209,13 @@ export default function HomePage() {
               {([
                 ["flashcard", "Flashcard", "Flip to reveal"],
                 ["multiple-choice", "Multiple Choice", "Pick from 4 options"],
-                ["dropdown", "Dropdown", "Select from all species"],
+                ["dropdown", "Dropdown", "Select from list"],
                 ["free-response", "Free Response", "Type your answer"],
               ] as [QuizMode, string, string][]).map(([mode, label, desc]) => (
                 <button
                   key={mode}
                   onClick={() => setQuizMode(mode)}
-                  className={`p-3 rounded-lg text-left transition-colors border ${
+                  className={`p-3 rounded-lg text-center transition-colors border ${
                     quizMode === mode
                       ? "bg-green-50 border-green-400"
                       : "bg-white border-stone-200 hover:border-green-300"
@@ -166,56 +230,10 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Session Options */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-stone-600">
-              Start a Session
-            </h3>
-
-            <button
-              onClick={() => startSession("learn", "photo")}
-              disabled={!newAvailable}
-              className="w-full p-4 bg-green-700 text-white rounded-xl text-left hover:bg-green-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <div className="font-semibold">Learn New</div>
-              <div className="text-sm text-green-100 mt-0.5">
-                Introduce new species in order of local prevalence
-              </div>
-            </button>
-
-            <button
-              onClick={() => startSession("review", "mixed")}
-              disabled={dueCount === 0}
-              className="w-full p-4 bg-amber-600 text-white rounded-xl text-left hover:bg-amber-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <div className="font-semibold flex items-center justify-between">
-                <span>Review Due</span>
-                {dueCount > 0 && (
-                  <span className="bg-amber-500 px-2 py-0.5 rounded-full text-xs">
-                    {dueCount} due
-                  </span>
-                )}
-              </div>
-              <div className="text-sm text-amber-100 mt-0.5">
-                Practice cards using spaced repetition
-              </div>
-            </button>
-
-            <button
-              onClick={() => startSession("quiz", "mixed")}
-              className="w-full p-4 bg-blue-600 text-white rounded-xl text-left hover:bg-blue-700 transition-colors"
-            >
-              <div className="font-semibold">Quick Quiz</div>
-              <div className="text-sm text-blue-100 mt-0.5">
-                15 random cards across all modes
-              </div>
-            </button>
-          </div>
-
           {/* Study Mode Selection */}
-          <div>
+          <div className="text-center">
             <h3 className="text-sm font-semibold text-stone-600 mb-2">
-              Or pick a specific mode
+              Study Mode
             </h3>
             <div className="grid grid-cols-3 gap-2">
               <button
@@ -246,6 +264,18 @@ export default function HomePage() {
           <ProgressDashboard species={species} />
         </>
       ) : null}
+
+      {/* Footer */}
+      <footer className="text-center pt-4 pb-2 border-t border-stone-200">
+        <a
+          href="https://github.com/cjpaulphd/Naturalist-Nuturer"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-stone-400 hover:text-green-700 transition-colors"
+        >
+          NaturalistNurturer by cjpaulphd
+        </a>
+      </footer>
     </div>
   );
 }

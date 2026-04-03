@@ -9,6 +9,7 @@ import {
   SessionType,
   StudyMode,
   QuizMode,
+  NameDisplay,
   Rating,
 } from "@/lib/types";
 import { loadSpeciesData, getSpeciesById, filterBySeason } from "@/lib/species";
@@ -33,18 +34,34 @@ const RATING_BUTTONS: { rating: Rating; label: string; color: string }[] = [
   { rating: "easy", label: "Easy", color: "bg-blue-600 hover:bg-blue-700" },
 ];
 
-// Generate multiple-choice options: correct answer + 3 distractors
+// Format species name based on display preference
+function formatName(species: Species, display: NameDisplay): string {
+  switch (display) {
+    case "common":
+      return species.commonName;
+    case "scientific":
+      return species.scientificName;
+    case "both":
+    default:
+      return species.commonName;
+  }
+}
+
+function formatNameSecondary(species: Species, display: NameDisplay): string | null {
+  if (display === "both") return species.scientificName;
+  return null;
+}
+
+// Generate multiple-choice options: correct answer + 3 distractors from SAME category only
 function generateChoices(
   correctSpecies: Species,
   allSpecies: Species[],
   count: number = 4
 ): Species[] {
-  const others = allSpecies.filter((s) => s.id !== correctSpecies.id);
-  // Prefer same-category distractors for harder questions
-  const sameCategory = others.filter((s) => s.category === correctSpecies.category);
-  const pool = sameCategory.length >= count - 1 ? sameCategory : others;
-
-  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  const sameCategory = allSpecies.filter(
+    (s) => s.category === correctSpecies.category && s.id !== correctSpecies.id
+  );
+  const shuffled = [...sameCategory].sort(() => Math.random() - 0.5);
   const distractors = shuffled.slice(0, count - 1);
   const choices = [correctSpecies, ...distractors].sort(() => Math.random() - 0.5);
   return choices;
@@ -57,6 +74,7 @@ function StudyContent() {
   const sessionType = (searchParams.get("type") || "learn") as SessionType;
   const studyMode = (searchParams.get("mode") || "mixed") as StudyMode;
   const quizMode = (searchParams.get("quizMode") || "flashcard") as QuizMode;
+  const nameDisplay = (searchParams.get("nameDisplay") || "both") as NameDisplay;
   const seasonParam = searchParams.get("season") as Season | null;
   const categoryParam = searchParams.get("categories");
   const categories: Category[] = categoryParam
@@ -95,9 +113,8 @@ function StudyContent() {
     };
 
     loadData().then((data) => {
-      // Apply season filter
       const filtered = filterBySeason(data, seasonParam);
-      setAllSpecies(data); // Keep all species for choices/dropdown
+      setAllSpecies(data);
 
       let ids: number[];
       switch (sessionType) {
@@ -142,16 +159,19 @@ function StudyContent() {
       ? getSpeciesById(allSpecies, cardIds[currentIndex])
       : undefined;
 
-  // Generate choices for current card (memoized)
+  // Generate choices for current card - same category only
   const choices = useMemo(() => {
     if (!currentSpecies || quizMode === "flashcard") return [];
     return generateChoices(currentSpecies, allSpecies);
   }, [currentSpecies, allSpecies, quizMode]);
 
-  // Sorted species list for dropdown
+  // Dropdown options - same category only, sorted
   const dropdownOptions = useMemo(() => {
-    return [...allSpecies].sort((a, b) => a.commonName.localeCompare(b.commonName));
-  }, [allSpecies]);
+    if (!currentSpecies) return [];
+    return [...allSpecies]
+      .filter((s) => s.category === currentSpecies.category)
+      .sort((a, b) => a.commonName.localeCompare(b.commonName));
+  }, [allSpecies, currentSpecies]);
 
   const handleFlip = () => setFlipped(true);
 
@@ -268,8 +288,8 @@ function StudyContent() {
           Session Complete!
         </h2>
 
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-stone-200 mb-6 text-left">
-          <div className="grid grid-cols-2 gap-3 text-sm">
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-stone-200 mb-6">
+          <div className="grid grid-cols-2 gap-3 text-sm text-center">
             <div>
               <span className="text-stone-500">Cards studied:</span>
               <span className="ml-2 font-semibold">{sessionStats.total}</span>
@@ -366,7 +386,7 @@ function StudyContent() {
 
       {/* Quiz mode badge */}
       {isHardMode && (
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center justify-center gap-2 mb-3">
           <span className="px-2 py-0.5 bg-red-100 text-red-700 rounded text-xs font-medium">
             {quizMode === "multiple-choice"
               ? "Multiple Choice"
@@ -380,7 +400,7 @@ function StudyContent() {
             </span>
           )}
           {isHardMode && sessionStats.correct + sessionStats.incorrect > 0 && (
-            <span className="text-xs text-stone-400 ml-auto">
+            <span className="text-xs text-stone-400">
               {sessionStats.correct}/{sessionStats.correct + sessionStats.incorrect} correct
             </span>
           )}
@@ -415,11 +435,13 @@ function StudyContent() {
               {activeMode === "name" && (
                 <div className="p-8 text-center min-h-[300px] flex flex-col items-center justify-center">
                   <p className="text-2xl font-bold text-stone-800">
-                    {currentSpecies.commonName}
+                    {formatName(currentSpecies, nameDisplay)}
                   </p>
-                  <p className="text-stone-400 italic mt-2">
-                    {currentSpecies.scientificName}
-                  </p>
+                  {formatNameSecondary(currentSpecies, nameDisplay) && (
+                    <p className="text-stone-400 italic mt-2">
+                      {formatNameSecondary(currentSpecies, nameDisplay)}
+                    </p>
+                  )}
                   <p className="text-sm text-stone-500 mt-6">
                     Can you describe this species?
                   </p>
@@ -430,7 +452,7 @@ function StudyContent() {
               )}
 
               {activeMode === "sound" && (
-                <div className="p-6 min-h-[300px] flex flex-col items-center justify-center">
+                <div className="p-6 min-h-[300px] flex flex-col items-center justify-center text-center">
                   <p className="text-4xl mb-4">🔊</p>
                   <p className="text-lg font-semibold text-stone-700 mb-4">
                     What bird is this?
@@ -461,16 +483,18 @@ function StudyContent() {
                         <button
                           key={choice.id}
                           onClick={() => setSelectedAnswer(choice.id)}
-                          className={`p-3 rounded-lg text-left text-sm transition-colors border ${
+                          className={`p-3 rounded-lg text-center text-sm transition-colors border ${
                             selectedAnswer === choice.id
                               ? "bg-green-50 border-green-400 text-green-800"
                               : "bg-white border-stone-200 text-stone-700 hover:border-stone-400"
                           }`}
                         >
-                          {choice.commonName}
-                          <span className="text-xs text-stone-400 italic ml-2">
-                            {choice.scientificName}
-                          </span>
+                          <span>{formatName(choice, nameDisplay)}</span>
+                          {formatNameSecondary(choice, nameDisplay) && (
+                            <span className="text-xs text-stone-400 italic ml-2">
+                              ({formatNameSecondary(choice, nameDisplay)})
+                            </span>
+                          )}
                         </button>
                       ))}
                     </div>
@@ -481,14 +505,18 @@ function StudyContent() {
                     <select
                       value={dropdownValue}
                       onChange={(e) => setDropdownValue(e.target.value)}
-                      className="w-full p-3 rounded-lg border border-stone-300 bg-white text-stone-700 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
+                      className="w-full p-3 rounded-lg border border-stone-300 bg-white text-stone-700 text-sm text-center focus:outline-none focus:ring-2 focus:ring-green-600"
                     >
                       <option value="">Select a species...</option>
-                      {dropdownOptions.map((sp) => (
-                        <option key={sp.id} value={String(sp.id)}>
-                          {sp.commonName} ({sp.scientificName})
-                        </option>
-                      ))}
+                      {dropdownOptions.map((sp) => {
+                        const primary = formatName(sp, nameDisplay);
+                        const secondary = formatNameSecondary(sp, nameDisplay);
+                        return (
+                          <option key={sp.id} value={String(sp.id)}>
+                            {primary}{secondary ? ` (${secondary})` : ""}
+                          </option>
+                        );
+                      })}
                     </select>
                   )}
 
@@ -504,8 +532,14 @@ function StudyContent() {
                             handleSubmitAnswer();
                           }
                         }}
-                        placeholder="Type common or scientific name..."
-                        className="w-full p-3 rounded-lg border border-stone-300 bg-white text-stone-700 text-sm placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-green-600"
+                        placeholder={
+                          nameDisplay === "common"
+                            ? "Type common name..."
+                            : nameDisplay === "scientific"
+                            ? "Type scientific name..."
+                            : "Type common or scientific name..."
+                        }
+                        className="w-full p-3 rounded-lg border border-stone-300 bg-white text-stone-700 text-sm text-center placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-green-600"
                         autoComplete="off"
                         autoCapitalize="off"
                       />
@@ -525,7 +559,6 @@ function StudyContent() {
                   </button>
                 </div>
               ) : !isHardMode ? (
-                /* Flashcard mode: show answer button */
                 <button
                   onClick={handleFlip}
                   className="w-full py-3 bg-green-700 text-white font-medium hover:bg-green-800 transition-colors"
@@ -534,7 +567,6 @@ function StudyContent() {
                 </button>
               ) : null}
 
-              {/* Name mode with flashcard: show answer button */}
               {activeMode === "name" && !isHardMode && (
                 <button
                   onClick={handleFlip}
@@ -576,7 +608,7 @@ function StudyContent() {
                 />
               )}
 
-              <div className="p-4 space-y-3">
+              <div className="p-4 space-y-3 text-center">
                 <div>
                   <h3 className="text-xl font-bold text-stone-800">
                     {currentSpecies.commonName}
@@ -586,7 +618,7 @@ function StudyContent() {
                   </p>
                 </div>
 
-                <div className="flex gap-2 flex-wrap">
+                <div className="flex gap-2 flex-wrap justify-center">
                   <span className="px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs font-medium">
                     {currentSpecies.category === "tree"
                       ? "Tree"
@@ -611,7 +643,7 @@ function StudyContent() {
                 />
 
                 {currentSpecies.keyFacts.length > 0 && (
-                  <ul className="text-sm text-stone-600 space-y-1">
+                  <ul className="text-sm text-stone-600 space-y-1 text-left">
                     {currentSpecies.keyFacts.map((fact, i) => (
                       <li key={i} className="flex gap-2">
                         <span className="text-green-600 flex-shrink-0">
@@ -624,7 +656,7 @@ function StudyContent() {
                 )}
 
                 {currentSpecies.identificationTips && (
-                  <p className="text-sm text-stone-600 bg-amber-50 p-2 rounded">
+                  <p className="text-sm text-stone-600 bg-amber-50 p-2 rounded text-left">
                     <strong className="text-amber-700">Tip:</strong>{" "}
                     {currentSpecies.identificationTips}
                   </p>
@@ -640,9 +672,8 @@ function StudyContent() {
               </div>
 
               {/* Rating buttons */}
-              <div className="p-3 border-t border-stone-100">
+              <div className="p-3 border-t border-stone-100 text-center">
                 {isHardMode ? (
-                  /* Hard mode: auto-rate based on correctness, just show Next */
                   <div>
                     <button
                       onClick={() => handleRate(isCorrect ? "good" : "again")}
@@ -652,7 +683,6 @@ function StudyContent() {
                     </button>
                   </div>
                 ) : (
-                  /* Flashcard mode: manual rating */
                   <div>
                     <p className="text-xs text-stone-500 text-center mb-2">
                       How well did you know this?
