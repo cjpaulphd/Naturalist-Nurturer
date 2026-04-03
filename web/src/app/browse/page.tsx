@@ -12,7 +12,7 @@ import {
   sortByFamily,
   getPhotoPath,
 } from "@/lib/species";
-import { getCachedLocationSpecies } from "@/lib/inat";
+import { getCachedLocationSpecies, getLastLocation } from "@/lib/inat";
 import CategorySelector from "@/components/CategorySelector";
 import SpeciesDetail from "@/components/SpeciesDetail";
 
@@ -25,6 +25,12 @@ export default function BrowsePage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [sortMode, setSortMode] = useState<SortMode>("prevalence");
   const [selectedSpecies, setSelectedSpecies] = useState<Species | null>(null);
+  const [locationName, setLocationName] = useState<string | null>(null);
+
+  useEffect(() => {
+    const last = getLastLocation();
+    if (last?.name) setLocationName(last.name);
+  }, []);
 
   useEffect(() => {
     // Prefer location-based species if available, else fall back to static
@@ -77,9 +83,14 @@ export default function BrowsePage() {
 
   return (
     <div className="max-w-lg mx-auto px-4 py-4 space-y-4">
-      <h2 className="text-lg font-bold text-stone-800">
-        Species Field Guide
-      </h2>
+      <div>
+        <h2 className="text-lg font-bold text-stone-800">
+          Species Field Guide
+        </h2>
+        {locationName && (
+          <p className="text-sm text-green-700 mt-0.5">{locationName}</p>
+        )}
+      </div>
 
       {/* Search */}
       <input
