@@ -32,6 +32,22 @@ export default function HomePage() {
     }
   }, []);
 
+  // Preload species photos so Learn/Quiz work instantly
+  useEffect(() => {
+    if (species.length === 0) return;
+    for (const sp of species) {
+      for (const photo of sp.photos) {
+        const src = photo.filename
+          ? `/data/photos/${sp.id}/${photo.filename}`
+          : photo.url;
+        if (src) {
+          const img = new Image();
+          img.src = src;
+        }
+      }
+    }
+  }, [species]);
+
   const handleSpeciesLoaded = (newSpecies: Species[], name: string) => {
     setSpecies(newSpecies);
     setLocationName(name);
@@ -107,6 +123,26 @@ export default function HomePage() {
         </p>
       </div>
 
+      {/* Learn & Quiz buttons — above location search */}
+      {species.length > 0 && (
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={startLearn}
+            disabled={!newAvailable}
+            className="p-3 bg-green-700 text-white rounded-xl text-center hover:bg-green-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <div className="font-semibold text-sm">Learn</div>
+          </button>
+
+          <button
+            onClick={() => setShowQuizSettings(true)}
+            className="p-3 bg-blue-600 text-white rounded-xl text-center hover:bg-blue-700 transition-colors"
+          >
+            <div className="font-semibold text-sm">Quiz</div>
+          </button>
+        </div>
+      )}
+
       {/* Location Picker */}
       <LocationPicker
         onSpeciesLoaded={handleSpeciesLoaded}
@@ -140,24 +176,6 @@ export default function HomePage() {
               </p>
             </div>
           )}
-
-          {/* Learn & Quiz buttons — above categories */}
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={startLearn}
-              disabled={!newAvailable}
-              className="p-3 bg-green-700 text-white rounded-xl text-center hover:bg-green-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <div className="font-semibold text-sm">Learn</div>
-            </button>
-
-            <button
-              onClick={() => setShowQuizSettings(true)}
-              className="p-3 bg-blue-600 text-white rounded-xl text-center hover:bg-blue-700 transition-colors"
-            >
-              <div className="font-semibold text-sm">Quiz</div>
-            </button>
-          </div>
 
           {/* Category Selection */}
           <div className="text-center">

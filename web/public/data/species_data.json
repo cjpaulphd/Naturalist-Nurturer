@@ -10,8 +10,23 @@
     "observationCount": 342,
     "prevalenceRank": 1,
     "nativeStatus": "native",
-    "seasons": ["spring", "summer", "fall"],
-    "photos": [],
+    "seasons": [
+      "spring",
+      "summer",
+      "fall"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/2757/medium.jpg",
+        "attribution": "(c) Distant Hill Gardens, some rights reserved (CC BY-NC-SA)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/58620851/medium.jpg",
+        "attribution": "(c) Andrew Conboy, some rights reserved (CC BY-NC)",
+        "filename": ""
+      }
+    ],
     "sounds": [],
     "keyFacts": [
       "Tallest eastern hardwood, reaching 150+ feet.",
@@ -19,7 +34,7 @@
       "Yellow-green tulip-shaped flowers appear in late spring."
     ],
     "habitat": "Rich, moist soils of coves and lower slopes in the Blue Ridge.",
-    "identificationTips": "Look for the unique four-lobed leaf shape — no other eastern tree has it."
+    "identificationTips": "Look for the unique four-lobed leaf shape \u2014 no other eastern tree has it."
   },
   {
     "id": 48734,
@@ -32,8 +47,24 @@
     "observationCount": 280,
     "prevalenceRank": 2,
     "nativeStatus": "native",
-    "seasons": ["spring", "summer", "fall", "winter"],
-    "photos": [],
+    "seasons": [
+      "spring",
+      "summer",
+      "fall",
+      "winter"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/26841/medium.jpg",
+        "attribution": "(c) Matt Lavin, some rights reserved (CC BY-SA)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/61982570/medium.jpg",
+        "attribution": "(c) Josh Vandermeulen, some rights reserved (CC BY-NC)",
+        "filename": ""
+      }
+    ],
     "sounds": [],
     "keyFacts": [
       "Five needles per bundle (mnemonic: W-H-I-T-E has 5 letters).",
@@ -41,7 +72,7 @@
       "Soft, flexible needles 2-5 inches long."
     ],
     "habitat": "Moist, well-drained soils; coves and ridges.",
-    "identificationTips": "Count the needles in each bundle — 5 means white pine."
+    "identificationTips": "Count the needles in each bundle \u2014 5 means white pine."
   },
   {
     "id": 54327,
@@ -54,8 +85,24 @@
     "observationCount": 245,
     "prevalenceRank": 3,
     "nativeStatus": "native",
-    "seasons": ["spring", "summer", "fall", "winter"],
-    "photos": [],
+    "seasons": [
+      "spring",
+      "summer",
+      "fall",
+      "winter"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/9802/medium.jpg",
+        "attribution": "(c) Dan Mullen, some rights reserved (CC BY-NC-ND)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/178985685/medium.jpg",
+        "attribution": "(c) Jason Hollinger, some rights reserved (CC BY)",
+        "filename": ""
+      }
+    ],
     "sounds": [],
     "keyFacts": [
       "One of the first trees to flower in spring with small red blossoms.",
@@ -76,8 +123,24 @@
     "observationCount": 198,
     "prevalenceRank": 4,
     "nativeStatus": "native",
-    "seasons": ["spring", "summer", "fall", "winter"],
-    "photos": [],
+    "seasons": [
+      "spring",
+      "summer",
+      "fall",
+      "winter"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/22792/medium.jpg",
+        "attribution": "(c) Nicholas Tonelli, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/29693816/medium.jpg",
+        "attribution": "(c) Katja Schulz, some rights reserved (CC BY)",
+        "filename": ""
+      }
+    ],
     "sounds": [],
     "keyFacts": [
       "Short, flat needles with two white stripes on the underside.",
@@ -98,8 +161,23 @@
     "observationCount": 175,
     "prevalenceRank": 5,
     "nativeStatus": "native",
-    "seasons": ["spring", "summer", "fall"],
-    "photos": [],
+    "seasons": [
+      "spring",
+      "summer",
+      "fall"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/16476/medium.jpg",
+        "attribution": "(c) plant4wildlife, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/130396463/medium.jpg",
+        "attribution": "(c) Dan Mullen, some rights reserved (CC BY-NC-ND)",
+        "filename": ""
+      }
+    ],
     "sounds": [],
     "keyFacts": [
       "Leaves have rounded lobes without bristle tips.",
@@ -120,8 +198,24 @@
     "observationCount": 310,
     "prevalenceRank": 1,
     "nativeStatus": "native",
-    "seasons": ["spring", "summer", "fall", "winter"],
-    "photos": [],
+    "seasons": [
+      "spring",
+      "summer",
+      "fall",
+      "winter"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/36261/medium.jpg",
+        "attribution": "(c) Katja Schulz, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/30419756/medium.jpg",
+        "attribution": "(c) Judy Gallagher, some rights reserved (CC BY)",
+        "filename": ""
+      }
+    ],
     "sounds": [],
     "keyFacts": [
       "Evergreen fern; stays green through winter (hence 'Christmas').",
@@ -129,7 +223,7 @@
       "One of the most common ferns in eastern North American forests."
     ],
     "habitat": "Shaded slopes, stream banks, and rocky woods.",
-    "identificationTips": "Look for the 'ear' or 'thumb' at the base of each leaflet — shaped like a stocking."
+    "identificationTips": "Look for the 'ear' or 'thumb' at the base of each leaflet \u2014 shaped like a stocking."
   },
   {
     "id": 73450,
@@ -142,8 +236,22 @@
     "observationCount": 185,
     "prevalenceRank": 2,
     "nativeStatus": "native",
-    "seasons": ["spring", "summer"],
-    "photos": [],
+    "seasons": [
+      "spring",
+      "summer"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/19419/medium.jpg",
+        "attribution": "(c) Jason Hollinger, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/43455283/medium.jpg",
+        "attribution": "(c) Joshua Mayer, some rights reserved (CC BY-SA)",
+        "filename": ""
+      }
+    ],
     "sounds": [],
     "keyFacts": [
       "Distinctive hooded flower (spathe) sheltering a club-shaped spadix.",
@@ -164,8 +272,21 @@
     "observationCount": 142,
     "prevalenceRank": 3,
     "nativeStatus": "native",
-    "seasons": ["spring"],
-    "photos": [],
+    "seasons": [
+      "spring"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/12449/medium.jpg",
+        "attribution": "(c) Judy Gallagher, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/26959419/medium.jpg",
+        "attribution": "(c) Dan Mullen, some rights reserved (CC BY-NC-ND)",
+        "filename": ""
+      }
+    ],
     "sounds": [],
     "keyFacts": [
       "One of the earliest spring wildflowers, blooming March-April.",
@@ -186,8 +307,22 @@
     "observationCount": 120,
     "prevalenceRank": 4,
     "nativeStatus": "native",
-    "seasons": ["spring", "summer"],
-    "photos": [],
+    "seasons": [
+      "spring",
+      "summer"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/11432/medium.jpg",
+        "attribution": "(c) Katja Schulz, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/130456788/medium.jpg",
+        "attribution": "(c) Dan Mullen, some rights reserved (CC BY-NC-ND)",
+        "filename": ""
+      }
+    ],
     "sounds": [],
     "keyFacts": [
       "Heart-shaped velvety leaves growing low to the ground.",
@@ -208,8 +343,21 @@
     "observationCount": 108,
     "prevalenceRank": 5,
     "nativeStatus": "native",
-    "seasons": ["spring"],
-    "photos": [],
+    "seasons": [
+      "spring"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/2547/medium.jpg",
+        "attribution": "(c) Distant Hill Gardens, some rights reserved (CC BY-NC-SA)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/84399/medium.jpg",
+        "attribution": "(c) Jason Hollinger, some rights reserved (CC BY)",
+        "filename": ""
+      }
+    ],
     "sounds": [],
     "keyFacts": [
       "Everything in threes: three leaves, three petals, three sepals.",
@@ -217,7 +365,7 @@
       "Takes 7-10 years to reach flowering maturity from seed."
     ],
     "habitat": "Rich, mesic deciduous forests, especially cove hardwoods.",
-    "identificationTips": "The 'rule of three' — if all parts come in threes, it's a trillium."
+    "identificationTips": "The 'rule of three' \u2014 if all parts come in threes, it's a trillium."
   },
   {
     "id": 9083,
@@ -230,8 +378,24 @@
     "observationCount": 425,
     "prevalenceRank": 1,
     "nativeStatus": "native",
-    "seasons": ["spring", "summer", "fall", "winter"],
-    "photos": [],
+    "seasons": [
+      "spring",
+      "summer",
+      "fall",
+      "winter"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/25741/medium.jpg",
+        "attribution": "(c) Andy Reago & Chrissy McClarren, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/126505/medium.jpg",
+        "attribution": "(c) Dan Pancamo, some rights reserved (CC BY-SA)",
+        "filename": ""
+      }
+    ],
     "sounds": [],
     "keyFacts": [
       "Loud, ringing 'teakettle-teakettle-teakettle' song.",
@@ -252,8 +416,24 @@
     "observationCount": 380,
     "prevalenceRank": 2,
     "nativeStatus": "native",
-    "seasons": ["spring", "summer", "fall", "winter"],
-    "photos": [],
+    "seasons": [
+      "spring",
+      "summer",
+      "fall",
+      "winter"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/14379/medium.jpg",
+        "attribution": "(c) Dan Pancamo, some rights reserved (CC BY-SA)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/42979/medium.jpg",
+        "attribution": "(c) Kelly Colgan Azar, some rights reserved (CC BY-ND)",
+        "filename": ""
+      }
+    ],
     "sounds": [],
     "keyFacts": [
       "Distinctive 'drink-your-tea' song.",
@@ -274,11 +454,25 @@
     "observationCount": 298,
     "prevalenceRank": 3,
     "nativeStatus": "native",
-    "seasons": ["spring", "summer"],
-    "photos": [],
+    "seasons": [
+      "spring",
+      "summer"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/7085/medium.jpg",
+        "attribution": "(c) Kyle Tansley, some rights reserved (CC BY-NC)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/28740/medium.jpg",
+        "attribution": "(c) Andy Reago & Chrissy McClarren, some rights reserved (CC BY)",
+        "filename": ""
+      }
+    ],
     "sounds": [],
     "keyFacts": [
-      "One of the most common songbirds in eastern forests — sings nearly constantly.",
+      "One of the most common songbirds in eastern forests \u2014 sings nearly constantly.",
       "Can sing over 20,000 songs per day.",
       "Olive-green back, white below, with gray crown and white eyebrow bordered by black."
     ],
@@ -296,8 +490,22 @@
     "observationCount": 256,
     "prevalenceRank": 4,
     "nativeStatus": "native",
-    "seasons": ["spring", "summer"],
-    "photos": [],
+    "seasons": [
+      "spring",
+      "summer"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/13389/medium.jpg",
+        "attribution": "(c) Andy Reago & Chrissy McClarren, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/79866/medium.jpg",
+        "attribution": "(c) Dan Pancamo, some rights reserved (CC BY-SA)",
+        "filename": ""
+      }
+    ],
     "sounds": [],
     "keyFacts": [
       "Considered to have one of the most beautiful songs of any North American bird.",
@@ -318,8 +526,22 @@
     "observationCount": 210,
     "prevalenceRank": 5,
     "nativeStatus": "native",
-    "seasons": ["spring", "summer"],
-    "photos": [],
+    "seasons": [
+      "spring",
+      "summer"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/6283/medium.jpg",
+        "attribution": "(c) Andy Reago & Chrissy McClarren, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/36479/medium.jpg",
+        "attribution": "(c) Dan Pancamo, some rights reserved (CC BY-SA)",
+        "filename": ""
+      }
+    ],
     "sounds": [],
     "keyFacts": [
       "Breeding male is brilliant red with jet-black wings and tail.",
@@ -328,5 +550,926 @@
     ],
     "habitat": "Canopy of mature deciduous forests, especially oak-dominated stands.",
     "identificationTips": "Male's red body with black wings is unmistakable; listen for hoarse robin-like song."
+  },
+  {
+    "id": 47169,
+    "category": "fungus",
+    "commonName": "Turkey Tail",
+    "scientificName": "Trametes versicolor",
+    "order": "Polyporales",
+    "family": "Polyporaceae",
+    "genus": "Trametes",
+    "observationCount": 420,
+    "prevalenceRank": 1,
+    "nativeStatus": "native",
+    "seasons": [
+      "spring",
+      "summer",
+      "fall",
+      "winter"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/7828/medium.jpg",
+        "attribution": "(c) Katja Schulz, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/68277/medium.jpg",
+        "attribution": "(c) Jason Hollinger, some rights reserved (CC BY)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "Multicolored concentric zones on the upper surface resemble a wild turkey's tail.",
+      "One of the most common bracket fungi in the world.",
+      "Contains compounds (PSK, PSP) studied for immune-boosting properties."
+    ],
+    "habitat": "Dead and decaying hardwood logs, stumps, and branches.",
+    "identificationTips": "Fan-shaped brackets with concentric color bands; white pore surface underneath (not gills)."
+  },
+  {
+    "id": 48100,
+    "category": "fungus",
+    "commonName": "Chicken of the Woods",
+    "scientificName": "Laetiporus sulphureus",
+    "order": "Polyporales",
+    "family": "Fomitopsidaceae",
+    "genus": "Laetiporus",
+    "observationCount": 280,
+    "prevalenceRank": 2,
+    "nativeStatus": "native",
+    "seasons": [
+      "summer",
+      "fall"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/1577/medium.jpg",
+        "attribution": "(c) mycowalt, some rights reserved (CC BY-SA)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/30361/medium.jpg",
+        "attribution": "(c) Jason Hollinger, some rights reserved (CC BY)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "Bright orange and yellow shelf fungus that is a popular edible.",
+      "Grows in large overlapping clusters that can weigh over 50 pounds.",
+      "Causes brown rot in hardwood trees, especially oaks."
+    ],
+    "habitat": "Living and dead hardwoods, especially oaks; occasionally on conifers.",
+    "identificationTips": "Unmistakable bright orange-yellow shelves; soft and moist when young."
+  },
+  {
+    "id": 53715,
+    "category": "fungus",
+    "commonName": "Chanterelle",
+    "scientificName": "Cantharellus cibarius",
+    "order": "Cantharellales",
+    "family": "Cantharellaceae",
+    "genus": "Cantharellus",
+    "observationCount": 195,
+    "prevalenceRank": 3,
+    "nativeStatus": "native",
+    "seasons": [
+      "summer",
+      "fall"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/3505/medium.jpg",
+        "attribution": "(c) James Gaither, some rights reserved (CC BY-NC-ND)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/93854/medium.jpg",
+        "attribution": "(c) Jason Hollinger, some rights reserved (CC BY)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "Prized edible mushroom with a fruity, apricot-like aroma.",
+      "Forms mycorrhizal relationships with oaks and other hardwoods.",
+      "Golden-yellow color throughout cap, false gills, and stem."
+    ],
+    "habitat": "Oak and hardwood forests on well-drained slopes.",
+    "identificationTips": "Egg-yolk yellow; blunt, forking ridges (not true gills) running down the stem."
+  },
+  {
+    "id": 67762,
+    "category": "fungus",
+    "commonName": "Reishi",
+    "scientificName": "Ganoderma tsugae",
+    "order": "Polyporales",
+    "family": "Ganodermataceae",
+    "genus": "Ganoderma",
+    "observationCount": 160,
+    "prevalenceRank": 4,
+    "nativeStatus": "native",
+    "seasons": [
+      "summer",
+      "fall"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/42783/medium.jpg",
+        "attribution": "(c) Jason Hollinger, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/111539/medium.jpg",
+        "attribution": "(c) Katja Schulz, some rights reserved (CC BY)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "Shiny, varnished-looking reddish-brown cap is distinctive.",
+      "Grows primarily on eastern hemlock (Tsuga canadensis).",
+      "Used in traditional medicine for centuries; closely related to Ganoderma lucidum."
+    ],
+    "habitat": "Dead and dying hemlocks, occasionally other conifers.",
+    "identificationTips": "Kidney-shaped, glossy reddish-brown cap; white pore surface; woody texture."
+  },
+  {
+    "id": 55232,
+    "category": "fungus",
+    "commonName": "Violet-toothed Polypore",
+    "scientificName": "Trichaptum biforme",
+    "order": "Hymenochaetales",
+    "family": "Hymenochaetaceae",
+    "genus": "Trichaptum",
+    "observationCount": 140,
+    "prevalenceRank": 5,
+    "nativeStatus": "native",
+    "seasons": [
+      "spring",
+      "summer",
+      "fall",
+      "winter"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/29555/medium.jpg",
+        "attribution": "(c) Jason Hollinger, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/74261/medium.jpg",
+        "attribution": "(c) Katja Schulz, some rights reserved (CC BY)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "Common bracket fungus with a distinctive violet-purple pore surface when fresh.",
+      "One of the first fungi to colonize dead hardwood.",
+      "Upper surface is grayish-white with faint zones."
+    ],
+    "habitat": "Dead hardwood logs, stumps, and branches.",
+    "identificationTips": "Look for the purple-violet color on the underside pore surface, especially on fresh specimens."
+  },
+  {
+    "id": 43243,
+    "category": "mammal",
+    "commonName": "White-tailed Deer",
+    "scientificName": "Odocoileus virginianus",
+    "order": "Artiodactyla",
+    "family": "Cervidae",
+    "genus": "Odocoileus",
+    "observationCount": 520,
+    "prevalenceRank": 1,
+    "nativeStatus": "native",
+    "seasons": [
+      "spring",
+      "summer",
+      "fall",
+      "winter"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/12940/medium.jpg",
+        "attribution": "(c) Hal Trachtenberg, some rights reserved (CC BY-NC)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/41786/medium.jpg",
+        "attribution": "(c) Jim Rathert, some rights reserved (CC BY-NC)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "Most common large mammal in eastern North America.",
+      "Named for the white underside of the tail, flashed as an alarm signal.",
+      "Bucks grow and shed antlers annually; antlers can span over 2 feet."
+    ],
+    "habitat": "Forest edges, meadows, and mixed woodlands.",
+    "identificationTips": "Large brown deer; white tail flashes when running; bucks have branching antlers."
+  },
+  {
+    "id": 46017,
+    "category": "mammal",
+    "commonName": "Eastern Gray Squirrel",
+    "scientificName": "Sciurus carolinensis",
+    "order": "Rodentia",
+    "family": "Sciuridae",
+    "genus": "Sciurus",
+    "observationCount": 410,
+    "prevalenceRank": 2,
+    "nativeStatus": "native",
+    "seasons": [
+      "spring",
+      "summer",
+      "fall",
+      "winter"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/7162/medium.jpg",
+        "attribution": "(c) Diliff, some rights reserved (CC BY-SA)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/82519/medium.jpg",
+        "attribution": "(c) Katja Schulz, some rights reserved (CC BY)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "Bushy tail used for balance, communication, and warmth.",
+      "Buries thousands of nuts each fall but forgets many, helping plant trees.",
+      "Can rotate hind ankles 180 degrees to descend trees headfirst."
+    ],
+    "habitat": "Hardwood and mixed forests, parks, and suburban areas.",
+    "identificationTips": "Gray fur with white belly; large bushy tail; active during the day."
+  },
+  {
+    "id": 46142,
+    "category": "mammal",
+    "commonName": "Eastern Chipmunk",
+    "scientificName": "Tamias striatus",
+    "order": "Rodentia",
+    "family": "Sciuridae",
+    "genus": "Tamias",
+    "observationCount": 310,
+    "prevalenceRank": 3,
+    "nativeStatus": "native",
+    "seasons": [
+      "spring",
+      "summer",
+      "fall"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/5843/medium.jpg",
+        "attribution": "(c) Gilles Gonthier, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/25370/medium.jpg",
+        "attribution": "(c) Dan Mullen, some rights reserved (CC BY-NC-ND)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "Five dark stripes alternating with lighter stripes along the back.",
+      "Cheek pouches can expand to three times the size of the head.",
+      "Builds extensive underground burrow systems up to 30 feet long."
+    ],
+    "habitat": "Deciduous forests with rocky areas, stone walls, and log piles.",
+    "identificationTips": "Small, striped ground squirrel; loud, repeated 'chip' call; cheeks often stuffed with food."
+  },
+  {
+    "id": 42910,
+    "category": "mammal",
+    "commonName": "Black Bear",
+    "scientificName": "Ursus americanus",
+    "order": "Carnivora",
+    "family": "Ursidae",
+    "genus": "Ursus",
+    "observationCount": 180,
+    "prevalenceRank": 4,
+    "nativeStatus": "native",
+    "seasons": [
+      "spring",
+      "summer",
+      "fall"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/12584/medium.jpg",
+        "attribution": "(c) Yellowstone National Park, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/36775/medium.jpg",
+        "attribution": "(c) Mary Keim, some rights reserved (CC BY-NC-SA)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "Western NC has one of the densest black bear populations in the Southeast.",
+      "Omnivorous \u2014 diet is 85% plant material (berries, nuts, grasses).",
+      "Can run up to 35 mph and are excellent tree climbers."
+    ],
+    "habitat": "Mature forests with dense understory; often near streams and berry patches.",
+    "identificationTips": "Solid black fur (occasionally brown muzzle); no shoulder hump (vs. grizzly); straight face profile."
+  },
+  {
+    "id": 46098,
+    "category": "mammal",
+    "commonName": "Raccoon",
+    "scientificName": "Procyon lotor",
+    "order": "Carnivora",
+    "family": "Procyonidae",
+    "genus": "Procyon",
+    "observationCount": 155,
+    "prevalenceRank": 5,
+    "nativeStatus": "native",
+    "seasons": [
+      "spring",
+      "summer",
+      "fall",
+      "winter"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/11717/medium.jpg",
+        "attribution": "(c) Jnzl's Photos, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/57248/medium.jpg",
+        "attribution": "(c) Dan Mullen, some rights reserved (CC BY-NC-ND)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "Distinctive black mask across the eyes and ringed tail.",
+      "Extremely dexterous front paws used to manipulate food and open containers.",
+      "Highly adaptable; thrives in forests, wetlands, and urban areas."
+    ],
+    "habitat": "Forests near water, wetlands, and suburban areas.",
+    "identificationTips": "Black facial mask; bushy ringed tail; stocky body; active at night."
+  },
+  {
+    "id": 47792,
+    "category": "insect",
+    "commonName": "Eastern Tiger Swallowtail",
+    "scientificName": "Papilio glaucus",
+    "order": "Lepidoptera",
+    "family": "Papilionidae",
+    "genus": "Papilio",
+    "observationCount": 380,
+    "prevalenceRank": 1,
+    "nativeStatus": "native",
+    "seasons": [
+      "spring",
+      "summer"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/11183/medium.jpg",
+        "attribution": "(c) Judy Gallagher, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/48216/medium.jpg",
+        "attribution": "(c) Katja Schulz, some rights reserved (CC BY)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "One of the most recognizable butterflies in eastern North America.",
+      "Males are yellow with black tiger stripes; females can be yellow or dark morph.",
+      "Wingspan of 3.5 to 5.5 inches \u2014 one of the largest eastern butterflies."
+    ],
+    "habitat": "Forest edges, gardens, meadows, and near streams.",
+    "identificationTips": "Large yellow butterfly with bold black stripes and tail-like extensions on hindwings."
+  },
+  {
+    "id": 48486,
+    "category": "insect",
+    "commonName": "Monarch Butterfly",
+    "scientificName": "Danaus plexippus",
+    "order": "Lepidoptera",
+    "family": "Nymphalidae",
+    "genus": "Danaus",
+    "observationCount": 290,
+    "prevalenceRank": 2,
+    "nativeStatus": "native",
+    "seasons": [
+      "summer",
+      "fall"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/36534/medium.jpg",
+        "attribution": "(c) Sid Mosdell, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/95694/medium.jpg",
+        "attribution": "(c) Katja Schulz, some rights reserved (CC BY)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "Famous for annual migration of up to 3,000 miles to central Mexico.",
+      "Caterpillars feed exclusively on milkweed, making adults toxic to predators.",
+      "Orange wings with black veins and white-spotted black borders."
+    ],
+    "habitat": "Open meadows, fields, and gardens with milkweed.",
+    "identificationTips": "Orange wings with black veins; white dots along black wing borders; slow, gliding flight."
+  },
+  {
+    "id": 47946,
+    "category": "insect",
+    "commonName": "Eastern Carpenter Bee",
+    "scientificName": "Xylocopa virginica",
+    "order": "Hymenoptera",
+    "family": "Apidae",
+    "genus": "Xylocopa",
+    "observationCount": 245,
+    "prevalenceRank": 3,
+    "nativeStatus": "native",
+    "seasons": [
+      "spring",
+      "summer"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/20116/medium.jpg",
+        "attribution": "(c) Judy Gallagher, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/78319/medium.jpg",
+        "attribution": "(c) Katja Schulz, some rights reserved (CC BY)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "Drills perfectly round holes in wood to create nesting galleries.",
+      "Males are territorial but cannot sting; females rarely sting.",
+      "Important native pollinator \u2014 larger and more efficient than honeybees for some plants."
+    ],
+    "habitat": "Forest edges, gardens, and near wooden structures.",
+    "identificationTips": "Large, robust bee; shiny black abdomen (vs. fuzzy bumblebee); hovers near wood surfaces."
+  },
+  {
+    "id": 48979,
+    "category": "insect",
+    "commonName": "Luna Moth",
+    "scientificName": "Actias luna",
+    "order": "Lepidoptera",
+    "family": "Saturniidae",
+    "genus": "Actias",
+    "observationCount": 175,
+    "prevalenceRank": 4,
+    "nativeStatus": "native",
+    "seasons": [
+      "spring",
+      "summer"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/6459/medium.jpg",
+        "attribution": "(c) Katja Schulz, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/43862/medium.jpg",
+        "attribution": "(c) Andy Reago & Chrissy McClarren, some rights reserved (CC BY)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "Striking lime-green wings with long, twisting tails on the hindwings.",
+      "Adults have no mouth and do not eat \u2014 they live only about one week.",
+      "Wingspan up to 4.5 inches; one of the largest moths in North America."
+    ],
+    "habitat": "Deciduous and mixed forests; attracted to lights at night.",
+    "identificationTips": "Unmistakable large pale green moth with long hindwing tails and eyespots on each wing."
+  },
+  {
+    "id": 81746,
+    "category": "insect",
+    "commonName": "Ebony Jewelwing",
+    "scientificName": "Calopteryx maculata",
+    "order": "Odonata",
+    "family": "Calopterygidae",
+    "genus": "Calopteryx",
+    "observationCount": 150,
+    "prevalenceRank": 5,
+    "nativeStatus": "native",
+    "seasons": [
+      "spring",
+      "summer"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/5609/medium.jpg",
+        "attribution": "(c) Judy Gallagher, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/38437/medium.jpg",
+        "attribution": "(c) Katja Schulz, some rights reserved (CC BY)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "Males have entirely jet-black wings and metallic green bodies.",
+      "Females have smoky wings with a white spot near the tip (stigma).",
+      "Flutter-like flight is unique among damselflies \u2014 looks almost butterfly-like."
+    ],
+    "habitat": "Shaded, clean forest streams and small rivers.",
+    "identificationTips": "Damselfly with broad, dark wings; iridescent green body; slow, fluttery flight along streams."
+  },
+  {
+    "id": 28755,
+    "category": "reptile",
+    "commonName": "Eastern Box Turtle",
+    "scientificName": "Terrapene carolina",
+    "order": "Testudines",
+    "family": "Emydidae",
+    "genus": "Terrapene",
+    "observationCount": 210,
+    "prevalenceRank": 1,
+    "nativeStatus": "native",
+    "seasons": [
+      "spring",
+      "summer",
+      "fall"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/13607/medium.jpg",
+        "attribution": "(c) Richard Coldiron, some rights reserved (CC BY-NC)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/38923/medium.jpg",
+        "attribution": "(c) Judy Gallagher, some rights reserved (CC BY)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "Can close its shell completely using a hinged plastron \u2014 like a box.",
+      "Can live over 100 years in the wild.",
+      "Omnivorous, eating mushrooms, berries, insects, and snails."
+    ],
+    "habitat": "Moist deciduous forests, meadow edges, and floodplains.",
+    "identificationTips": "High-domed shell with variable orange, yellow, and brown patterns; hinged bottom shell."
+  },
+  {
+    "id": 35643,
+    "category": "reptile",
+    "commonName": "Five-lined Skink",
+    "scientificName": "Plestiodon fasciatus",
+    "order": "Squamata",
+    "family": "Scincidae",
+    "genus": "Plestiodon",
+    "observationCount": 175,
+    "prevalenceRank": 2,
+    "nativeStatus": "native",
+    "seasons": [
+      "spring",
+      "summer",
+      "fall"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/19203/medium.jpg",
+        "attribution": "(c) Judy Gallagher, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/45768/medium.jpg",
+        "attribution": "(c) Katja Schulz, some rights reserved (CC BY)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "Juveniles have bright blue tails that distract predators.",
+      "Five light stripes run along a dark body from head to tail.",
+      "Males develop orange-red heads during breeding season."
+    ],
+    "habitat": "Rocky woodlands, rotting logs, and forest edges.",
+    "identificationTips": "Sleek lizard with five cream stripes; juveniles have vivid blue tails; fast-moving."
+  },
+  {
+    "id": 29227,
+    "category": "reptile",
+    "commonName": "Eastern Rat Snake",
+    "scientificName": "Pantherophis alleghaniensis",
+    "order": "Squamata",
+    "family": "Colubridae",
+    "genus": "Pantherophis",
+    "observationCount": 145,
+    "prevalenceRank": 3,
+    "nativeStatus": "native",
+    "seasons": [
+      "spring",
+      "summer",
+      "fall"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/59853/medium.jpg",
+        "attribution": "(c) Judy Gallagher, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/27613/medium.jpg",
+        "attribution": "(c) Katja Schulz, some rights reserved (CC BY)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "One of the longest snakes in eastern North America \u2014 up to 6 feet.",
+      "Excellent climber; can scale vertical tree trunks and walls.",
+      "Non-venomous constrictor that helps control rodent populations."
+    ],
+    "habitat": "Forests, farmlands, rocky hillsides, and old buildings.",
+    "identificationTips": "Large shiny black snake (adults); juveniles are gray with dark blotches; smooth, powerful body."
+  },
+  {
+    "id": 30746,
+    "category": "reptile",
+    "commonName": "Eastern Fence Lizard",
+    "scientificName": "Sceloporus undulatus",
+    "order": "Squamata",
+    "family": "Phrynosomatidae",
+    "genus": "Sceloporus",
+    "observationCount": 120,
+    "prevalenceRank": 4,
+    "nativeStatus": "native",
+    "seasons": [
+      "spring",
+      "summer",
+      "fall"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/10133/medium.jpg",
+        "attribution": "(c) Judy Gallagher, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/56284/medium.jpg",
+        "attribution": "(c) Katja Schulz, some rights reserved (CC BY)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "Males have bright blue patches on throat and belly.",
+      "Often seen basking on fence posts, rocks, and logs.",
+      "Rough, keeled scales give a spiny appearance."
+    ],
+    "habitat": "Dry, open forests with rocky outcrops and fallen logs.",
+    "identificationTips": "Gray-brown spiny lizard; males flash blue belly patches; often on sunny surfaces."
+  },
+  {
+    "id": 28756,
+    "category": "reptile",
+    "commonName": "Eastern Copperhead",
+    "scientificName": "Agkistrodon contortrix",
+    "order": "Squamata",
+    "family": "Viperidae",
+    "genus": "Agkistrodon",
+    "observationCount": 95,
+    "prevalenceRank": 5,
+    "nativeStatus": "native",
+    "seasons": [
+      "spring",
+      "summer",
+      "fall"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/26413/medium.jpg",
+        "attribution": "(c) Judy Gallagher, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/71082/medium.jpg",
+        "attribution": "(c) Katja Schulz, some rights reserved (CC BY)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "Venomous pit viper \u2014 responsible for most snakebites in the Southeast.",
+      "Distinctive hourglass-shaped crossbands on a copper-tan body.",
+      "Freeze response when threatened makes them easy to step on accidentally."
+    ],
+    "habitat": "Rocky, wooded hillsides; forest edges; near streams and logs.",
+    "identificationTips": "Hourglass-shaped tan and copper crossbands; triangular head; vertical pupils; heat-sensing pits."
+  },
+  {
+    "id": 25928,
+    "category": "amphibian",
+    "commonName": "Red-spotted Newt",
+    "scientificName": "Notophthalmus viridescens",
+    "order": "Urodela",
+    "family": "Salamandridae",
+    "genus": "Notophthalmus",
+    "observationCount": 290,
+    "prevalenceRank": 1,
+    "nativeStatus": "native",
+    "seasons": [
+      "spring",
+      "summer",
+      "fall"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/4863/medium.jpg",
+        "attribution": "(c) Judy Gallagher, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/34520/medium.jpg",
+        "attribution": "(c) Todd Pierson, some rights reserved (CC BY-NC-SA)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "Three life stages: aquatic larva, terrestrial red eft, and aquatic adult.",
+      "Red eft stage is bright orange-red with red spots \u2014 a warning of skin toxins.",
+      "Adults are olive-green with red spots bordered in black."
+    ],
+    "habitat": "Ponds and slow streams (adults); moist forest floor (efts).",
+    "identificationTips": "Efts are bright orange-red on land; adults are greenish with red spots in water."
+  },
+  {
+    "id": 27272,
+    "category": "amphibian",
+    "commonName": "American Toad",
+    "scientificName": "Anaxyrus americanus",
+    "order": "Anura",
+    "family": "Bufonidae",
+    "genus": "Anaxyrus",
+    "observationCount": 240,
+    "prevalenceRank": 2,
+    "nativeStatus": "native",
+    "seasons": [
+      "spring",
+      "summer",
+      "fall"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/9738/medium.jpg",
+        "attribution": "(c) Judy Gallagher, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/45110/medium.jpg",
+        "attribution": "(c) Katja Schulz, some rights reserved (CC BY)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "Warty skin secretes bufotoxin that deters most predators.",
+      "Long, sustained trilling call lasts up to 30 seconds during breeding.",
+      "One female can lay up to 20,000 eggs in long strings."
+    ],
+    "habitat": "Gardens, forests, meadows \u2014 anywhere with moist cover and insect prey.",
+    "identificationTips": "Warty brown skin; one or two warts per dark spot on back; parotoid glands behind eyes."
+  },
+  {
+    "id": 26790,
+    "category": "amphibian",
+    "commonName": "Spring Peeper",
+    "scientificName": "Pseudacris crucifer",
+    "order": "Anura",
+    "family": "Hylidae",
+    "genus": "Pseudacris",
+    "observationCount": 200,
+    "prevalenceRank": 3,
+    "nativeStatus": "native",
+    "seasons": [
+      "spring",
+      "summer"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/4921/medium.jpg",
+        "attribution": "(c) Judy Gallagher, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/39188/medium.jpg",
+        "attribution": "(c) Katja Schulz, some rights reserved (CC BY)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "Tiny frog (under 1.5 inches) with an incredibly loud, high-pitched peep.",
+      "Dark X-shaped marking on the back is diagnostic.",
+      "One of the first frogs to call in spring \u2014 a harbinger of the season."
+    ],
+    "habitat": "Wooded wetlands, pond edges, and swamps; breeds in temporary pools.",
+    "identificationTips": "Tiny tan frog with dark X on back; loud single 'peep' repeated every second."
+  },
+  {
+    "id": 26507,
+    "category": "amphibian",
+    "commonName": "Eastern Red-backed Salamander",
+    "scientificName": "Plethodon cinereus",
+    "order": "Urodela",
+    "family": "Plethodontidae",
+    "genus": "Plethodon",
+    "observationCount": 165,
+    "prevalenceRank": 4,
+    "nativeStatus": "native",
+    "seasons": [
+      "spring",
+      "summer",
+      "fall"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/14727/medium.jpg",
+        "attribution": "(c) Judy Gallagher, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/31998/medium.jpg",
+        "attribution": "(c) Todd Pierson, some rights reserved (CC BY-NC-SA)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "Lungless salamander \u2014 breathes entirely through its skin.",
+      "Two color phases: 'redback' (red stripe) and 'leadback' (all dark).",
+      "Most abundant vertebrate in many eastern forests."
+    ],
+    "habitat": "Under rocks, logs, and leaf litter in moist forests.",
+    "identificationTips": "Small, slender salamander; straight-edged red or orange dorsal stripe (or all gray 'leadback')."
+  },
+  {
+    "id": 65080,
+    "category": "amphibian",
+    "commonName": "Green Frog",
+    "scientificName": "Lithobates clamitans",
+    "order": "Anura",
+    "family": "Ranidae",
+    "genus": "Lithobates",
+    "observationCount": 140,
+    "prevalenceRank": 5,
+    "nativeStatus": "native",
+    "seasons": [
+      "spring",
+      "summer",
+      "fall"
+    ],
+    "photos": [
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/23174/medium.jpg",
+        "attribution": "(c) Judy Gallagher, some rights reserved (CC BY)",
+        "filename": ""
+      },
+      {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/41662/medium.jpg",
+        "attribution": "(c) Dan Mullen, some rights reserved (CC BY-NC-ND)",
+        "filename": ""
+      }
+    ],
+    "sounds": [],
+    "keyFacts": [
+      "Call sounds like a loose banjo string \u2014 a single plunking note.",
+      "Dorsolateral ridges run partway down the back (vs. full length in bullfrog).",
+      "Males have a tympanum (ear disc) larger than their eye."
+    ],
+    "habitat": "Ponds, streams, springs, and wetlands with permanent water.",
+    "identificationTips": "Green to brown frog with dorsolateral ridges that stop before the hind legs; large tympanum in males."
   }
 ]
