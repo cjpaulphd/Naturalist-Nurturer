@@ -8,37 +8,35 @@ import {
   LocationCoords,
 } from "@/lib/inat";
 import { Species } from "@/lib/types";
+import LocationDisambiguator, {
+  GeocodedLocation,
+} from "./LocationDisambiguator";
 
 interface LocationPickerProps {
   onSpeciesLoaded: (species: Species[], locationName: string) => void;
   onLoading: (loading: boolean) => void;
 }
 
-// Geocode a place name or zip code to coordinates using Nominatim
-async function geocodeSearch(query: string): Promise<LocationCoords & { displayName: string }> {
+// Geocode a place name or zip code to candidate locations using Nominatim
+async function geocodeSearch(query: string): Promise<GeocodedLocation[]> {
   const encoded = encodeURIComponent(query.trim());
   const res = await fetch(
-    `https://nominatim.openstreetmap.org/search?q=${encoded}&format=json&limit=1&countrycodes=us`,
+    `https://nominatim.openstreetmap.org/search?q=${encoded}&format=json&limit=5&addressdetails=1`,
     { headers: { "User-Agent": "NaturalistNurturer/1.0" } }
   );
   if (!res.ok) throw new Error("Geocoding request failed");
   const results = await res.json();
   if (!results || results.length === 0) {
-    throw new Error("Location not found. Try a city name or zip code.");
+    throw new Error("Location not found. Try a different city name or zip code.");
   }
-  const result = results[0];
-  // Extract a short display name (city, state)
-  const parts = (result.display_name || "").split(",");
-  const displayName = parts.length >= 2
-    ? `${parts[0].trim()}, ${parts[1].trim()}`
-    : parts[0]?.trim() || query;
-
-  return {
-    lat: parseFloat(result.lat),
-    lng: parseFloat(result.lon),
-    name: displayName,
-    displayName,
-  };
+  return results.map(
+    (r: { lat: string; lon: string; display_name: string; type: string }) => ({
+      lat: parseFloat(r.lat),
+      lng: parseFloat(r.lon),
+      displayName: r.display_name || query,
+      type: r.type || "",
+    })
+  );
 }
 
 export default function LocationPicker({
@@ -50,6 +48,8 @@ export default function LocationPicker({
   const [detecting, setDetecting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searching, setSearching] = useState(false);
+  const [candidates, setCandidates] = useState<GeocodedLocation[] | null>(null);
+  const [pendingQuery, setPendingQuery] = useState("");
 
   useEffect(() => {
     const last = getLastLocation();
@@ -58,9 +58,80 @@ export default function LocationPicker({
     }
   }, []);
 
+  const loadSpeciesForLocation = async (loc: GeocodedLocation) => {
+    setSearching(true);
+    setCandidates(null);
+    setError(null);
+    onLoading(true);
+
+    try {
+      // Build a short display name from the full display_name
+      const parts = loc.displayName.split(",");
+      const shortName =
+        parts.length >= 2
+          ? `${parts[0].trim()}, ${parts[1].trim()}`
+          : parts[0]?.trim() || pendingQuery;
+
+      const coords: LocationCoords = {
+        lat: loc.lat,
+        lng: loc.lng,
+        name: shortName,
+      };
+      const result = await fetchSpeciesForLocation(coords);
+      setLocationName(result.locationName);
+      setSearchQuery("");
+      setPendingQuery("");
+      onSpeciesLoaded(result.species, result.locationName);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Search failed";
+      setError(msg);
+    } finally {
+      setSearching(false);
+      onLoading(false);
+    }
+  };
+
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+    setSearching(true);
+    setError(null);
+    setCandidates(null);
+    onLoading(true);
+
+    try {
+      const results = await geocodeSearch(searchQuery);
+      if (results.length === 1) {
+        // Only one match — use it directly
+        setPendingQuery(searchQuery);
+        await loadSpeciesForLocation(results[0]);
+      } else {
+        // Multiple matches — show disambiguator
+        setPendingQuery(searchQuery);
+        setCandidates(results);
+        setSearching(false);
+        onLoading(false);
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Search failed";
+      setError(msg);
+      setSearching(false);
+      onLoading(false);
+    }
+  };
+
+  const handleDisambiguationSelect = (loc: GeocodedLocation) => {
+    loadSpeciesForLocation(loc);
+  };
+
+  const handleDisambiguationCancel = () => {
+    setCandidates(null);
+    setPendingQuery("");
+  };
+
   const handleDetectLocation = async () => {
     setDetecting(true);
     setError(null);
+    setCandidates(null);
     onLoading(true);
 
     try {
@@ -80,6 +151,7 @@ export default function LocationPicker({
   const handleUseCoordinates = async (coords: LocationCoords) => {
     setDetecting(true);
     setError(null);
+    setCandidates(null);
     onLoading(true);
 
     try {
@@ -91,28 +163,6 @@ export default function LocationPicker({
       setError(msg);
     } finally {
       setDetecting(false);
-      onLoading(false);
-    }
-  };
-
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
-    setSearching(true);
-    setError(null);
-    onLoading(true);
-
-    try {
-      const geo = await geocodeSearch(searchQuery);
-      const coords: LocationCoords = { lat: geo.lat, lng: geo.lng, name: geo.displayName };
-      const result = await fetchSpeciesForLocation(coords);
-      setLocationName(result.locationName);
-      setSearchQuery("");
-      onSpeciesLoaded(result.species, result.locationName);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Search failed";
-      setError(msg);
-    } finally {
-      setSearching(false);
       onLoading(false);
     }
   };
@@ -141,7 +191,7 @@ export default function LocationPicker({
           onKeyDown={(e) => {
             if (e.key === "Enter" && searchQuery.trim()) handleSearch();
           }}
-          placeholder="City, state or zip code..."
+          placeholder="Search any city worldwide..."
           className="flex-1 px-3 py-2 rounded-lg border border-stone-300 bg-white text-stone-700 text-sm placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
           disabled={isLoading}
         />
@@ -157,6 +207,16 @@ export default function LocationPicker({
           )}
         </button>
       </div>
+
+      {/* Location disambiguation list */}
+      {candidates && candidates.length > 1 && (
+        <LocationDisambiguator
+          locations={candidates}
+          query={pendingQuery}
+          onSelect={handleDisambiguationSelect}
+          onCancel={handleDisambiguationCancel}
+        />
+      )}
 
       <div className="flex gap-2 flex-wrap">
         <button
