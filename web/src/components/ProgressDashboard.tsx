@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Species } from "@/lib/types";
 import { CATEGORIES } from "@/lib/categories";
 import { getLearnedCount, getDueCards, getUserProgress } from "@/lib/srs";
@@ -25,7 +26,11 @@ export default function ProgressDashboard({ species }: ProgressDashboardProps) {
           const pct = total > 0 ? Math.round((learned / total) * 100) : 0;
 
           return (
-            <div key={cat.value} className="text-center">
+            <Link
+              key={cat.value}
+              href={`/study?type=review&mode=photo&categories=${cat.value}`}
+              className="text-center block rounded-lg p-1 hover:bg-stone-50 transition-colors"
+            >
               <div className="text-lg mb-1">{cat.icon}</div>
               <div className="text-xs text-stone-500 mb-1">{cat.label}</div>
               <div className="w-full h-2 bg-stone-200 rounded-full overflow-hidden">
@@ -37,7 +42,7 @@ export default function ProgressDashboard({ species }: ProgressDashboardProps) {
               <div className="text-xs text-stone-600 mt-1">
                 {learned}/{total}
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>

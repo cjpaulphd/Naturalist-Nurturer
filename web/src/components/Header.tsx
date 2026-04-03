@@ -1,17 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const NAV_ITEMS = [
-  { href: "/", label: "Home" },
-  { href: "/study", label: "Study" },
   { href: "/browse", label: "Browse" },
   { href: "/progress", label: "Progress" },
 ];
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
 
   return (
     <header className="bg-green-800 text-white shadow-md">
@@ -29,6 +28,12 @@ export default function Header() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={(e) => {
+                if (pathname === item.href) {
+                  e.preventDefault();
+                  router.push(item.href + "?t=" + Date.now());
+                }
+              }}
               className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 pathname === item.href
                   ? "bg-green-700 text-white"
