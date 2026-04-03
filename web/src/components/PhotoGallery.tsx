@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { SpeciesPhoto } from "@/lib/types";
 import { getPhotoPath } from "@/lib/species";
 
@@ -28,6 +27,7 @@ export default function PhotoGallery({
   }
 
   const photo = photos[currentIndex];
+  // Use local path if filename exists, otherwise use remote URL
   const src = photo.filename
     ? getPhotoPath(speciesId, photo.filename)
     : photo.url;
@@ -40,15 +40,15 @@ export default function PhotoGallery({
             Photo unavailable
           </div>
         ) : (
-          <Image
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
             src={src}
             alt="Species photo"
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 600px"
+            className="w-full h-full object-cover"
             onError={() =>
               setImgError((prev) => ({ ...prev, [currentIndex]: true }))
             }
+            loading="lazy"
           />
         )}
       </div>

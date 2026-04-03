@@ -9,11 +9,11 @@ import {
   sortByPrevalence,
   sortAlphabetical,
   sortByFamily,
+  getPhotoPath,
 } from "@/lib/species";
+import { getCachedLocationSpecies } from "@/lib/inat";
 import CategorySelector from "@/components/CategorySelector";
 import SpeciesDetail from "@/components/SpeciesDetail";
-import { getPhotoPath } from "@/lib/species";
-import Image from "next/image";
 
 type SortMode = "prevalence" | "alphabetical" | "family";
 
@@ -26,10 +26,17 @@ export default function BrowsePage() {
   const [selectedSpecies, setSelectedSpecies] = useState<Species | null>(null);
 
   useEffect(() => {
-    loadSpeciesData().then((data) => {
-      setAllSpecies(data);
+    // Prefer location-based species if available, else fall back to static
+    const cached = getCachedLocationSpecies();
+    if (cached && cached.length > 0) {
+      setAllSpecies(cached);
       setLoading(false);
-    });
+    } else {
+      loadSpeciesData().then((data) => {
+        setAllSpecies(data);
+        setLoading(false);
+      });
+    }
   }, []);
 
   const filteredSpecies = useMemo(() => {
@@ -90,7 +97,7 @@ export default function BrowsePage() {
       <div className="flex gap-2">
         {([
           ["prevalence", "By Prevalence"],
-          ["alphabetical", "A–Z"],
+          ["alphabetical", "A\u2013Z"],
           ["family", "By Family"],
         ] as [SortMode, string][]).map(([mode, label]) => (
           <button
@@ -141,8 +148,10 @@ function SpeciesListItem({
 }) {
   const [imgError, setImgError] = useState(false);
   const photo = species.photos[0];
-  const src = photo?.filename
-    ? getPhotoPath(species.id, photo.filename)
+  const src = photo
+    ? photo.filename
+      ? getPhotoPath(species.id, photo.filename)
+      : photo.url
     : null;
 
   const categoryIcon =
@@ -159,13 +168,13 @@ function SpeciesListItem({
     >
       <div className="w-14 h-14 rounded-lg overflow-hidden bg-stone-100 flex-shrink-0 relative">
         {src && !imgError ? (
-          <Image
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
             src={src}
             alt={species.commonName}
-            fill
-            className="object-cover"
-            sizes="56px"
+            className="w-full h-full object-cover"
             onError={() => setImgError(true)}
+            loading="lazy"
           />
         ) : (
           <span className="w-full h-full flex items-center justify-center text-2xl">
@@ -189,7 +198,7 @@ function SpeciesListItem({
         </div>
       </div>
 
-      <span className="text-stone-300">›</span>
+      <span className="text-stone-300">&rsaquo;</span>
     </button>
   );
 }

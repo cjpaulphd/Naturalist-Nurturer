@@ -104,7 +104,7 @@ export default function SpeciesDetail({ species, onClose }: SpeciesDetailProps) 
         )}
 
         <p className="text-[10px] text-stone-400 pt-2">
-          {species.observationCount} observations near Green River Preserve
+          {species.observationCount} observations in this area
         </p>
       </div>
     </div>
