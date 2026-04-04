@@ -97,6 +97,11 @@ function StudyContent() {
   const [freeResponseInput, setFreeResponseInput] = useState("");
   const [dropdownValue, setDropdownValue] = useState("");
   const [isCorrect, setIsCorrect] = useState<"correct" | "partial" | "incorrect" | null>(null);
+  const [showRatingOptions, setShowRatingOptions] = useState(false);
+
+  // Swipe gesture state
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchDeltaX, setTouchDeltaX] = useState(0);
 
   const [sessionStats, setSessionStats] = useState({
     total: 0,
@@ -253,37 +258,66 @@ function StudyContent() {
     }));
   };
 
+  const advanceToNext = useCallback(() => {
+    const nextIndex = currentIndex + 1;
+    if (nextIndex >= cardIds.length) {
+      setSessionComplete(true);
+    } else {
+      setCurrentIndex(nextIndex);
+      setFlipped(false);
+      resetQuizState();
+      setShowRatingOptions(false);
+      if (studyMode === "mixed") {
+        setCurrentMode(pickRandomMode(allSpecies, cardIds[nextIndex]));
+      }
+    }
+  }, [currentIndex, cardIds, studyMode, allSpecies, pickRandomMode]);
+
   const handleRate = (rating: Rating) => {
     if (!currentSpecies) return;
 
     rateCard(currentSpecies.id, rating);
     setSessionStats((s) => ({ ...s, [rating]: s[rating] + 1 }));
+    advanceToNext();
+  };
 
-    const nextIndex = currentIndex + 1;
-    if (nextIndex >= cardIds.length) {
-      setSessionComplete(true);
-    } else {
-      setCurrentIndex(nextIndex);
-      setFlipped(false);
-      resetQuizState();
-      if (studyMode === "mixed") {
-        setCurrentMode(pickRandomMode(allSpecies, cardIds[nextIndex]));
-      }
-    }
+  const handleNext = () => {
+    if (!currentSpecies) return;
+    // Default to "good" rating when using Next button or swipe
+    rateCard(currentSpecies.id, "good");
+    setSessionStats((s) => ({ ...s, good: s.good + 1 }));
+    advanceToNext();
   };
 
   const handleSkip = () => {
-    const nextIndex = currentIndex + 1;
-    if (nextIndex >= cardIds.length) {
-      setSessionComplete(true);
-    } else {
-      setCurrentIndex(nextIndex);
-      setFlipped(false);
-      resetQuizState();
-      if (studyMode === "mixed") {
-        setCurrentMode(pickRandomMode(allSpecies, cardIds[nextIndex]));
-      }
+    advanceToNext();
+  };
+
+  // Swipe gesture handlers
+  const SWIPE_THRESHOLD = 80;
+
+  const handleTouchStart = (e: { touches: { clientX: number }[] }) => {
+    setTouchStartX(e.touches[0].clientX);
+    setTouchDeltaX(0);
+  };
+
+  const handleTouchMove = (e: { touches: { clientX: number }[] }) => {
+    if (touchStartX === null) return;
+    const delta = e.touches[0].clientX - touchStartX;
+    // Only track leftward swipes (negative delta) when card is flipped
+    if (flipped) {
+      setTouchDeltaX(delta);
     }
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartX === null) return;
+    if (flipped && touchDeltaX < -SWIPE_THRESHOLD) {
+      // Swiped left while viewing answer → advance with "good" rating
+      handleNext();
+    }
+    setTouchStartX(null);
+    setTouchDeltaX(0);
   };
 
   if (loading) {
@@ -449,7 +483,17 @@ function StudyContent() {
       )}
 
       {/* Flashcard */}
-      <div className="card-flip">
+      <div
+        className="card-flip"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        style={{
+          transform: touchDeltaX < 0 && flipped ? `translateX(${touchDeltaX}px)` : undefined,
+          opacity: touchDeltaX < -SWIPE_THRESHOLD && flipped ? 0.6 : 1,
+          transition: touchStartX !== null ? 'none' : 'transform 0.3s ease, opacity 0.3s ease',
+        }}
+      >
         <div className={`card-flip-inner ${flipped ? "flipped" : ""}`}>
           {/* Front */}
           <div className={`card-face ${flipped ? "hidden" : ""}`}>
@@ -737,40 +781,59 @@ function StudyContent() {
                   )}
               </div>
 
-              {/* Rating buttons */}
+              {/* Navigation buttons */}
               <div className="p-3 border-t border-stone-100 text-center">
                 {isHardMode ? (
+                  <button
+                    onClick={() => handleRate(isCorrect === "correct" ? "good" : isCorrect === "partial" ? "hard" : "again")}
+                    className="w-full py-2.5 rounded-lg text-white text-sm font-medium bg-green-700 hover:bg-green-800 transition-colors"
+                  >
+                    Next
+                  </button>
+                ) : (
                   <div>
                     <button
-                      onClick={() => handleRate(isCorrect === "correct" ? "good" : isCorrect === "partial" ? "hard" : "again")}
+                      onClick={handleNext}
                       className="w-full py-2.5 rounded-lg text-white text-sm font-medium bg-green-700 hover:bg-green-800 transition-colors"
                     >
                       Next
                     </button>
-                  </div>
-                ) : (
-                  <div>
-                    <p className="text-xs text-stone-500 text-center mb-2">
-                      How well did you know this?
-                    </p>
-                    <div className="grid grid-cols-4 gap-2">
-                      {RATING_BUTTONS.map((btn) => (
-                        <button
-                          key={btn.rating}
-                          onClick={() => handleRate(btn.rating)}
-                          className={`py-2.5 rounded-lg text-white text-sm font-medium ${btn.color} transition-colors`}
-                        >
-                          {btn.label}
-                        </button>
-                      ))}
+                    <div className="mt-2 flex items-center justify-center gap-2">
+                      <button
+                        onClick={() => setShowRatingOptions(!showRatingOptions)}
+                        className="text-xs text-stone-400 hover:text-stone-600 transition-colors"
+                      >
+                        {showRatingOptions ? "Hide" : "Rate difficulty"}
+                      </button>
+                      <span className="text-stone-300">·</span>
+                      <button
+                        onClick={handleSkip}
+                        className="text-xs text-stone-400 hover:text-stone-600 transition-colors"
+                      >
+                        Skip
+                      </button>
                     </div>
-                    <button
-                      onClick={handleSkip}
-                      className="w-full mt-2 py-1.5 text-xs text-stone-400 hover:text-stone-600"
-                    >
-                      Skip
-                    </button>
+                    {showRatingOptions && (
+                      <div className="mt-2">
+                        <div className="grid grid-cols-4 gap-2">
+                          {RATING_BUTTONS.map((btn) => (
+                            <button
+                              key={btn.rating}
+                              onClick={() => handleRate(btn.rating)}
+                              className={`py-2 rounded-lg text-white text-xs font-medium ${btn.color} transition-colors`}
+                            >
+                              {btn.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
+                )}
+                {!isHardMode && (
+                  <p className="text-[10px] text-stone-300 mt-2">
+                    Swipe left for next
+                  </p>
                 )}
               </div>
             </div>
