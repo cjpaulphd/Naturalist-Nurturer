@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, Suspense } from "react";
+import { useState, useEffect, useRef, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Species, Category } from "@/lib/types";
 import { CATEGORY_ICONS } from "@/lib/categories";
@@ -18,6 +18,17 @@ import CategorySelector from "@/components/CategorySelector";
 import SpeciesDetail from "@/components/SpeciesDetail";
 
 type SortMode = "prevalence" | "alphabetical" | "family";
+
+function ScrollToTop() {
+  const didScroll = useRef(false);
+  useEffect(() => {
+    if (!didScroll.current) {
+      window.scrollTo(0, 0);
+      didScroll.current = true;
+    }
+  }, []);
+  return null;
+}
 
 export default function BrowsePage() {
   return (
@@ -87,10 +98,11 @@ function BrowseContent() {
     );
   }
 
-  // Species detail modal
+  // Species detail view
   if (selectedSpecies) {
     return (
       <div className="max-w-lg mx-auto px-4 py-4">
+        <ScrollToTop />
         <SpeciesDetail
           species={selectedSpecies}
           allSpecies={allSpecies}

@@ -42,7 +42,7 @@ body {
   transform: rotateY(180deg);
 }
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
+/* Prevent mobile overscroll / pull-to-refresh rebound */
+html, body {
+  overscroll-behavior-y: none;
 }
