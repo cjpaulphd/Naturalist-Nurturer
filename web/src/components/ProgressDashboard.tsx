@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Species } from "@/lib/types";
 import { CATEGORIES } from "@/lib/categories";
-import { getLearnedCount, getDueCards, getUserProgress } from "@/lib/srs";
+import { getLearnedCount, getUserProgress } from "@/lib/srs";
 
 interface ProgressDashboardProps {
   species: Species[];
@@ -11,7 +11,6 @@ interface ProgressDashboardProps {
 
 export default function ProgressDashboard({ species }: ProgressDashboardProps) {
   const progress = getUserProgress();
-  const dueCount = getDueCards(species, []).length;
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-4">
@@ -52,10 +51,7 @@ export default function ProgressDashboard({ species }: ProgressDashboardProps) {
           Streak: <strong className="text-stone-700">{progress.streakDays} day{progress.streakDays !== 1 ? "s" : ""}</strong>
         </span>
         <span>
-          Reviews due: <strong className="text-stone-700">{dueCount}</strong>
-        </span>
-        <span>
-          Total reviewed: <strong className="text-stone-700">{progress.totalReviewed}</strong>
+          Total known: <strong className="text-stone-700">{progress.totalReviewed}</strong>
         </span>
       </div>
     </div>
