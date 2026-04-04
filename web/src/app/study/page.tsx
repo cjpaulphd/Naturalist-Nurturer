@@ -12,7 +12,7 @@ import {
   Rating,
 } from "@/lib/types";
 import { loadSpeciesData, getSpeciesById } from "@/lib/species";
-import { getCachedLocationSpecies, fetchBirdSounds } from "@/lib/inat";
+import { getCachedLocationSpecies, fetchBirdSounds, updateCachedSpeciesSounds } from "@/lib/inat";
 import {
   getNewCards,
   getDueCards,
@@ -136,6 +136,8 @@ function StudyContent() {
               species.sounds = sounds;
             }
           }
+          // Persist sounds to cache so they aren't re-fetched on next visit
+          updateCachedSpeciesSounds(soundMap);
         } catch {
           // Sounds are optional; continue without them
         }

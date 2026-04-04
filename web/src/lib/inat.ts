@@ -306,8 +306,8 @@ async function fetchSeasonalData(
   const result = new Map<number, Season[]>();
   const bbox = buildBBox(coords);
 
-  // Batch in groups of 10 to avoid too many parallel requests
-  const batchSize = 10;
+  // Batch in groups of 25 for faster parallel fetching
+  const batchSize = 25;
   const promises: Promise<void>[] = [];
 
   for (let i = 0; i < taxonIds.length; i += batchSize) {
@@ -395,34 +395,41 @@ export async function fetchBirdSounds(
   // Use local API proxy to avoid CORS/403 from Xeno-canto
   const SOUNDS_API = "/api/sounds";
 
-  // Fetch in small batches to respect rate limits
-  for (const bird of birdNames.slice(0, 30)) {
-    try {
-      const res = await fetch(
-        `${SOUNDS_API}?query=${encodeURIComponent(bird.scientificName + " q:A")}`
-      );
-      if (!res.ok) continue;
-      const data = await res.json();
-      const recordings = data.recordings || [];
+  // Fetch in parallel batches of 10 to balance speed and rate limits
+  const birds = birdNames.slice(0, 30);
+  const batchSize = 10;
+  for (let i = 0; i < birds.length; i += batchSize) {
+    const batch = birds.slice(i, i + batchSize);
+    await Promise.all(
+      batch.map(async (bird) => {
+        try {
+          const res = await fetch(
+            `${SOUNDS_API}?query=${encodeURIComponent(bird.scientificName + " q:A")}`
+          );
+          if (!res.ok) return;
+          const data = await res.json();
+          const recordings = data.recordings || [];
 
-      if (recordings.length > 0) {
-        // Take up to 2 best quality recordings
-        const sounds: SpeciesSound[] = recordings.slice(0, 2).map((rec: {
-          file: string;
-          rec: string;
-          lic: string;
-          length: string;
-        }) => ({
-          url: rec.file ? (rec.file.startsWith("//") ? "https:" + rec.file : rec.file) : "",
-          attribution: `${rec.rec || "Unknown"} (${rec.lic || "CC"}) via Xeno-canto`,
-          filename: "",
-          duration: parseXenoCantoDuration(rec.length),
-        }));
-        result.set(bird.id, sounds);
-      }
-    } catch {
-      // Skip this bird
-    }
+          if (recordings.length > 0) {
+            // Take up to 2 best quality recordings
+            const sounds: SpeciesSound[] = recordings.slice(0, 2).map((rec: {
+              file: string;
+              rec: string;
+              lic: string;
+              length: string;
+            }) => ({
+              url: rec.file ? (rec.file.startsWith("//") ? "https:" + rec.file : rec.file) : "",
+              attribution: `${rec.rec || "Unknown"} (${rec.lic || "CC"}) via Xeno-canto`,
+              filename: "",
+              duration: parseXenoCantoDuration(rec.length),
+            }));
+            result.set(bird.id, sounds);
+          }
+        } catch {
+          // Skip this bird
+        }
+      })
+    );
   }
 
   return result;
@@ -567,17 +574,8 @@ export async function fetchSpeciesForLocation(
     .map((r) => (r.taxon as { id?: number }).id)
     .filter((id): id is number => id !== undefined);
 
-  // Collect bird scientific names for sound fetching
-  const avesGroup = taxaResults.find((t) => t.iconicTaxa === "Aves");
-  const birdNames = (avesGroup?.results || [])
-    .map((r) => {
-      const t = r.taxon as { id?: number; name?: string };
-      return { id: t.id || 0, scientificName: t.name || "" };
-    })
-    .filter((b) => b.id && b.scientificName);
-
-  // Select top ~7 species per taxa group for seasonal histograms (cap ~50 total)
-  const histogramBudget = 50;
+  // Select top species per taxa group for seasonal histograms (cap ~25 total)
+  const histogramBudget = 25;
   const perGroupBudget = Math.max(5, Math.floor(histogramBudget / taxaResults.length));
   const histogramIds = taxaResults.flatMap((t) =>
     t.results
@@ -586,18 +584,17 @@ export async function fetchSpeciesForLocation(
       .filter((id): id is number => id !== undefined)
   );
 
-  // Fetch taxonomy details, seasonal data, and bird sounds in parallel
-  const [taxonomyMap, seasonMap, soundMap] = await Promise.all([
+  // Fetch taxonomy details and seasonal data in parallel
+  // Bird sounds are deferred to the study page where they're actually needed
+  const [taxonomyMap, seasonMap] = await Promise.all([
     fetchTaxonDetails(taxonIds),
     fetchSeasonalData(coords, histogramIds),
-    fetchBirdSounds(birdNames),
   ]);
 
   // Convert each taxa group to Species format
   const allSpecies: Species[] = [];
   for (const group of taxaResults) {
-    const sounds = group.iconicTaxa === "Aves" ? soundMap : new Map<number, SpeciesSound[]>();
-    const species = convertToSpecies(group.results, group.iconicTaxa, taxonomyMap, seasonMap, sounds);
+    const species = convertToSpecies(group.results, group.iconicTaxa, taxonomyMap, seasonMap);
     allSpecies.push(...species);
   }
 
@@ -632,6 +629,25 @@ export async function fetchSpeciesForLocation(
   setStorage(CACHE_LOCATION_KEY, coordsWithName);
 
   return { species: allSpecies, locationName };
+}
+
+/**
+ * Update cached species data with bird sounds so they persist across navigations.
+ */
+export function updateCachedSpeciesSounds(soundMap: Map<number, SpeciesSound[]>): void {
+  const cached = getStorage<CachedLocationData | null>(CACHE_KEY, null);
+  if (!cached) return;
+  let updated = false;
+  for (const species of cached.species) {
+    const sounds = soundMap.get(species.id);
+    if (sounds && sounds.length > 0 && (!species.sounds || species.sounds.length === 0)) {
+      species.sounds = sounds;
+      updated = true;
+    }
+  }
+  if (updated) {
+    setStorage<CachedLocationData>(CACHE_KEY, cached);
+  }
 }
 
 /**
