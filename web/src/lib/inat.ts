@@ -4,12 +4,24 @@
 
 import { Species, Season, Category, SpeciesPhoto, SpeciesSound } from "./types";
 import { getStorage, setStorage } from "./storage";
-import { CATEGORY_ORDER, ICONIC_TAXA_CONFIGS } from "./categories";
+import { CATEGORY_ORDER, CATEGORIES, ICONIC_TAXA_CONFIGS } from "./categories";
+import { loadSpeciesData } from "./species";
 
 const INAT_API = "https://api.inaturalist.org/v1";
 const CACHE_KEY = "nn_location_species_v2";
 const CACHE_LOCATION_KEY = "nn_last_location";
 const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+
+// Default location: Green River Preserve, NC
+const GRP_LAT = 35.25;
+const GRP_LNG = -82.61;
+
+function isGreenRiverPreserve(coords: LocationCoords): boolean {
+  return (
+    Math.abs(coords.lat - GRP_LAT) < 0.05 &&
+    Math.abs(coords.lng - GRP_LNG) < 0.05
+  );
+}
 
 // Families known to contain trees (from the Python pipeline)
 const TREE_FAMILIES = new Set([
@@ -496,6 +508,36 @@ export async function fetchSpeciesForLocation(
   for (const sp of allSpecies) {
     if (!byCategory[sp.category]) byCategory[sp.category] = [];
     byCategory[sp.category].push(sp);
+  }
+
+  // For the default Green River Preserve location, backfill categories that
+  // have fewer than 5 species with curated defaults from bundled data.
+  // Other locations only show species actually observed there.
+  const isDefaultLocation = isGreenRiverPreserve(coords);
+  if (isDefaultLocation) {
+    const MIN_SPECIES_PER_CATEGORY = 5;
+    const categoriesToBackfill = CATEGORIES
+      .map((c) => c.value)
+      .filter((cat) => !byCategory[cat] || byCategory[cat].length < MIN_SPECIES_PER_CATEGORY);
+
+    if (categoriesToBackfill.length > 0) {
+      const defaultSpecies = await loadSpeciesData();
+      const fetchedIds = new Set(allSpecies.map((sp) => sp.id));
+
+      for (const cat of categoriesToBackfill) {
+        const existing = byCategory[cat] || [];
+        const needed = MIN_SPECIES_PER_CATEGORY - existing.length;
+        const defaults = defaultSpecies
+          .filter((sp) => sp.category === cat && !fetchedIds.has(sp.id))
+          .slice(0, needed);
+        for (const sp of defaults) {
+          fetchedIds.add(sp.id);
+          allSpecies.push(sp);
+          if (!byCategory[cat]) byCategory[cat] = [];
+          byCategory[cat].push(sp);
+        }
+      }
+    }
   }
 
   for (const catSpecies of Object.values(byCategory)) {
