@@ -426,6 +426,12 @@ function StudyContent() {
             Home
           </button>
           <button
+            onClick={() => router.push("/growth")}
+            className="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600"
+          >
+            Growth
+          </button>
+          <button
             onClick={() => window.location.reload()}
             className="px-6 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800"
           >
