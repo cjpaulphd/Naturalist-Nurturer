@@ -195,18 +195,6 @@ function StudyContent() {
       ? getSpeciesById(allSpecies, cardIds[currentIndex])
       : undefined;
 
-  // Auto-skip cards that require a photo but have none
-  const activeModePrelim = studyMode === "mixed" ? currentMode : studyMode;
-  useEffect(() => {
-    if (
-      currentSpecies &&
-      activeModePrelim === "photo" &&
-      currentSpecies.photos.length === 0
-    ) {
-      advanceToNext();
-    }
-  }, [currentSpecies, activeModePrelim, advanceToNext]);
-
   // Generate choices for current card - same category only
   const choices = useMemo(() => {
     if (!currentSpecies || quizMode === "flashcard") return [];
@@ -288,6 +276,18 @@ function StudyContent() {
       }
     }
   }, [currentIndex, cardIds, studyMode, allSpecies, pickRandomMode]);
+
+  // Auto-skip cards that require a photo but have none
+  const activeModePrelim = studyMode === "mixed" ? currentMode : studyMode;
+  useEffect(() => {
+    if (
+      currentSpecies &&
+      activeModePrelim === "photo" &&
+      currentSpecies.photos.length === 0
+    ) {
+      advanceToNext();
+    }
+  }, [currentSpecies, activeModePrelim, advanceToNext]);
 
   const handleRate = (rating: Rating) => {
     if (!currentSpecies) return;
