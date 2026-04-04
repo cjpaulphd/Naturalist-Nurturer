@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo, Suspense } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   Species,
@@ -12,7 +12,7 @@ import {
   Rating,
 } from "@/lib/types";
 import { loadSpeciesData, getSpeciesById } from "@/lib/species";
-import { getCachedLocationSpecies, fetchBirdSounds } from "@/lib/inat";
+import { getCachedLocationSpecies, fetchBirdSounds, updateCachedSpeciesSounds } from "@/lib/inat";
 import {
   getNewCards,
   getDueCards,
@@ -117,34 +117,14 @@ function StudyContent() {
     incorrect: 0,
   });
 
+  // Track which bird species we've already attempted to fetch sounds for
+  const soundFetchedRef = useRef<Set<number>>(new Set());
+
   useEffect(() => {
-    const loadData = async () => {
-      const cached = getCachedLocationSpecies();
-      const data = cached && cached.length > 0 ? cached : await loadSpeciesData();
+    const cached = getCachedLocationSpecies();
+    const dataPromise = cached && cached.length > 0 ? Promise.resolve(cached) : loadSpeciesData();
 
-      // Fetch sounds for birds that don't have any
-      const birdsWithoutSounds = data
-        .filter((s) => s.category === "bird" && (!s.sounds || s.sounds.length === 0))
-        .map((s) => ({ id: s.id, scientificName: s.scientificName }));
-
-      if (birdsWithoutSounds.length > 0) {
-        try {
-          const soundMap = await fetchBirdSounds(birdsWithoutSounds);
-          for (const species of data) {
-            const sounds = soundMap.get(species.id);
-            if (sounds && sounds.length > 0) {
-              species.sounds = sounds;
-            }
-          }
-        } catch {
-          // Sounds are optional; continue without them
-        }
-      }
-
-      return data;
-    };
-
-    loadData().then((data) => {
+    dataPromise.then((data) => {
       setAllSpecies(data);
 
       let ids: number[];
@@ -197,6 +177,30 @@ function StudyContent() {
     cardIds.length > 0
       ? getSpeciesById(allSpecies, cardIds[currentIndex])
       : undefined;
+
+  // Fetch bird sounds on-demand when a bird card is displayed
+  useEffect(() => {
+    if (!currentSpecies) return;
+    if (currentSpecies.category !== "bird") return;
+    if (currentSpecies.sounds && currentSpecies.sounds.length > 0) return;
+    if (soundFetchedRef.current.has(currentSpecies.id)) return;
+
+    soundFetchedRef.current.add(currentSpecies.id);
+
+    fetchBirdSounds([{ id: currentSpecies.id, scientificName: currentSpecies.scientificName }])
+      .then((soundMap) => {
+        const sounds = soundMap.get(currentSpecies.id);
+        if (sounds && sounds.length > 0) {
+          setAllSpecies((prev) =>
+            prev.map((s) => (s.id === currentSpecies.id ? { ...s, sounds } : s))
+          );
+          updateCachedSpeciesSounds(soundMap);
+        }
+      })
+      .catch(() => {
+        // Sounds are optional
+      });
+  }, [currentSpecies]);
 
   // Generate choices for current card - same category only
   const choices = useMemo(() => {
