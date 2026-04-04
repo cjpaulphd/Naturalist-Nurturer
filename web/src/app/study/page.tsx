@@ -72,6 +72,7 @@ function StudyContent() {
   const router = useRouter();
 
   const sessionType = (searchParams.get("type") || "learn") as SessionType;
+  const isFallbackReview = searchParams.get("fallback") === "true";
   // Learn mode always uses photo on the front (card shows photo, user identifies)
   const studyMode = (sessionType === "learn"
     ? "photo"
@@ -82,6 +83,8 @@ function StudyContent() {
   const categories: Category[] = categoryParam
     ? (categoryParam.split(",") as Category[])
     : [];
+
+  const [showFallbackBanner, setShowFallbackBanner] = useState(isFallbackReview);
 
   const [allSpecies, setAllSpecies] = useState<Species[]>([]);
   const [cardIds, setCardIds] = useState<number[]>([]);
@@ -462,6 +465,23 @@ function StudyContent() {
           {currentIndex + 1}/{cardIds.length}
         </span>
       </div>
+
+      {/* Fallback review banner */}
+      {showFallbackBanner && (
+        <div className="flex items-center justify-between gap-2 mb-3 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg">
+          <p className="text-xs text-amber-700">
+            {sessionType === "review"
+              ? "No new species to learn \u2014 reviewing due cards instead."
+              : "No new species to learn \u2014 reviewing what you know."}
+          </p>
+          <button
+            onClick={() => setShowFallbackBanner(false)}
+            className="text-amber-400 hover:text-amber-600 text-sm flex-shrink-0"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* Quiz mode badge */}
       {isHardMode && (
