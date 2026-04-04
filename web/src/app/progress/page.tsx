@@ -75,7 +75,7 @@ export default function ProgressPage() {
               disabled={dueCount === 0 && learnedCount === 0}
               className="px-6 py-3 bg-amber-600 text-white rounded-xl text-center hover:bg-amber-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed relative inline-block"
             >
-              <span className="font-semibold">Review</span>
+              <span className="font-semibold">Revisit</span>
               {dueCount > 0 ? (
                 <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white px-1.5 py-0.5 rounded-full text-[10px] font-bold">
                   {dueCount}
