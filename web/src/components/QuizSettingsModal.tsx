@@ -21,15 +21,16 @@ export default function QuizSettingsModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
       <div
-        className="bg-white rounded-2xl shadow-xl max-w-sm w-full mx-4 p-5 space-y-5"
+        className="bg-white rounded-2xl shadow-xl max-w-sm w-full mx-4 p-5 space-y-5 relative"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Start Quiz — at the top */}
+        {/* Close button */}
         <button
-          onClick={() => onStart(quizMode, nameDisplay, studyMode)}
-          className="w-full py-3 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+          onClick={onClose}
+          className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-colors"
+          aria-label="Close"
         >
-          Start Quiz
+          ✕
         </button>
 
         {/* Quiz Difficulty */}
@@ -128,12 +129,12 @@ export default function QuizSettingsModal({
           </div>
         </div>
 
-        {/* Cancel */}
+        {/* Start Challenge — at the bottom */}
         <button
-          onClick={onClose}
-          className="w-full py-2.5 rounded-xl text-sm font-medium text-stone-600 bg-stone-100 hover:bg-stone-200 transition-colors"
+          onClick={() => onStart(quizMode, nameDisplay, studyMode)}
+          className="w-full py-3 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors"
         >
-          Cancel
+          Start Challenge
         </button>
       </div>
     </div>
