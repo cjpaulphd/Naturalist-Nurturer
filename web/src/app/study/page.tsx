@@ -439,10 +439,10 @@ function StudyContent() {
 
         <div className="flex gap-3 justify-center">
           <button
-            onClick={() => router.push("/")}
-            className="px-6 py-2 bg-stone-200 text-stone-700 rounded-lg hover:bg-stone-300"
+            onClick={() => window.location.reload()}
+            className="px-6 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800"
           >
-            Home
+            Meet More
           </button>
           <button
             onClick={() => router.push("/growth")}
@@ -451,10 +451,10 @@ function StudyContent() {
             Growth
           </button>
           <button
-            onClick={() => window.location.reload()}
-            className="px-6 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800"
+            onClick={() => router.push("/")}
+            className="px-6 py-2 bg-stone-200 text-stone-700 rounded-lg hover:bg-stone-300"
           >
-            Meet More
+            Home
           </button>
         </div>
       </div>
