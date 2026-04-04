@@ -172,7 +172,7 @@ function BrowseContent() {
 
   return (
     <div className="max-w-lg mx-auto px-4 py-4 space-y-4">
-      <div>
+      <div className="text-center">
         <h2 className="text-lg font-bold text-stone-800">
           Species Field Guide
         </h2>
@@ -191,12 +191,12 @@ function BrowseContent() {
       />
 
       {/* Filters */}
-      <div className="flex items-center gap-3 flex-wrap">
+      <div className="flex items-center gap-3 flex-wrap justify-center">
         <CategorySelector selected={categories} onChange={setCategories} />
       </div>
 
       {/* Sort */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 justify-center">
         {([
           ["prevalence", "By iNat Popularity"],
           ["alphabetical", "A\u2013Z"],
@@ -217,7 +217,7 @@ function BrowseContent() {
       </div>
 
       {/* Results count */}
-      <p className="text-xs text-stone-500">
+      <p className="text-xs text-stone-500 text-center">
         {filteredSpecies.length} species
       </p>
 

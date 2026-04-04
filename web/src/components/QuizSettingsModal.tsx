@@ -34,7 +34,7 @@ export default function QuizSettingsModal({
 
         {/* Quiz Difficulty */}
         <div>
-          <h4 className="text-sm font-semibold text-stone-600 mb-2">Difficulty</h4>
+          <h4 className="text-sm font-semibold text-stone-600 mb-2 text-center">Difficulty</h4>
           <div className="grid grid-cols-2 gap-2">
             {([
               ["flashcard", "Flashcard", "Flip to reveal"],
@@ -62,7 +62,8 @@ export default function QuizSettingsModal({
 
         {/* Name Display */}
         <div>
-          <h4 className="text-sm font-semibold text-stone-600 mb-2">Name Display</h4>
+          <h4 className="text-sm font-semibold text-stone-600 mb-2 text-center">Name Display</h4>
+          <div className="flex justify-center">
           <div className="inline-flex gap-1 bg-stone-100 p-1 rounded-lg">
             {([
               ["common", "Common"],
@@ -82,11 +83,12 @@ export default function QuizSettingsModal({
               </button>
             ))}
           </div>
+          </div>
         </div>
 
         {/* Study Mode */}
         <div>
-          <h4 className="text-sm font-semibold text-stone-600 mb-2">Study Mode</h4>
+          <h4 className="text-sm font-semibold text-stone-600 mb-2 text-center">Study Mode</h4>
           <div className={`grid gap-2 ${hasBirds ? "grid-cols-3" : "grid-cols-2"}`}>
             <button
               onClick={() => setStudyMode("photo")}
