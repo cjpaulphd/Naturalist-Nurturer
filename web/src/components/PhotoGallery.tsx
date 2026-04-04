@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { SpeciesPhoto } from "@/lib/types";
 import { getPhotoPath } from "@/lib/species";
 
@@ -17,6 +17,40 @@ export default function PhotoGallery({
 }: PhotoGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [imgError, setImgError] = useState<Record<number, boolean>>({});
+  const touchStartX = useRef<number | null>(null);
+  const touchDeltaX = useRef(0);
+  const SWIPE_THRESHOLD = 50;
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchDeltaX.current = 0;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    touchDeltaX.current = e.touches[0].clientX - touchStartX.current;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || photos.length <= 1) {
+      touchStartX.current = null;
+      return;
+    }
+    const delta = touchDeltaX.current;
+    if (Math.abs(delta) > SWIPE_THRESHOLD) {
+      // Stop propagation to prevent card-level swipe from firing
+      e.stopPropagation();
+      if (delta < 0) {
+        // Swiped left → next photo
+        setCurrentIndex((currentIndex + 1) % photos.length);
+      } else {
+        // Swiped right → previous photo
+        setCurrentIndex((currentIndex - 1 + photos.length) % photos.length);
+      }
+    }
+    touchStartX.current = null;
+    touchDeltaX.current = 0;
+  };
 
   if (photos.length === 0) {
     return (
@@ -33,7 +67,12 @@ export default function PhotoGallery({
     : photo.url;
 
   return (
-    <div className="relative w-full">
+    <div
+      className="relative w-full"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
       <div className="relative w-full aspect-[4/3] bg-stone-100 rounded-lg overflow-hidden">
         {imgError[currentIndex] ? (
           <div className="w-full h-full flex items-center justify-center text-stone-400 text-sm">
