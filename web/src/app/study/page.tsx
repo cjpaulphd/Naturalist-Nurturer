@@ -296,12 +296,12 @@ function StudyContent() {
   // Swipe gesture handlers
   const SWIPE_THRESHOLD = 80;
 
-  const handleTouchStart = (e: { touches: { clientX: number }[] }) => {
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     setTouchStartX(e.touches[0].clientX);
     setTouchDeltaX(0);
   };
 
-  const handleTouchMove = (e: { touches: { clientX: number }[] }) => {
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
     if (touchStartX === null) return;
     const delta = e.touches[0].clientX - touchStartX;
     // Only track leftward swipes (negative delta) when card is flipped
