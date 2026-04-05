@@ -58,7 +58,7 @@ export default function WelcomePopup({ onClose }: WelcomePopupProps) {
           </div>
           <div className="flex gap-3 items-start">
             <span className="flex-shrink-0 w-6 h-6 rounded-full bg-green-100 text-green-700 flex items-center justify-center text-xs font-bold">3</span>
-            <p><span className="font-medium text-stone-700">Start learning</span> — tap <span className="font-semibold text-green-700">Learn</span> for flashcards or <span className="font-semibold text-blue-600">Challenge</span> to quiz yourself.</p>
+            <p><span className="font-medium text-stone-700">Start learning</span> — tap <span className="font-semibold text-green-700">Learn</span> for flashcards or <span className="font-semibold text-blue-600">Challenge</span> to quiz yourself. Swipe left or tap <span className="font-semibold">Next</span> to advance between cards.</p>
           </div>
         </div>
 
