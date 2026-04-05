@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { QuizMode, QuizDifficulty, NameDisplay, StudyMode } from "@/lib/types";
+import { getStorage, setStorage } from "@/lib/storage";
 
 interface QuizSettingsModalProps {
   hasBirds: boolean;
@@ -14,10 +15,10 @@ export default function QuizSettingsModal({
   onStart,
   onClose,
 }: QuizSettingsModalProps) {
-  const [quizMode, setQuizMode] = useState<QuizMode>("multiple-choice");
-  const [nameDisplay, setNameDisplay] = useState<NameDisplay>("both");
-  const [studyMode, setStudyMode] = useState<StudyMode>("photo");
-  const [difficulty, setDifficulty] = useState<QuizDifficulty>("medium");
+  const [quizMode, setQuizMode] = useState<QuizMode>(() => getStorage<QuizMode>("quiz_mode", "multiple-choice"));
+  const [nameDisplay, setNameDisplay] = useState<NameDisplay>(() => getStorage<NameDisplay>("quiz_name_display", "both"));
+  const [studyMode, setStudyMode] = useState<StudyMode>(() => getStorage<StudyMode>("quiz_study_mode", "photo"));
+  const [difficulty, setDifficulty] = useState<QuizDifficulty>(() => getStorage<QuizDifficulty>("quiz_difficulty", "medium"));
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
@@ -166,7 +167,13 @@ export default function QuizSettingsModal({
 
         {/* Start Challenge — at the bottom */}
         <button
-          onClick={() => onStart(quizMode, nameDisplay, studyMode, difficulty)}
+          onClick={() => {
+            setStorage("quiz_mode", quizMode);
+            setStorage("quiz_name_display", nameDisplay);
+            setStorage("quiz_study_mode", studyMode);
+            setStorage("quiz_difficulty", difficulty);
+            onStart(quizMode, nameDisplay, studyMode, difficulty);
+          }}
           className="w-full py-3 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors"
         >
           Start Challenge
