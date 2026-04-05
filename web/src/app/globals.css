@@ -42,6 +42,32 @@ body {
   transform: rotateY(180deg);
 }
 
+/* Falling leaves celebration animation */
+@keyframes leaf-fall {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  25% {
+    transform: translateY(25vh) translateX(var(--sway, 30px)) rotate(90deg);
+  }
+  50% {
+    transform: translateY(50vh) translateX(calc(var(--sway, 30px) * -0.5)) rotate(180deg);
+  }
+  75% {
+    transform: translateY(75vh) translateX(var(--sway, 30px)) rotate(270deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(105vh) translateX(calc(var(--sway, 30px) * -1)) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.animate-leaf-fall {
+  animation: leaf-fall linear forwards;
+}
+
 /* Prevent mobile overscroll / pull-to-refresh rebound */
 html, body {
   overscroll-behavior-y: none;
