@@ -10,6 +10,8 @@ import { CATEGORIES } from "@/lib/categories";
 import CategorySelector from "@/components/CategorySelector";
 import LocationPicker from "@/components/LocationPicker";
 import QuizSettingsModal from "@/components/QuizSettingsModal";
+import WelcomePopup from "@/components/WelcomePopup";
+import { getStorage, setStorage } from "@/lib/storage";
 
 export default function HomePage() {
   const router = useRouter();
@@ -19,6 +21,13 @@ export default function HomePage() {
   const [categories, setCategories] = useState<Category[]>(["tree"]);
   const [locationName, setLocationName] = useState<string | null>(null);
   const [showQuizSettings, setShowQuizSettings] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    if (!getStorage<boolean>("welcome_seen", false)) {
+      setShowWelcome(true);
+    }
+  }, []);
 
   useEffect(() => {
     const cached = getCachedLocationSpecies();
@@ -240,6 +249,16 @@ export default function HomePage() {
         </>
       ) : null}
 
+      {/* Welcome Popup */}
+      {showWelcome && (
+        <WelcomePopup
+          onClose={() => {
+            setShowWelcome(false);
+            setStorage("welcome_seen", true);
+          }}
+        />
+      )}
+
       {/* Quiz Settings Modal */}
       {showQuizSettings && (
         <QuizSettingsModal
@@ -340,6 +359,13 @@ export default function HomePage() {
           >
             Feedback
           </a>
+          {" · "}
+          <button
+            onClick={() => setShowWelcome(true)}
+            className="hover:text-green-700 transition-colors"
+          >
+            Welcome
+          </button>
         </p>
       </footer>
     </div>
