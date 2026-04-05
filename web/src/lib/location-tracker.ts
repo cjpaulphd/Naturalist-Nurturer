@@ -22,7 +22,44 @@ export interface StudyLocation {
 }
 
 export function getStudyLocations(): StudyLocation[] {
-  return getStorage<StudyLocation[]>(STUDY_LOCATIONS_KEY, []);
+  const locations = getStorage<StudyLocation[]>(STUDY_LOCATIONS_KEY, []);
+  const merged = deduplicateLocations(locations);
+  if (merged.length < locations.length) {
+    saveStudyLocations(merged);
+  }
+  return merged;
+}
+
+/**
+ * Merge duplicate locations that share the same name.
+ */
+function deduplicateLocations(locations: StudyLocation[]): StudyLocation[] {
+  const result: StudyLocation[] = [];
+  for (const loc of locations) {
+    const existing = result.find((r) => r.name === loc.name);
+    if (existing) {
+      // Merge species IDs
+      for (const id of loc.speciesIds) {
+        if (!existing.speciesIds.includes(id)) {
+          existing.speciesIds.push(id);
+        }
+      }
+      // Merge category counts (take the max)
+      for (const [cat, count] of Object.entries(loc.categoryCounts)) {
+        const c = cat as Category;
+        existing.categoryCounts[c] = Math.max(
+          existing.categoryCounts[c] || 0,
+          count
+        );
+      }
+      // Keep the earliest firstStudied and latest lastStudied
+      existing.firstStudied = Math.min(existing.firstStudied, loc.firstStudied);
+      existing.lastStudied = Math.max(existing.lastStudied, loc.lastStudied);
+    } else {
+      result.push({ ...loc, speciesIds: [...loc.speciesIds], categoryCounts: { ...loc.categoryCounts } });
+    }
+  }
+  return result;
 }
 
 function saveStudyLocations(locations: StudyLocation[]): void {
@@ -30,7 +67,8 @@ function saveStudyLocations(locations: StudyLocation[]): void {
 }
 
 /**
- * Find the existing study location near the given coords (within ~1km).
+ * Find the existing study location near the given coords (within ~1km)
+ * or with the same name.
  */
 function findNearbyLocation(
   locations: StudyLocation[],
@@ -40,6 +78,7 @@ function findNearbyLocation(
     const dist =
       Math.abs(loc.lat - coords.lat) + Math.abs(loc.lng - coords.lng);
     if (dist < 0.01) return loc; // ~1km threshold
+    if (coords.name && loc.name === coords.name) return loc;
   }
   return null;
 }
