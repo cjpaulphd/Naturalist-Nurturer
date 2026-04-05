@@ -2,11 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-const LEAF_EMOJIS = ["🍂", "🍁", "🌿", "🍃", "🌱", "🪻", "🌸"];
-
 interface Leaf {
   id: number;
-  emoji: string;
   left: number; // % from left
   delay: number; // animation delay in seconds
   duration: number; // fall duration in seconds
@@ -17,7 +14,6 @@ interface Leaf {
 function createLeaves(count: number): Leaf[] {
   return Array.from({ length: count }, (_, i) => ({
     id: i,
-    emoji: LEAF_EMOJIS[Math.floor(Math.random() * LEAF_EMOJIS.length)],
     left: Math.random() * 100,
     delay: Math.random() * 2,
     duration: 3 + Math.random() * 4,
@@ -57,7 +53,7 @@ export default function FallingLeaves({ count = 20 }: { count?: number }) {
             "--sway": `${leaf.swayAmount}px`,
           } as React.CSSProperties}
         >
-          {leaf.emoji}
+          🌿
         </span>
       ))}
     </div>
