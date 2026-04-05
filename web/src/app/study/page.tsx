@@ -29,13 +29,6 @@ import { getStorage } from "@/lib/storage";
 const LEARN_COUNT = 10;
 const QUIZ_COUNT = 15;
 
-const RATING_BUTTONS: { rating: Rating; label: string; color: string }[] = [
-  { rating: "again", label: "Again", color: "bg-red-600 hover:bg-red-700" },
-  { rating: "hard", label: "Hard", color: "bg-orange-500 hover:bg-orange-600" },
-  { rating: "good", label: "Good", color: "bg-green-600 hover:bg-green-700" },
-  { rating: "easy", label: "Easy", color: "bg-blue-600 hover:bg-blue-700" },
-];
-
 // Format species name based on display preference
 function formatName(species: Species, display: NameDisplay): string {
   switch (display) {
@@ -102,8 +95,6 @@ function StudyContent() {
   const [freeResponseInput, setFreeResponseInput] = useState("");
   const [dropdownValue, setDropdownValue] = useState("");
   const [isCorrect, setIsCorrect] = useState<"correct" | "partial" | "incorrect" | null>(null);
-  const [showRatingOptions, setShowRatingOptions] = useState(false);
-
   // Swipe gesture state
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchDeltaX, setTouchDeltaX] = useState(0);
@@ -279,7 +270,6 @@ function StudyContent() {
       setCurrentIndex(nextIndex);
       setFlipped(false);
       resetQuizState();
-      setShowRatingOptions(false);
       if (studyMode === "mixed") {
         setCurrentMode(pickRandomMode(allSpecies, cardIds[nextIndex]));
       }
@@ -311,10 +301,6 @@ function StudyContent() {
     // Default to "good" rating when using Next button or swipe
     rateCard(currentSpecies.id, "good", currentSpecies.category);
     setSessionStats((s) => ({ ...s, good: s.good + 1 }));
-    advanceToNext();
-  };
-
-  const handleSkip = () => {
     advanceToNext();
   };
 
@@ -620,49 +606,12 @@ function StudyContent() {
                 Next
               </button>
             ) : (
-              <div>
-                <button
-                  onClick={handleNext}
-                  className="w-full py-3 rounded-lg text-white font-medium bg-green-700 hover:bg-green-800 transition-colors"
-                >
-                  Next
-                </button>
-                <div className="mt-2 flex items-center justify-center gap-2">
-                  <button
-                    onClick={() => setShowRatingOptions(!showRatingOptions)}
-                    className="text-xs text-stone-400 hover:text-stone-600 transition-colors"
-                  >
-                    {showRatingOptions ? "Hide" : "Rate difficulty"}
-                  </button>
-                  <span className="text-stone-300">·</span>
-                  <button
-                    onClick={handleSkip}
-                    className="text-xs text-stone-400 hover:text-stone-600 transition-colors"
-                  >
-                    Skip
-                  </button>
-                </div>
-                {showRatingOptions && (
-                  <div className="mt-2">
-                    <div className="grid grid-cols-4 gap-2">
-                      {RATING_BUTTONS.map((btn) => (
-                        <button
-                          key={btn.rating}
-                          onClick={() => handleRate(btn.rating)}
-                          className={`py-2 rounded-lg text-white text-xs font-medium ${btn.color} transition-colors`}
-                        >
-                          {btn.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-            {!isHardMode && (
-              <p className="text-[10px] text-stone-300 mt-2">
-                Swipe left for next
-              </p>
+              <button
+                onClick={handleNext}
+                className="w-full py-3 rounded-lg text-white font-medium bg-green-700 hover:bg-green-800 transition-colors"
+              >
+                Next
+              </button>
             )}
           </div>
         )}
