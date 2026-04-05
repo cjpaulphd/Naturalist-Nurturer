@@ -57,21 +57,31 @@ def extract_key_facts(taxon_data):
 
 
 def get_native_status(taxon_data):
-    """Try to determine native status from taxon data."""
+    """Determine native/introduced status from taxon data.
+
+    Checks establishment_means first (most reliable when fetched with a
+    preferred_place_id), then falls back to conservation statuses.
+    """
     if not taxon_data:
         return "unknown"
 
-    # Check conservation statuses or listed taxa for native info
+    # Check establishment_means — this is the primary signal from iNaturalist.
+    # The API returns it as an object: { "establishment_means": "native", "place": {...} }
+    # or occasionally as a plain string.
+    em = taxon_data.get("establishment_means")
+    if em:
+        em_value = em if isinstance(em, str) else em.get("establishment_means", "")
+        if em_value in ("native", "endemic"):
+            return "native"
+        if em_value == "introduced":
+            return "introduced"
+
+    # Fallback: check conservation statuses for US-based native info
     statuses = taxon_data.get("conservation_statuses", [])
     for status in statuses:
         place = status.get("place", {})
         if place and "united states" in (place.get("display_name") or "").lower():
             return "native"
-
-    # Check if there's establishment means data
-    listed = taxon_data.get("listed_taxa_count")
-    if listed:
-        return "likely native"
 
     return "unknown"
 

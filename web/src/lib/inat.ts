@@ -245,8 +245,38 @@ async function fetchSpeciesCounts(
  * Batch-fetch full taxon details including ancestors from /taxa endpoint.
  * The taxa endpoint returns ancestor data (order, family, genus).
  */
+/**
+ * Look up the most specific iNaturalist place for the given coordinates.
+ * Returns the place ID to use as preferred_place_id when fetching taxa,
+ * which ensures establishment_means reflects the user's actual location.
+ */
+async function findNearestPlaceId(coords: LocationCoords): Promise<number | null> {
+  try {
+    const delta = 0.5;
+    const res = await fetch(
+      `${INAT_API}/places/nearby?nelat=${coords.lat + delta}&nelng=${coords.lng + delta}&swlat=${coords.lat - delta}&swlng=${coords.lng - delta}`,
+      { headers: { "User-Agent": "NaturalistNurturer/1.0" } }
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    // Prefer standard administrative places (states, countries) over community places
+    const standard = (data.results?.standard || []) as { id?: number; bbox_area?: number }[];
+    if (standard.length > 0) {
+      // Pick the most specific (smallest area) standard place
+      const sorted = [...standard].sort(
+        (a, b) => (a.bbox_area ?? Infinity) - (b.bbox_area ?? Infinity)
+      );
+      return sorted[0]?.id ?? null;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 async function fetchTaxonDetails(
-  taxonIds: number[]
+  taxonIds: number[],
+  placeId: number = 1
 ): Promise<Map<number, { order: string; family: string; genus: string; nativeStatus: string; wikipediaSummary: string }>> {
   const result = new Map<number, { order: string; family: string; genus: string; nativeStatus: string; wikipediaSummary: string }>();
   if (taxonIds.length === 0) return result;
@@ -262,7 +292,7 @@ async function fetchTaxonDetails(
     batches.map(async (batch) => {
       try {
         const res = await fetch(
-          `${INAT_API}/taxa/${batch.join(",")}?preferred_place_id=1&locale=en`,
+          `${INAT_API}/taxa/${batch.join(",")}?preferred_place_id=${placeId}&locale=en`,
           { headers: { "User-Agent": "NaturalistNurturer/1.0" } }
         );
         if (!res.ok) return [];
@@ -279,14 +309,15 @@ async function fetchTaxonDetails(
       let order = "";
       let family = "";
       let genus = "";
-      // Only label native/introduced when iNaturalist provides explicit
-      // establishment_means data. The API's native/introduced booleans are
-      // unreliable (e.g. White-breasted Nuthatch, American sweetgum show as
-      // "introduced" despite being clearly native to eastern US). Default to
-      // "unknown" so we don't show incorrect labels.
+      // Extract establishment_means when iNaturalist provides it.
+      // The API returns this as an object: { establishment_means: "native", place: {...} }
+      // or occasionally as a plain string. Handle both formats.
       let nativeStatus = "unknown";
       if (taxon.establishment_means) {
-        const em = taxon.establishment_means as string;
+        const emRaw = taxon.establishment_means;
+        const em = typeof emRaw === "string"
+          ? emRaw
+          : (emRaw as { establishment_means?: string }).establishment_means || "";
         if (em === "native" || em === "endemic") {
           nativeStatus = "native";
         } else if (em === "introduced") {
@@ -506,14 +537,18 @@ export async function fetchSpeciesForLocation(
     }))
   );
 
-  const [locationNameResult, ...taxaSettled] = await Promise.all([
+  // Look up the nearest iNaturalist place in parallel with taxa fetches
+  // so establishment_means reflects the user's actual location
+  const [locationNameResult, placeIdResult, ...taxaSettled] = await Promise.all([
     reverseGeocode(coords),
+    findNearestPlaceId(coords),
     ...taxaFetches.map((p) =>
       p.catch(() => null)
     ),
   ]);
 
   const locationName = locationNameResult as string;
+  const placeId = (placeIdResult as number | null) ?? 1;
   const taxaResults = (taxaSettled as (({ iconicTaxa: string; results: { count: number; taxon: Record<string, unknown> }[] }) | null)[])
     .filter((r): r is { iconicTaxa: string; results: { count: number; taxon: Record<string, unknown> }[] } => r !== null);
 
@@ -523,9 +558,9 @@ export async function fetchSpeciesForLocation(
     .map((r) => (r.taxon as { id?: number }).id)
     .filter((id): id is number => id !== undefined);
 
-  // Fetch taxonomy details only — seasonal data and bird sounds are deferred
-  // to avoid blocking the home page with dozens of extra API calls
-  const taxonomyMap = await fetchTaxonDetails(taxonIds);
+  // Fetch taxonomy details using the location-specific place ID
+  // so native/introduced labels are accurate for the user's area
+  const taxonomyMap = await fetchTaxonDetails(taxonIds, placeId);
 
   // Convert each taxa group to Species format (no seasonal data — defaults to all seasons)
   const emptySeasonMap = new Map<number, Season[]>();
