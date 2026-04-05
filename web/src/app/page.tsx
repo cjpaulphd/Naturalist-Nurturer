@@ -293,7 +293,7 @@ export default function HomePage() {
           }}
           className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-stone-100 hover:bg-stone-200 rounded-full text-xs text-stone-600 transition-colors"
         >
-          🍂 Celebrations {animations ? "On" : "Off"}
+          🍂 Animations {animations ? "On" : "Off"}
         </button>
 
         {/* Add to Home Screen */}
