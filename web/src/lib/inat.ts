@@ -251,54 +251,64 @@ async function fetchTaxonDetails(
   const result = new Map<number, { order: string; family: string; genus: string; nativeStatus: string; wikipediaSummary: string }>();
   if (taxonIds.length === 0) return result;
 
-  // Batch in groups of 30 (API limit)
+  // Batch in groups of 30 (API limit), fetch all batches in parallel
   const batchSize = 30;
+  const batches: number[][] = [];
   for (let i = 0; i < taxonIds.length; i += batchSize) {
-    const batch = taxonIds.slice(i, i + batchSize);
-    try {
-      const res = await fetch(
-        `${INAT_API}/taxa/${batch.join(",")}?preferred_place_id=1&locale=en`,
-        { headers: { "User-Agent": "NaturalistNurturer/1.0" } }
-      );
-      if (!res.ok) continue;
-      const data = await res.json();
-      for (const taxon of data.results || []) {
-        let order = "";
-        let family = "";
-        let genus = "";
-        // Only label native/introduced when iNaturalist provides explicit
-        // establishment_means data. The API's native/introduced booleans are
-        // unreliable (e.g. White-breasted Nuthatch, American sweetgum show as
-        // "introduced" despite being clearly native to eastern US). Default to
-        // "unknown" so we don't show incorrect labels.
-        let nativeStatus = "unknown";
-        if (taxon.establishment_means) {
-          const em = taxon.establishment_means as string;
-          if (em === "native" || em === "endemic") {
-            nativeStatus = "native";
-          } else if (em === "introduced") {
-            nativeStatus = "introduced";
-          }
-        }
+    batches.push(taxonIds.slice(i, i + batchSize));
+  }
 
-        // Extract from ancestors array
-        const ancestors = (taxon.ancestors || []) as { rank?: string; name?: string }[];
-        for (const anc of ancestors) {
-          if (anc.rank === "order") order = anc.name || "";
-          if (anc.rank === "family") family = anc.name || "";
-          if (anc.rank === "genus") genus = anc.name || "";
-        }
-
-        // Genus fallback: parse from scientific name
-        if (!genus && taxon.name) {
-          genus = taxon.name.split(" ")[0] || "";
-        }
-
-        const wikipediaSummary = (taxon.wikipedia_summary as string) || "";
-        result.set(taxon.id, { order, family, genus, nativeStatus, wikipediaSummary });
+  const batchResults = await Promise.all(
+    batches.map(async (batch) => {
+      try {
+        const res = await fetch(
+          `${INAT_API}/taxa/${batch.join(",")}?preferred_place_id=1&locale=en`,
+          { headers: { "User-Agent": "NaturalistNurturer/1.0" } }
+        );
+        if (!res.ok) return [];
+        const data = await res.json();
+        return (data.results || []) as Record<string, unknown>[];
+      } catch {
+        return [];
       }
-    } catch {
-      // Continue with what we have
+    })
+  );
+
+  for (const taxons of batchResults) {
+    for (const taxon of taxons) {
+      let order = "";
+      let family = "";
+      let genus = "";
+      // Only label native/introduced when iNaturalist provides explicit
+      // establishment_means data. The API's native/introduced booleans are
+      // unreliable (e.g. White-breasted Nuthatch, American sweetgum show as
+      // "introduced" despite being clearly native to eastern US). Default to
+      // "unknown" so we don't show incorrect labels.
+      let nativeStatus = "unknown";
+      if (taxon.establishment_means) {
+        const em = taxon.establishment_means as string;
+        if (em === "native" || em === "endemic") {
+          nativeStatus = "native";
+        } else if (em === "introduced") {
+          nativeStatus = "introduced";
+        }
+      }
+
+      // Extract from ancestors array
+      const ancestors = (taxon.ancestors || []) as { rank?: string; name?: string }[];
+      for (const anc of ancestors) {
+        if (anc.rank === "order") order = anc.name || "";
+        if (anc.rank === "family") family = anc.name || "";
+        if (anc.rank === "genus") genus = anc.name || "";
+      }
+
+      // Genus fallback: parse from scientific name
+      if (!genus && (taxon.name as string)) {
+        genus = (taxon.name as string).split(" ")[0] || "";
+      }
+
+      const wikipediaSummary = (taxon.wikipedia_summary as string) || "";
+      result.set(taxon.id as number, { order, family, genus, nativeStatus, wikipediaSummary });
     }
   }
 

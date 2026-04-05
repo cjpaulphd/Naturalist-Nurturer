@@ -214,10 +214,15 @@ export default function HomePage() {
 
       {/* Loading overlay for location fetch */}
       {locationLoading && (
-        <div className="flex items-center justify-center gap-2 px-4 py-3 bg-green-50 rounded-lg border border-green-200">
-          <div className="w-4 h-4 border-2 border-green-700 border-t-transparent rounded-full animate-spin" />
-          <span className="text-sm text-green-700">
-            Discovering species near you...
+        <div className="flex flex-col items-center justify-center gap-1 px-4 py-3 bg-green-50 rounded-lg border border-green-200">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 border-2 border-green-700 border-t-transparent rounded-full animate-spin" />
+            <span className="text-sm text-green-700">
+              Discovering species near you...
+            </span>
+          </div>
+          <span className="text-xs text-green-600">
+            This may take a minute...
           </span>
         </div>
       )}
