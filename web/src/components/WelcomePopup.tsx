@@ -30,7 +30,19 @@ export default function WelcomePopup({ onClose }: WelcomePopupProps) {
             Welcome to Naturalist Nurturer!
           </h2>
           <p className="text-sm text-stone-500 mt-1">
-            Learn to identify the plants, animals, and fungi around you.
+            Get to know the species around you.
+          </p>
+          <p className="text-xs text-stone-400 mt-2">
+            Powered by{" "}
+            <a
+              href="https://www.inaturalist.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-green-700 transition-colors"
+            >
+              iNaturalist
+            </a>
+            {" "}community observations, photos, and species data.
           </p>
         </div>
 
