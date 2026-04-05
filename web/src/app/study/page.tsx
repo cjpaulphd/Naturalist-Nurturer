@@ -50,6 +50,76 @@ function formatNameSecondary(species: Species, display: NameDisplay): string | n
   return null;
 }
 
+// General identification tips by category
+function getCategoryTips(category: Category): string[] {
+  switch (category) {
+    case "tree":
+      return [
+        "Look at leaf shape, size, and arrangement (opposite vs alternate)",
+        "Check bark texture and color — smooth, furrowed, plated, or peeling",
+        "Note the overall silhouette and branching pattern",
+        "Look for fruits, seeds, or flowers if present",
+        "Consider leaf margins — toothed, lobed, or smooth",
+      ];
+    case "plant":
+      return [
+        "Observe flower color, petal count, and arrangement",
+        "Check leaf shape, margins, and how leaves attach to the stem",
+        "Note plant height and growth habit (upright, sprawling, climbing)",
+        "Look at stem characteristics — round, square, hairy, or smooth",
+        "Consider habitat — wetland, forest floor, meadow, or disturbed ground",
+      ];
+    case "fungus":
+      return [
+        "Note cap shape, color, and surface texture",
+        "Check the underside — gills, pores, teeth, or smooth",
+        "Look at stem presence, ring, and base shape",
+        "Consider where it's growing — on wood, soil, or other substrates",
+        "Note the overall size and any color changes when bruised",
+      ];
+    case "bird":
+      return [
+        "Note overall size and body shape relative to familiar species",
+        "Look at bill shape and size — it indicates diet and behavior",
+        "Check key field marks: wing bars, eye rings, breast markings",
+        "Observe color patterns on head, back, wings, and underparts",
+        "Consider habitat, behavior, and flight pattern",
+      ];
+    case "mammal":
+      return [
+        "Note body size, shape, and proportions",
+        "Look at fur color and any distinctive markings or patterns",
+        "Check ear shape and size, tail length and bushiness",
+        "Consider habitat and time of day (nocturnal vs diurnal)",
+        "Look at tracks, gait, and movement style if observed in motion",
+      ];
+    case "insect":
+      return [
+        "Count the wings and legs — body segments help narrow the order",
+        "Note color patterns, especially warning colors or mimicry",
+        "Check wing shape, venation, and whether they're clear or opaque",
+        "Look at antennae shape — clubbed, feathered, or thread-like",
+        "Consider size, habitat, and what plants it's associated with",
+      ];
+    case "reptile":
+      return [
+        "Look at scale patterns, texture, and coloration",
+        "Note body shape — slender, stocky, flattened, or elongated",
+        "Check head shape and eye characteristics",
+        "Consider size, habitat preference, and geographic range",
+        "Look for distinctive markings — bands, stripes, or blotches",
+      ];
+    case "amphibian":
+      return [
+        "Note skin texture — smooth (frogs) vs bumpy (toads)",
+        "Look at body proportions, especially hind leg length",
+        "Check coloration and any distinctive patterns or markings",
+        "Consider habitat — aquatic, terrestrial, or arboreal",
+        "Note size and eye characteristics (color, pupil shape)",
+      ];
+  }
+}
+
 // Generate multiple-choice options with taxonomy-aware distractor selection
 function generateChoices(
   correctSpecies: Species,
@@ -149,6 +219,9 @@ function StudyContent() {
   const [freeResponseInput, setFreeResponseInput] = useState("");
   const [dropdownValue, setDropdownValue] = useState("");
   const [isCorrect, setIsCorrect] = useState<"correct" | "partial" | "incorrect" | null>(null);
+  // Tips overlay state
+  const [showTips, setShowTips] = useState(false);
+
   // Swipe gesture state
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchDeltaX, setTouchDeltaX] = useState(0);
@@ -335,6 +408,7 @@ function StudyContent() {
     } else {
       setCurrentIndex(nextIndex);
       setFlipped(false);
+      setShowTips(false);
       resetQuizState();
       if (studyMode === "mixed") {
         setCurrentMode(pickRandomMode(allSpecies, cardIds[nextIndex]));
@@ -649,12 +723,24 @@ function StudyContent() {
       <div className="mb-3">
         {!flipped ? (
           (!isHardMode || activeMode === "name") && (
-            <button
-              onClick={handleFlip}
-              className="w-full py-3 bg-green-700 text-white font-medium hover:bg-green-800 transition-colors rounded-lg"
-            >
-              Reveal
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowTips(!showTips)}
+                className={`px-4 py-3 font-medium transition-colors rounded-lg text-sm ${
+                  showTips
+                    ? "bg-amber-100 text-amber-800 border border-amber-300"
+                    : "bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100"
+                }`}
+              >
+                Tips
+              </button>
+              <button
+                onClick={handleFlip}
+                className="flex-1 py-3 bg-green-700 text-white font-medium hover:bg-green-800 transition-colors rounded-lg"
+              >
+                Reveal
+              </button>
+            </div>
           )
         ) : (
           <div className="text-center">
@@ -777,6 +863,33 @@ function StudyContent() {
                     <p className="text-sm text-stone-400 mt-4">
                       Choose your answer below
                     </p>
+                  )}
+                </div>
+              )}
+
+              {/* Tips panel */}
+              {showTips && currentSpecies && (
+                <div className="border-t border-amber-200 bg-amber-50 p-4 space-y-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">
+                    {currentSpecies.category.charAt(0).toUpperCase() + currentSpecies.category.slice(1)} Identification Tips
+                  </p>
+                  <ul className="text-sm text-stone-600 space-y-1.5">
+                    {getCategoryTips(currentSpecies.category).map((tip, i) => (
+                      <li key={i} className="flex gap-2">
+                        <span className="text-amber-500 flex-shrink-0">&#8226;</span>
+                        <span>{tip}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  {currentSpecies.identificationTips && (
+                    <div className="mt-2 pt-2 border-t border-amber-200">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 mb-1">
+                        Species-Specific Tip
+                      </p>
+                      <p className="text-sm text-stone-700">
+                        {currentSpecies.identificationTips}
+                      </p>
+                    </div>
                   )}
                 </div>
               )}
