@@ -8,27 +8,27 @@ A mobile-first web app for learning species identification through flashcards, s
 
 ### Location-Based Species Discovery
 - **GPS detection** or **search by city/zip code** using OpenStreetMap geocoding
-- Fetches real species data from iNaturalist for any US location
-- Preset for Green River Preserve, NC
+- Fetches real species data from iNaturalist for any location worldwide
+- **Location disambiguator** for resolving multiple search results
+- **Study Locations dropdown** with saved past locations for quick switching
+- Defaults to **Green River Preserve** as the starting location for new users
 - 24-hour location cache for offline use
 
-### Season Chooser
-- **Current Season** auto-detects spring/summer/fall/winter
-- **Random Season** for variety
-- **Manual pick** from a visual season grid
-- Filters species to those active in the selected season
-
 ### Study Modes
-- **Photo ID** - Identify species from photos
-- **Name Recall** - Describe species from name prompts
-- **Sound ID** - Identify birds by their calls
-- **Mixed Mode** - Random rotation of all modes
+- **Photo ID** — Identify species from photos (default mode)
+- **Name Recall** — Describe species from name prompts
+- **Sound ID** — Identify birds by their calls (birds only)
+- **Mixed Mode** — Random rotation of all modes
 
 ### Quiz Difficulty Levels
-- **Flashcard** - Classic flip-to-reveal with self-rating (Again/Hard/Good/Easy)
-- **Multiple Choice** - Pick from 4 same-category options
-- **Dropdown** - Select from all species in that category
-- **Free Response** - Type the common or scientific name
+- **Flashcard** — Flip-to-reveal with self-rating
+- **Multiple Choice** — Pick from 4 same-category options
+- **Dropdown** — Select from all species in that category
+- **Free Response** — Type the common or scientific name (with partial credit)
+
+### Species Categories
+- Trees, Plants, Birds, Fungi, Insects, Mammals, Reptiles, and Amphibians
+- Category-filtered sessions with wrapping category selector
 
 ### Name Display Toggle
 Choose how species names appear during quizzes:
@@ -45,25 +45,45 @@ Visual Order > Family > Genus > Species hierarchy shown on every card back and i
 ### Spaced Repetition (SM-2)
 - SuperMemo SM-2 algorithm tracks your learning
 - Cards scheduled based on your self-rating
-- Streak tracking and progress dashboard
-- Per-category progress bars
+- **"Learn"** introduces new cards in prevalence order
+- **"Revisit"** brings back cards due for review
+- Per-category progress bars on session complete screen
+
+### Study Experience
+- Swipeable photo gallery with touch support on mobile and desktop
+- **"Reveal"** button to flip cards, action buttons positioned above the card
+- **"Nicely Nurtured!"** celebration heading with falling 🌿 fern animation on session complete
+- Loading indicator with "This may take a minute..." message during taxonomy fetches
+- Parallelized API calls for faster species loading
+- Bird sounds loaded on-demand per card for optimized performance
+- Graceful handling of species with missing photos
+
+### Growth Tracking
+- Progress dashboard with per-category stats
+- **Location tracking map** showing where you've studied
+- Streak counter and cards-learned totals
+- Shareable progress with inviting share text
 
 ### Field Guide / Browse
 - Searchable species list (by name, scientific name, family, order, or genus)
-- Filter by category (Trees, Plants, Birds)
-- Sort by prevalence, alphabetical, or family
+- Filter by category
+- Sort by prevalence (with iNaturalist attribution), alphabetical, or family
 - Detailed species profiles with taxonomy, photos, sounds, and identification tips
+- Centered, consistent design across all views
+
+### Welcome Experience
+- Welcome popup for first-time visitors with app tagline and iNaturalist attribution
+- **"Try It Out"** button loads Green River Preserve data for new users
 
 ## Species Data
 
 Each species includes:
 - Common and scientific names
 - Full taxonomy: Order, Family, Genus
-- Active seasons
-- Observation count and local prevalence rank
+- Observation count and local prevalence rank (sourced from iNaturalist)
 - Key facts, habitat, and identification tips
-- Photos from [iNaturalist](https://www.inaturalist.org) (CC-BY-NC)
-- Bird sounds from [Xeno-canto](https://xeno-canto.org) (CC-BY-NC 4.0)
+- Photos from [iNaturalist](https://www.inaturalist.org) (CC-BY-NC) with attribution displayed
+- Bird sounds from [Xeno-canto](https://xeno-canto.org) (CC-BY-NC 4.0) via server-side proxy
 
 ## Tech Stack
 
@@ -72,9 +92,10 @@ Each species includes:
 - **Tailwind CSS 4** for styling
 - **localStorage** for progress persistence (no account needed)
 - **PWA** with service worker for offline use
-- **[iNaturalist API](https://www.inaturalist.org)** for species data
+- **Vercel** hosting with Web Analytics
+- **[iNaturalist API](https://www.inaturalist.org)** for species data and taxonomy
 - **[OpenStreetMap Nominatim](https://nominatim.openstreetmap.org)** for geocoding
-- **[Xeno-canto API](https://xeno-canto.org)** for bird sounds
+- **[Xeno-canto API](https://xeno-canto.org)** for bird sounds (proxied server-side)
 
 ## Getting Started
 
@@ -101,29 +122,43 @@ python3 scripts/build_data.py
 ```
 web/
 ├── src/
-│   ├── app/           # Next.js pages (home, study, browse)
-│   ├── components/    # React components
+│   ├── app/              # Next.js pages
+│   │   ├── page.tsx      # Home — category selector, study launcher
+│   │   ├── study/        # Flashcard study sessions
+│   │   ├── browse/       # Field guide / species browser
+│   │   ├── progress/     # Growth tracking & location map
+│   │   └── api/          # Server-side API routes (Xeno-canto proxy)
+│   ├── components/
 │   │   ├── CategorySelector.tsx
-│   │   ├── SeasonChooser.tsx
-│   │   ├── TaxonomyChart.tsx
+│   │   ├── FallingLeaves.tsx
+│   │   ├── Header.tsx
+│   │   ├── LocationDisambiguator.tsx
 │   │   ├── LocationPicker.tsx
 │   │   ├── PhotoGallery.tsx
-│   │   ├── SoundPlayer.tsx
 │   │   ├── ProgressDashboard.tsx
-│   │   └── SpeciesDetail.tsx
-│   └── lib/           # Business logic
-│       ├── types.ts   # TypeScript interfaces
-│       ├── srs.ts     # SM-2 spaced repetition
-│       ├── species.ts # Data filtering/sorting/seasons
-│       ├── inat.ts    # iNaturalist API client
-│       └── storage.ts # localStorage wrapper
-├── public/data/       # Static species data
-└── scripts/           # Python data pipeline
+│   │   ├── QuizSettingsModal.tsx
+│   │   ├── SeasonChooser.tsx
+│   │   ├── ServiceWorkerRegistrar.tsx
+│   │   ├── SoundPlayer.tsx
+│   │   ├── SpeciesDetail.tsx
+│   │   ├── StudyLocationMap.tsx
+│   │   ├── TaxonomyChart.tsx
+│   │   └── WelcomePopup.tsx
+│   └── lib/
+│       ├── types.ts            # TypeScript interfaces
+│       ├── srs.ts              # SM-2 spaced repetition engine
+│       ├── species.ts          # Data filtering/sorting
+│       ├── categories.ts       # Taxa category definitions
+│       ├── inat.ts             # iNaturalist API client
+│       ├── storage.ts          # localStorage wrapper
+│       └── location-tracker.ts # Study location tracking
+├── public/data/          # Static species data
+└── scripts/              # Python data pipeline
 ```
 
 ## Data Attribution
 
-This app is built on the following open source data and APIs:
+This app is built on the following open data and APIs:
 
 - **[iNaturalist](https://www.inaturalist.org)** — Species observations, taxonomy, and photos (CC-BY-NC). iNaturalist is a joint initiative of the California Academy of Sciences and the National Geographic Society.
 - **[Xeno-canto](https://xeno-canto.org)** — Bird sound recordings (CC-BY-NC 4.0). Xeno-canto is a citizen science project for sharing bird sounds from around the world.

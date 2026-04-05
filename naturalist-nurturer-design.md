@@ -91,17 +91,22 @@ Pipeline:
 
 ---
 
-## 4. Estimated Species Counts
+## 4. Species Categories
 
-Based on iNaturalist research-grade observations within ~10mi of GRP:
+The app supports eight taxa categories, fetched dynamically from iNaturalist for any location:
 
-| Category | Est. Species | Priority Tier (learn first) |
-|----------|-------------|---------------------------|
-| Native trees | 60–80 | Top 30 by observation count |
-| Native plants (wildflowers, ferns, shrubs) | 200–400 | Top 50 |
-| Birds | 120–160 | Top 50 |
+| Category | Taxa Group |
+|----------|-----------|
+| Trees | Plantae (filtered by tree ancestry) |
+| Plants | Plantae (wildflowers, ferns, shrubs) |
+| Birds | Aves |
+| Fungi | Fungi |
+| Insects | Insecta |
+| Mammals | Mammalia |
+| Reptiles | Reptilia |
+| Amphibians | Amphibia |
 
-Starting with ~130 priority species across three categories is realistic for v1.
+Species are ranked by local observation count (prevalence) at the user's selected location. Base species data for Green River Preserve is pre-loaded (5 species per category), with additional species fetched on-demand from the iNaturalist API.
 
 ---
 
@@ -125,19 +130,27 @@ Random mode selection per card. Best for testing after initial learning.
 
 - **Prevalence ordering:** New cards introduced in order of local observation frequency — learn tulip poplar before Carolina silverbell
 - **Spaced repetition:** SM-2 algorithm (same as Anki) — cards you miss come back sooner
-- **Progress tracking:** Per-species mastery score, per-category completion percentage
-- **Session control:** "Learn 10 new" / "Review due" / "Quick quiz (15 cards)"
+- **Progress tracking:** Per-species mastery score, per-category progress bars
+- **Session options:** "Learn" (new cards) / "Revisit" (due cards) — Learn button never disabled, falls back to review with notification
+- **Session complete:** "Nicely Nurtured!" screen with falling 🌿 animation, category progress bars, and options to Meet More, view Growth, or go Home
 
 ### 5.3 Category & Filter Controls
 
-- Select: Trees / Plants / Birds (or all)
-- Filter: Native only (default on) / Include introduced
+- Select: Trees / Plants / Birds / Fungi / Insects / Mammals / Reptiles / Amphibians (wrapping selector)
 - Sort: By prevalence (default) / Alphabetical / Family grouping
-- Season filter: "What's visible/blooming/singing now?" (stretch goal)
+- Quiz settings accessible via modal popup
 
 ### 5.4 Reference Mode
 
-Browse the full species list as a field guide — searchable, sortable, with all photos and facts. Not flashcard mode; just a reference.
+Browse the full species list as a field guide — searchable, sortable, with all photos and facts. Centered, consistent design.
+
+### 5.5 Location Features
+
+- GPS detection or search by city/zip code (worldwide)
+- Location disambiguator for resolving multiple results
+- Study Locations dropdown with saved past locations
+- Defaults to Green River Preserve for new users
+- Location tracking map on growth page showing study locations
 
 ---
 
@@ -147,13 +160,14 @@ Browse the full species list as a field guide — searchable, sortable, with all
 
 | Layer | Choice | Rationale |
 |-------|--------|-----------|
-| Framework | **Next.js (App Router)** or **Vite + React** | Fast, deployable to Vercel/Netlify, good PWA support |
-| Styling | **Tailwind CSS** | Rapid prototyping, responsive by default |
-| Data | **Static JSON** files | Pre-fetched at build time; no database needed for v1 |
-| Audio | **HTML5 Audio API** | Native browser support for Xeno-canto MP3s |
+| Framework | **Next.js 16 (App Router)** | Fast, deployed to Vercel, good PWA support |
+| Styling | **Tailwind CSS 4** | Rapid prototyping, responsive by default |
+| Language | **TypeScript + React 19** | Type safety, modern React features |
+| Data | **Static JSON** + **iNaturalist API** | Pre-built base data plus live fetches for any location |
+| Audio | **HTML5 Audio API** | Native browser support for Xeno-canto MP3s (proxied server-side) |
 | State | **localStorage** | Progress/scores persist across sessions |
-| Hosting | **Vercel** (free tier) | Zero-config deployment from GitHub |
-| PWA | **next-pwa** or **vite-plugin-pwa** | Offline support, installable on phone |
+| Hosting | **Vercel** (free tier) | Zero-config deployment from GitHub with Web Analytics |
+| PWA | **Service worker** | Offline support, installable on phone |
 
 ### 6.2 Why Not a Database?
 
@@ -246,7 +260,7 @@ CONSTRAINTS:
 Build the "Naturalist Nurturer" web app — a flashcard app for learning
 species identification at Green River Preserve (western NC).
 
-STACK: Next.js 14 (App Router), Tailwind CSS, TypeScript
+STACK: Next.js 16 (App Router), Tailwind CSS 4, React 19, TypeScript
 
 DATA: The app reads from /public/data/species_data.json (pre-built static
 file with ~130 species across three categories: trees, plants, birds).
@@ -311,14 +325,17 @@ CRITICAL:
 
 ## 9. Development Phases
 
-| Phase | Scope | Effort |
+| Phase | Scope | Status |
 |-------|-------|--------|
-| **1. Data pipeline** | Python scripts to fetch & build species_data.json | 1–2 sessions |
-| **2. Core app** | Flashcard UI, photo mode, browse mode, SM-2 engine | 2–3 sessions |
-| **3. Sound integration** | Bird sound playback, sound quiz mode | 1 session |
-| **4. PWA + offline** | Service worker, caching, install prompt | 1 session |
-| **5. Curation pass** | Review key facts, add GRP-specific tips, fix bad photos | Ongoing |
-| **6. Stretch features** | Seasonal filters, eBird frequency integration, multi-user | Future |
+| **1. Data pipeline** | Python scripts to fetch & build species_data.json | ✅ Complete |
+| **2. Core app** | Flashcard UI, photo mode, browse mode, SM-2 engine | ✅ Complete |
+| **3. Sound integration** | Bird sound playback, sound quiz mode, server-side Xeno-canto proxy | ✅ Complete |
+| **4. PWA + offline** | Service worker, caching, install prompt | ✅ Complete |
+| **5. Location features** | Worldwide location search, disambiguator, saved locations, location tracking map | ✅ Complete |
+| **6. Extended taxa** | Fungi, insects, mammals, reptiles, amphibians added | ✅ Complete |
+| **7. UX polish** | Welcome popup, falling leaves animation, "Nicely Nurtured!" branding, quiz settings modal, swipeable photo gallery, loading indicators, parallelized fetches | ✅ Complete |
+| **8. Curation pass** | Review key facts, add GRP-specific tips, fix bad photos | Ongoing |
+| **9. Stretch features** | eBird frequency integration, multi-user | Future |
 
 ---
 
