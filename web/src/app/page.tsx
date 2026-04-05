@@ -70,16 +70,9 @@ export default function HomePage() {
     setLocationName(name);
   };
 
-  const hasNew = species.length > 0 && getNewCards(species, categories, 1).length > 0;
-  const hasDue = species.length > 0 && getDueCards(species, categories).length > 0;
-  const hasLearned = species.length > 0 && getAllLearnedCards(species, categories).length > 0;
   const hasAnyForCategory = species.length > 0 && species.some(
     (s) => categories.length === 0 || categories.includes(s.category)
   );
-
-  // Determine what the Learn button will do
-  type LearnAction = "learn" | "review" | "review-all" | "empty";
-  const learnAction: LearnAction = hasNew ? "learn" : hasDue ? "review" : hasLearned ? "review-all" : "empty";
 
   // Compute per-category new (unlearned) species counts
   const newCountsByCategory = useMemo(() => {
@@ -91,25 +84,53 @@ export default function HomePage() {
     return counts;
   }, [species]);
 
+  // Global check: any new species across all categories?
+  const hasAnyNew = species.length > 0 && getNewCards(species, [], 1).length > 0;
+  const hasAnyDue = species.length > 0 && getDueCards(species, []).length > 0;
+  const hasAnyLearned = species.length > 0 && getAllLearnedCards(species, []).length > 0;
+  const canLearn = hasAnyNew || hasAnyDue || hasAnyLearned;
+
+  const [learnToast, setLearnToast] = useState<string | null>(null);
+
   const hasBirds = species.some((s) => s.category === "bird");
 
   const startLearn = () => {
     const params = new URLSearchParams();
-    if (hasNew) {
+    let effectiveCategories = categories;
+
+    // Check if current selection has new species
+    const hasNewInCurrent = species.length > 0 && getNewCards(species, categories, 1).length > 0;
+
+    if (!hasNewInCurrent && hasAnyNew) {
+      // Auto-switch to a category that has new species
+      const nextCat = CATEGORIES.find(
+        (cat) => newCountsByCategory && newCountsByCategory[cat.value] > 0
+      );
+      if (nextCat) {
+        effectiveCategories = [nextCat.value];
+        setCategories(effectiveCategories);
+        const currentLabel = categories.length === 1
+          ? CATEGORIES.find(c => c.value === categories[0])?.label?.toLowerCase()
+          : "species";
+        setLearnToast(`All ${currentLabel} learned! Switching to ${nextCat.label.toLowerCase()}.`);
+        setTimeout(() => setLearnToast(null), 3000);
+      }
+    }
+
+    if (getNewCards(species, effectiveCategories, 1).length > 0) {
       params.set("type", "learn");
-    } else if (hasDue) {
+    } else if (getDueCards(species, effectiveCategories).length > 0) {
       params.set("type", "review");
-    } else if (hasLearned) {
+      params.set("fallback", "true");
+    } else if (getAllLearnedCards(species, effectiveCategories).length > 0) {
       params.set("type", "review-all");
+      params.set("fallback", "true");
     } else {
-      return; // truly nothing — button should be disabled
+      return;
     }
     params.set("mode", "photo");
-    if (categories.length > 0) {
-      params.set("categories", categories.join(","));
-    }
-    if (!hasNew) {
-      params.set("fallback", "true");
+    if (effectiveCategories.length > 0) {
+      params.set("categories", effectiveCategories.join(","));
     }
     router.push(`/study?${params.toString()}`);
   };
@@ -177,23 +198,10 @@ export default function HomePage() {
         <div className="grid grid-cols-2 gap-2">
           <button
             onClick={startLearn}
-            disabled={learnAction === "empty"}
-            className={`p-3 text-white rounded-xl text-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-              learnAction === "learn"
-                ? "bg-green-700 hover:bg-green-800"
-                : "bg-amber-600 hover:bg-amber-700"
-            }`}
+            disabled={!canLearn}
+            className={`p-3 text-white rounded-xl text-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-green-700 hover:bg-green-800`}
           >
-            <div className="font-semibold text-sm">
-              Learn
-            </div>
-            {learnAction !== "learn" && learnAction !== "empty" && (
-              <div className="text-[10px] opacity-80 mt-0.5">
-                All new {categories.length === 1
-                  ? CATEGORIES.find(c => c.value === categories[0])?.label?.toLowerCase()
-                  : "species"} learned!
-              </div>
-            )}
+            <div className="font-semibold text-sm">Learn</div>
           </button>
 
           <button
@@ -206,13 +214,11 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Empty category hint */}
-      {species.length > 0 && learnAction === "empty" && (
-        <p className="text-xs text-stone-400 text-center -mt-3">
-          {categories.length > 0
-            ? "No species found for these categories at this location. Try selecting others or tap All."
-            : "No species loaded. Search for a location above."}
-        </p>
+      {/* Ephemeral toast for auto-category switch */}
+      {learnToast && (
+        <div className="text-xs text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2 text-center -mt-3 animate-fade-in">
+          {learnToast}
+        </div>
       )}
 
       {/* Location Picker */}
