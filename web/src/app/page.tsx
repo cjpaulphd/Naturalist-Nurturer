@@ -188,7 +188,11 @@ export default function HomePage() {
               Learn
             </div>
             {learnAction !== "learn" && learnAction !== "empty" && (
-              <div className="text-[10px] opacity-80 mt-0.5">All new species learned!</div>
+              <div className="text-[10px] opacity-80 mt-0.5">
+                All new {categories.length === 1
+                  ? CATEGORIES.find(c => c.value === categories[0])?.label?.toLowerCase()
+                  : "species"} learned!
+              </div>
             )}
           </button>
 
