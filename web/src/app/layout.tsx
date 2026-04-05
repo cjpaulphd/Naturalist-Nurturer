@@ -6,6 +6,9 @@ import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
 
 export const metadata: Metadata = {
   title: "Naturalist Nurturer",
+  icons: {
+    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>",
+  },
   description:
     "Know Your Neighbors. Learn the species where you are with flashcards and quizzes powered by iNaturalist.",
   manifest: "/manifest.json",
