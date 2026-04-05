@@ -352,6 +352,10 @@ function StudyContent() {
   }
 
   if (cardIds.length === 0) {
+    const hasNew = getNewCards(allSpecies, categories, 1).length > 0;
+    const hasDue = getDueCards(allSpecies, categories).length > 0;
+    const hasLearned = getAllLearnedCards(allSpecies, categories).length > 0;
+
     return (
       <div className="max-w-lg mx-auto px-4 py-12 text-center">
         <p className="text-4xl mb-4">✅</p>
@@ -365,12 +369,53 @@ function StudyContent() {
             ? "Great job! Come back later for more reviews."
             : "You've learned all available cards in this category."}
         </p>
-        <button
-          onClick={() => router.push("/")}
-          className="px-6 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800"
-        >
-          Back to Home
-        </button>
+        <div className="flex gap-3 justify-center flex-wrap">
+          {hasNew && sessionType !== "learn" && (
+            <button
+              onClick={() => {
+                const params = new URLSearchParams(searchParams.toString());
+                params.set("type", "learn");
+                params.delete("fallback");
+                router.push(`/study?${params.toString()}`);
+              }}
+              className="px-6 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800"
+            >
+              Learn New
+            </button>
+          )}
+          {hasDue && sessionType !== "review" && (
+            <button
+              onClick={() => {
+                const params = new URLSearchParams(searchParams.toString());
+                params.set("type", "review");
+                params.delete("fallback");
+                router.push(`/study?${params.toString()}`);
+              }}
+              className="px-6 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800"
+            >
+              Review Due
+            </button>
+          )}
+          {hasLearned && sessionType !== "review-all" && (
+            <button
+              onClick={() => {
+                const params = new URLSearchParams(searchParams.toString());
+                params.set("type", "review-all");
+                params.delete("fallback");
+                router.push(`/study?${params.toString()}`);
+              }}
+              className="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600"
+            >
+              Review All
+            </button>
+          )}
+          <button
+            onClick={() => router.push("/")}
+            className="px-6 py-2 bg-stone-200 text-stone-700 rounded-lg hover:bg-stone-300"
+          >
+            Back to Home
+          </button>
+        </div>
       </div>
     );
   }
@@ -441,12 +486,29 @@ function StudyContent() {
           </div>
         </div>
 
-        <div className="flex gap-3 justify-center">
+        <div className="flex gap-3 justify-center flex-wrap">
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => {
+              const hasNew = getNewCards(allSpecies, categories, 1).length > 0;
+              if (hasNew) {
+                // More new cards available — reload to start a new learn session
+                window.location.reload();
+              } else {
+                // No new cards — fall back to review
+                const hasDue = getDueCards(allSpecies, categories).length > 0;
+                const params = new URLSearchParams(searchParams.toString());
+                if (hasDue) {
+                  params.set("type", "review");
+                } else {
+                  params.set("type", "review-all");
+                }
+                params.set("fallback", "true");
+                router.push(`/study?${params.toString()}`);
+              }
+            }}
             className="px-6 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800"
           >
-            Meet More
+            {getNewCards(allSpecies, categories, 1).length > 0 ? "Meet More" : "Review"}
           </button>
           <button
             onClick={() => router.push("/progress")}
