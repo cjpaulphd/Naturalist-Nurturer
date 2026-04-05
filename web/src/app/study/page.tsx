@@ -621,7 +621,7 @@ function StudyContent() {
       )}
 
       {/* Quiz mode badge */}
-      {isHardMode && (
+      {isHardMode && activeMode !== "name" && (
         <div className="flex items-center justify-center gap-2 mb-3">
           <span className="px-2 py-0.5 bg-red-100 text-red-700 rounded text-xs font-medium">
             {quizMode === "multiple-choice"
@@ -642,7 +642,7 @@ function StudyContent() {
       {/* Action buttons - above the card, under progress bar */}
       <div className="mb-3">
         {!flipped ? (
-          !isHardMode && (
+          (!isHardMode || activeMode === "name") && (
             <button
               onClick={handleFlip}
               className="w-full py-3 bg-green-700 text-white font-medium hover:bg-green-800 transition-colors rounded-lg"
@@ -652,7 +652,7 @@ function StudyContent() {
           )
         ) : (
           <div className="text-center">
-            {isHardMode ? (
+            {isHardMode && activeMode !== "name" ? (
               <button
                 onClick={() => handleRate(isCorrect === "correct" ? "good" : isCorrect === "partial" ? "hard" : "again")}
                 className="w-full py-3 rounded-lg text-white font-medium bg-green-700 hover:bg-green-800 transition-colors"
@@ -660,12 +660,32 @@ function StudyContent() {
                 Next
               </button>
             ) : (
-              <button
-                onClick={handleNext}
-                className="w-full py-3 rounded-lg text-white font-medium bg-green-700 hover:bg-green-800 transition-colors"
-              >
-                Next
-              </button>
+              <div className="grid grid-cols-4 gap-2">
+                <button
+                  onClick={() => handleRate("again")}
+                  className="py-3 rounded-lg text-white font-medium bg-red-500 hover:bg-red-600 transition-colors text-sm"
+                >
+                  Again
+                </button>
+                <button
+                  onClick={() => handleRate("hard")}
+                  className="py-3 rounded-lg text-white font-medium bg-orange-500 hover:bg-orange-600 transition-colors text-sm"
+                >
+                  Hard
+                </button>
+                <button
+                  onClick={() => handleRate("good")}
+                  className="py-3 rounded-lg text-white font-medium bg-green-600 hover:bg-green-700 transition-colors text-sm"
+                >
+                  Good
+                </button>
+                <button
+                  onClick={() => handleRate("easy")}
+                  className="py-3 rounded-lg text-white font-medium bg-blue-500 hover:bg-blue-600 transition-colors text-sm"
+                >
+                  Easy
+                </button>
+              </div>
             )}
           </div>
         )}
@@ -709,6 +729,9 @@ function StudyContent() {
 
               {activeMode === "name" && (
                 <div className="p-8 text-center min-h-[300px] flex flex-col items-center justify-center">
+                  <p className="text-xs uppercase tracking-wide text-stone-400 mb-4">
+                    Can you picture this species?
+                  </p>
                   <p className="text-2xl font-bold text-stone-800">
                     {formatName(currentSpecies, nameDisplay)}
                   </p>
@@ -717,12 +740,9 @@ function StudyContent() {
                       {formatNameSecondary(currentSpecies, nameDisplay)}
                     </p>
                   )}
-                  <p className="text-sm text-stone-500 mt-6">
-                    Can you describe this species?
-                  </p>
-                  <p className="text-xs text-stone-400 mt-1">
-                    Think: appearance, habitat, identifying features
-                  </p>
+                  <div className="mt-6 text-sm text-stone-400 space-y-1">
+                    <p>Picture its appearance, then reveal to check</p>
+                  </div>
                 </div>
               )}
 
