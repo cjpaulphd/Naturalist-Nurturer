@@ -1141,6 +1141,16 @@ function StudyContent() {
                 )}
               </div>
 
+              {/* Next card button on back of card */}
+              <button
+                onClick={isHardMode && activeMode !== "name"
+                  ? () => handleRate(isCorrect === "correct" ? "good" : isCorrect === "partial" ? "hard" : "again")
+                  : handleNext}
+                className="w-full py-3 border-t border-stone-200 bg-stone-50 hover:bg-stone-100 text-stone-500 hover:text-stone-700 transition-colors flex items-center justify-center gap-2 text-sm font-medium rounded-b-xl"
+              >
+                Next <span aria-hidden="true">&rarr;</span>
+              </button>
+
             </div>
           </div>
         </div>

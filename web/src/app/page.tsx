@@ -388,7 +388,7 @@ export default function HomePage() {
             onClick={() => setShowWelcome(true)}
             className="hover:text-green-700 transition-colors"
           >
-            Welcome
+            Welcome Page
           </button>
         </p>
       </footer>
