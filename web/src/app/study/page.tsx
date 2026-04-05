@@ -299,7 +299,7 @@ function StudyContent() {
   const handleRate = (rating: Rating) => {
     if (!currentSpecies) return;
 
-    rateCard(currentSpecies.id, rating);
+    rateCard(currentSpecies.id, rating, currentSpecies.category);
     setSessionStats((s) => ({ ...s, [rating]: s[rating] + 1 }));
     advanceToNext();
   };
@@ -307,7 +307,7 @@ function StudyContent() {
   const handleNext = () => {
     if (!currentSpecies) return;
     // Default to "good" rating when using Next button or swipe
-    rateCard(currentSpecies.id, "good");
+    rateCard(currentSpecies.id, "good", currentSpecies.category);
     setSessionStats((s) => ({ ...s, good: s.good + 1 }));
     advanceToNext();
   };

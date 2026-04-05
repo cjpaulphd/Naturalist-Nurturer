@@ -2,12 +2,18 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { Species, Category } from "@/lib/types";
 import { loadSpeciesData } from "@/lib/species";
 import { getCachedLocationSpecies } from "@/lib/inat";
 import { getDueCards, getAllLearnedCards } from "@/lib/srs";
 import ProgressDashboard from "@/components/ProgressDashboard";
 import CategorySelector from "@/components/CategorySelector";
+
+const StudyLocationMap = dynamic(
+  () => import("@/components/StudyLocationMap"),
+  { ssr: false }
+);
 
 export default function ProgressPage() {
   const router = useRouter();
@@ -61,6 +67,8 @@ export default function ProgressPage() {
       {species.length > 0 ? (
         <>
           <ProgressDashboard species={species} />
+
+          <StudyLocationMap />
 
           <div className="text-center space-y-3">
             <h3 className="text-sm font-semibold text-stone-600">

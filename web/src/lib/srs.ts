@@ -7,6 +7,7 @@
 
 import { CardState, Rating, Species, Category } from "./types";
 import { getStorage, setStorage } from "./storage";
+import { recordStudyLocation } from "./location-tracker";
 
 const CARD_STATE_KEY = "nn_card_states";
 const PROGRESS_KEY = "nn_progress";
@@ -52,7 +53,7 @@ export function createNewCardState(speciesId: number): CardState {
 /**
  * Apply SM-2 algorithm to update card state based on rating.
  */
-export function rateCard(speciesId: number, rating: Rating): CardState {
+export function rateCard(speciesId: number, rating: Rating, category?: Category): CardState {
   const existing = getCardState(speciesId) || createNewCardState(speciesId);
   const quality = RATING_QUALITY[rating];
 
@@ -93,6 +94,10 @@ export function rateCard(speciesId: number, rating: Rating): CardState {
 
   saveCardState(newState);
   updateProgress(speciesId);
+
+  if (category) {
+    recordStudyLocation(speciesId, category);
+  }
 
   return newState;
 }
