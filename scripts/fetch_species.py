@@ -152,7 +152,7 @@ def is_tree(taxon):
         rank = taxon.get("rank", "species")
         # For families that contain both trees and non-trees, use rank_level
         # Trees typically have rank_level >= 10 (species level)
-        if taxon_family in {"Rosaceae", "Fabaceae", "Ericaceae", "Salicaceae", "Adoxaceae"}:
+        if taxon_family in {"Rosaceae", "Fabaceae", "Ericaceae", "Salicaceae", "Adoxaceae", "Anacardiaceae", "Oleaceae", "Bignoniaceae"}:
             # These families have many non-tree members; check if common name
             # suggests tree-like growth
             common = (taxon.get("preferred_common_name") or "").lower()
@@ -165,6 +165,7 @@ def is_tree(taxon):
                 "buckeye", "chestnut", "persimmon", "serviceberry",
                 "silverbell", "pawpaw", "rhododendron", "mountain laurel",
                 "witch hazel", "catalpa", "paulownia",
+                "sumac", "smoketree", "fringe tree",
             }
             return any(w in common for w in tree_words)
         return True

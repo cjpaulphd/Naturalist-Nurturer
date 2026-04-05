@@ -48,6 +48,7 @@ const TREE_NAME_KEYWORDS = [
   "spruce", "fir", "cedar", "juniper", "holly", "sourwood", "basswood",
   "buckeye", "chestnut", "persimmon", "serviceberry", "silverbell",
   "pawpaw", "catalpa", "hackberry", "hornbeam", "linden",
+  "sumac", "smoketree", "fringe tree",
 ];
 
 
@@ -145,7 +146,7 @@ function classifyPlant(
   commonName: string
 ): Category {
   if (familyName && TREE_FAMILIES.has(familyName)) {
-    const ambiguousFamilies = new Set(["Rosaceae", "Fabaceae", "Ericaceae", "Salicaceae", "Adoxaceae"]);
+    const ambiguousFamilies = new Set(["Rosaceae", "Fabaceae", "Ericaceae", "Salicaceae", "Adoxaceae", "Anacardiaceae", "Oleaceae", "Bignoniaceae"]);
     if (ambiguousFamilies.has(familyName)) {
       const cn = commonName.toLowerCase();
       if (TREE_NAME_KEYWORDS.some((kw) => cn.includes(kw))) {
