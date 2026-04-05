@@ -14,6 +14,7 @@ export default function SoundPlayer({ speciesId, sounds }: SoundPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -54,6 +55,11 @@ export default function SoundPlayer({ speciesId, sounds }: SoundPlayerProps) {
     setProgress(0);
   };
 
+  const handleError = () => {
+    setIsPlaying(false);
+    setError(true);
+  };
+
   const switchTrack = (index: number) => {
     if (audioRef.current) {
       audioRef.current.pause();
@@ -61,6 +67,7 @@ export default function SoundPlayer({ speciesId, sounds }: SoundPlayerProps) {
     setCurrentIndex(index);
     setIsPlaying(false);
     setProgress(0);
+    setError(false);
   };
 
   const formatDuration = (seconds: number | null) => {
@@ -77,41 +84,46 @@ export default function SoundPlayer({ speciesId, sounds }: SoundPlayerProps) {
         src={src}
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleEnded}
+        onError={handleError}
         preload="metadata"
       />
 
-      <div className="flex items-center gap-3">
-        <button
-          onClick={togglePlay}
-          className="w-10 h-10 rounded-full bg-green-700 text-white flex items-center justify-center hover:bg-green-800 transition-colors flex-shrink-0"
-          aria-label={isPlaying ? "Pause" : "Play"}
-        >
-          {isPlaying ? (
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <rect x="6" y="4" width="4" height="16" />
-              <rect x="14" y="4" width="4" height="16" />
-            </svg>
-          ) : (
-            <svg className="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-              <polygon points="5,3 19,12 5,21" />
-            </svg>
-          )}
-        </button>
+      {error ? (
+        <p className="text-sm text-red-500 py-2">Unable to load audio. Try another track.</p>
+      ) : (
+        <div className="flex items-center gap-3">
+          <button
+            onClick={togglePlay}
+            className="w-10 h-10 rounded-full bg-green-700 text-white flex items-center justify-center hover:bg-green-800 transition-colors flex-shrink-0"
+            aria-label={isPlaying ? "Pause" : "Play"}
+          >
+            {isPlaying ? (
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <rect x="6" y="4" width="4" height="16" />
+                <rect x="14" y="4" width="4" height="16" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                <polygon points="5,3 19,12 5,21" />
+              </svg>
+            )}
+          </button>
 
-        <div className="flex-1 min-w-0">
-          <div className="w-full h-1.5 bg-stone-300 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-green-600 rounded-full transition-all duration-200"
-              style={{ width: `${progress}%` }}
-            />
+          <div className="flex-1 min-w-0">
+            <div className="w-full h-1.5 bg-stone-300 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-green-600 rounded-full transition-all duration-200"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            {sound.duration && (
+              <span className="text-[10px] text-stone-500 mt-0.5 block">
+                {formatDuration(sound.duration)}
+              </span>
+            )}
           </div>
-          {sound.duration && (
-            <span className="text-[10px] text-stone-500 mt-0.5 block">
-              {formatDuration(sound.duration)}
-            </span>
-          )}
         </div>
-      </div>
+      )}
 
       {sounds.length > 1 && (
         <div className="flex gap-2 mt-2">
