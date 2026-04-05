@@ -17,11 +17,11 @@ export default function CategorySelector({
 }: CategorySelectorProps) {
   const isAll = selected.length === 0;
 
-  const toggleCategory = (cat: Category) => {
+  const selectCategory = (cat: Category) => {
     if (selected.includes(cat)) {
-      onChange(selected.filter((c) => c !== cat));
+      onChange([]); // deselect → back to All
     } else {
-      onChange([...selected, cat]);
+      onChange([cat]); // exclusive: only this one
     }
   };
 
@@ -45,7 +45,7 @@ export default function CategorySelector({
         return (
           <button
             key={cat.value}
-            onClick={() => toggleCategory(cat.value)}
+            onClick={() => selectCategory(cat.value)}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors flex-shrink-0 ${
               selected.includes(cat.value)
                 ? isEmpty
