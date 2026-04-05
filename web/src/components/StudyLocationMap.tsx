@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import {
@@ -46,6 +46,39 @@ export default function StudyLocationMap() {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const [locations] = useState<StudyLocation[]>(() => getStudyLocations());
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    if (!showDropdown) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showDropdown]);
+
+  const flyToLocation = useCallback((loc: StudyLocation) => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+    map.flyTo([loc.lat, loc.lng], 12, { duration: 0.8 });
+    setShowDropdown(false);
+  }, []);
+
+  const fitAllLocations = useCallback(() => {
+    const map = mapInstanceRef.current;
+    if (!map || locations.length === 0) return;
+    if (locations.length === 1) {
+      map.flyTo([locations[0].lat, locations[0].lng], 12, { duration: 0.8 });
+    } else {
+      const bounds = L.latLngBounds(locations.map((l) => [l.lat, l.lng]));
+      map.flyToBounds(bounds.pad(0.2), { duration: 0.8 });
+    }
+    setShowDropdown(false);
+  }, [locations]);
 
   useEffect(() => {
     if (!mapRef.current || locations.length === 0) return;
@@ -129,14 +162,59 @@ export default function StudyLocationMap() {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
       <div className="px-4 pt-4 pb-2">
-        <h2 className="text-sm font-semibold text-stone-700">
-          Places You&apos;ve Explored
-        </h2>
-        <p className="text-xs text-stone-400 mt-0.5">
-          {locations.length} location{locations.length !== 1 ? "s" : ""} &middot;{" "}
-          {locations.reduce((sum, l) => sum + l.speciesIds.length, 0)} species
-          studied
-        </p>
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <h2 className="text-sm font-semibold text-stone-700">
+              Places You&apos;ve Explored
+            </h2>
+            <p className="text-xs text-stone-400 mt-0.5">
+              {locations.length} location{locations.length !== 1 ? "s" : ""} &middot;{" "}
+              {locations.reduce((sum, l) => sum + l.speciesIds.length, 0)} species
+              studied
+            </p>
+          </div>
+          {locations.length > 1 && (
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setShowDropdown(!showDropdown)}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-stone-100 text-stone-700 rounded-lg text-xs font-medium hover:bg-stone-200 transition-colors"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Jump to
+                <svg className={`w-3 h-3 transition-transform ${showDropdown ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {showDropdown && (
+                <div className="absolute top-full right-0 mt-1 w-56 bg-white border border-stone-200 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
+                  <button
+                    onClick={fitAllLocations}
+                    className="w-full text-left px-3 py-2 hover:bg-green-50 text-sm text-green-700 font-medium border-b border-stone-200 transition-colors"
+                  >
+                    Show all locations
+                  </button>
+                  {[...locations]
+                    .sort((a, b) => b.lastStudied - a.lastStudied)
+                    .map((loc, i) => (
+                      <button
+                        key={i}
+                        onClick={() => flyToLocation(loc)}
+                        className="w-full text-left px-3 py-2 hover:bg-green-50 text-sm text-stone-700 border-b border-stone-100 last:border-b-0 transition-colors"
+                      >
+                        <div className="font-medium">{loc.name}</div>
+                        <div className="text-xs text-stone-400">
+                          {loc.speciesIds.length} species studied
+                        </div>
+                      </button>
+                    ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
       <div
         ref={mapRef}
