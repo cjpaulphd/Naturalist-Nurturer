@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Species, Category, SessionType, StudyMode, QuizMode, QuizDifficulty, NameDisplay } from "@/lib/types";
 import { loadSpeciesData } from "@/lib/species";
 import { getCachedLocationSpecies, getLastLocation } from "@/lib/inat";
-import { getNewCards, getDueCards, getAllLearnedCards } from "@/lib/srs";
+import { getNewCards, getDueCards, getAllLearnedCards, getLearnedCount } from "@/lib/srs";
 import { CATEGORIES } from "@/lib/categories";
 import { getStorage, setStorage } from "@/lib/storage";
 import CategorySelector from "@/components/CategorySelector";
@@ -80,6 +80,25 @@ export default function HomePage() {
     const counts = {} as Record<Category, number>;
     for (const cat of CATEGORIES) {
       counts[cat.value] = getNewCards(species, [cat.value], Infinity).length;
+    }
+    return counts;
+  }, [species]);
+
+  // Compute per-category learned and total counts for ratio display
+  const learnedCountsByCategory = useMemo(() => {
+    if (species.length === 0) return undefined;
+    const counts = {} as Record<Category, number>;
+    for (const cat of CATEGORIES) {
+      counts[cat.value] = getLearnedCount(species, cat.value);
+    }
+    return counts;
+  }, [species]);
+
+  const totalCountsByCategory = useMemo(() => {
+    if (species.length === 0) return undefined;
+    const counts = {} as Record<Category, number>;
+    for (const cat of CATEGORIES) {
+      counts[cat.value] = species.filter((s) => s.category === cat.value).length;
     }
     return counts;
   }, [species]);
@@ -269,6 +288,8 @@ export default function HomePage() {
               selected={categories}
               onChange={setCategories}
               newCounts={newCountsByCategory}
+              learnedCounts={learnedCountsByCategory}
+              totalCounts={totalCountsByCategory}
             />
           </div>
         </>
