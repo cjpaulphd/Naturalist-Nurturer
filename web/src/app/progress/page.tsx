@@ -72,7 +72,7 @@ export default function ProgressPage() {
 
           <div className="text-center space-y-3">
             <h3 className="text-sm font-semibold text-stone-600">
-              Filter Review by Category
+              Filter Revisit by Category
             </h3>
             <CategorySelector selected={categories} onChange={setCategories} />
           </div>

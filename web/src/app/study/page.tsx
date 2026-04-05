@@ -361,12 +361,12 @@ function StudyContent() {
         <p className="text-4xl mb-4">✅</p>
         <h2 className="text-xl font-bold text-stone-800 mb-2">
           {sessionType === "review" || sessionType === "review-all"
-            ? "No cards due for review!"
+            ? "No cards due for revisit!"
             : "No new cards available"}
         </h2>
         <p className="text-stone-500 text-sm mb-4">
           {sessionType === "review" || sessionType === "review-all"
-            ? "Great job! Come back later for more reviews."
+            ? "Great job! Come back later to revisit more."
             : "You've learned all available cards in this category."}
         </p>
         <div className="flex gap-3 justify-center flex-wrap">
@@ -393,7 +393,7 @@ function StudyContent() {
               }}
               className="px-6 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800"
             >
-              Review Due
+              Revisit Due
             </button>
           )}
           {hasLearned && sessionType !== "review-all" && (
@@ -406,7 +406,7 @@ function StudyContent() {
               }}
               className="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600"
             >
-              Review All
+              Revisit All
             </button>
           )}
           <button
@@ -508,7 +508,7 @@ function StudyContent() {
             }}
             className="px-6 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800"
           >
-            {getNewCards(allSpecies, categories, 1).length > 0 ? "Meet More" : "Review"}
+            {getNewCards(allSpecies, categories, 1).length > 0 ? "Meet More" : "Revisit"}
           </button>
           <button
             onClick={() => router.push("/progress")}
@@ -564,8 +564,8 @@ function StudyContent() {
         <div className="flex items-center justify-between gap-2 mb-3 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg">
           <p className="text-xs text-amber-700">
             {sessionType === "review"
-              ? "No new species to learn \u2014 reviewing due cards instead."
-              : "No new species to learn \u2014 reviewing what you know."}
+              ? "No new species to learn \u2014 revisiting due cards instead."
+              : "No new species to learn \u2014 revisiting what you know."}
           </p>
           <button
             onClick={() => setShowFallbackBanner(false)}
