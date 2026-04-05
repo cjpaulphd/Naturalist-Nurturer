@@ -776,15 +776,6 @@ function StudyContent() {
                 </div>
               )}
 
-              {/* Single Show Answer button for flashcard mode */}
-              {!isHardMode && (
-                <button
-                  onClick={handleFlip}
-                  className="w-full py-3 bg-green-700 text-white font-medium hover:bg-green-800 transition-colors"
-                >
-                  Show Answer
-                </button>
-              )}
             </div>
           </div>
 
@@ -809,62 +800,6 @@ function StudyContent() {
                     : "Incorrect"}
                 </div>
               )}
-
-              {/* Navigation buttons - at top for visibility */}
-              <div className="p-3 border-b border-stone-100 text-center">
-                {isHardMode ? (
-                  <button
-                    onClick={() => handleRate(isCorrect === "correct" ? "good" : isCorrect === "partial" ? "hard" : "again")}
-                    className="w-full py-2.5 rounded-lg text-white text-sm font-medium bg-green-700 hover:bg-green-800 transition-colors"
-                  >
-                    Next
-                  </button>
-                ) : (
-                  <div>
-                    <button
-                      onClick={handleNext}
-                      className="w-full py-2.5 rounded-lg text-white text-sm font-medium bg-green-700 hover:bg-green-800 transition-colors"
-                    >
-                      Next
-                    </button>
-                    <div className="mt-2 flex items-center justify-center gap-2">
-                      <button
-                        onClick={() => setShowRatingOptions(!showRatingOptions)}
-                        className="text-xs text-stone-400 hover:text-stone-600 transition-colors"
-                      >
-                        {showRatingOptions ? "Hide" : "Rate difficulty"}
-                      </button>
-                      <span className="text-stone-300">·</span>
-                      <button
-                        onClick={handleSkip}
-                        className="text-xs text-stone-400 hover:text-stone-600 transition-colors"
-                      >
-                        Skip
-                      </button>
-                    </div>
-                    {showRatingOptions && (
-                      <div className="mt-2">
-                        <div className="grid grid-cols-4 gap-2">
-                          {RATING_BUTTONS.map((btn) => (
-                            <button
-                              key={btn.rating}
-                              onClick={() => handleRate(btn.rating)}
-                              className={`py-2 rounded-lg text-white text-xs font-medium ${btn.color} transition-colors`}
-                            >
-                              {btn.label}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-                {!isHardMode && (
-                  <p className="text-[10px] text-stone-300 mt-2">
-                    Swipe left for next
-                  </p>
-                )}
-              </div>
 
               {/* Always show photo on back */}
               {currentSpecies.photos.length > 0 && activeMode !== "photo" && (
@@ -952,6 +887,75 @@ function StudyContent() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Action buttons - always in the same position */}
+      <div className="mt-3">
+        {!flipped ? (
+          !isHardMode && (
+            <button
+              onClick={handleFlip}
+              className="w-full py-3 bg-green-700 text-white font-medium hover:bg-green-800 transition-colors rounded-lg"
+            >
+              Show Answer
+            </button>
+          )
+        ) : (
+          <div className="text-center">
+            {isHardMode ? (
+              <button
+                onClick={() => handleRate(isCorrect === "correct" ? "good" : isCorrect === "partial" ? "hard" : "again")}
+                className="w-full py-3 rounded-lg text-white font-medium bg-green-700 hover:bg-green-800 transition-colors"
+              >
+                Next
+              </button>
+            ) : (
+              <div>
+                <button
+                  onClick={handleNext}
+                  className="w-full py-3 rounded-lg text-white font-medium bg-green-700 hover:bg-green-800 transition-colors"
+                >
+                  Next
+                </button>
+                <div className="mt-2 flex items-center justify-center gap-2">
+                  <button
+                    onClick={() => setShowRatingOptions(!showRatingOptions)}
+                    className="text-xs text-stone-400 hover:text-stone-600 transition-colors"
+                  >
+                    {showRatingOptions ? "Hide" : "Rate difficulty"}
+                  </button>
+                  <span className="text-stone-300">·</span>
+                  <button
+                    onClick={handleSkip}
+                    className="text-xs text-stone-400 hover:text-stone-600 transition-colors"
+                  >
+                    Skip
+                  </button>
+                </div>
+                {showRatingOptions && (
+                  <div className="mt-2">
+                    <div className="grid grid-cols-4 gap-2">
+                      {RATING_BUTTONS.map((btn) => (
+                        <button
+                          key={btn.rating}
+                          onClick={() => handleRate(btn.rating)}
+                          className={`py-2 rounded-lg text-white text-xs font-medium ${btn.color} transition-colors`}
+                        >
+                          {btn.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+            {!isHardMode && (
+              <p className="text-[10px] text-stone-300 mt-2">
+                Swipe left for next
+              </p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
