@@ -103,6 +103,99 @@ export default function ProgressPage() {
           </p>
         </div>
       )}
+      {/* Footer */}
+      <footer className="text-center pt-4 pb-2 border-t border-stone-200 space-y-2">
+        {/* Share Button */}
+        <button
+          onClick={() => {
+            if (navigator.share) {
+              navigator.share({
+                title: "Naturalist Nurturer",
+                text: "Learn the species where you are!",
+                url: window.location.href,
+              });
+            } else {
+              navigator.clipboard.writeText(window.location.href);
+              alert("Link copied to clipboard!");
+            }
+          }}
+          className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-stone-100 hover:bg-stone-200 rounded-full text-xs text-stone-600 transition-colors"
+        >
+          💚 Share This App
+        </button>
+
+        {/* App attribution */}
+        <p className="text-xs text-stone-400">
+          <a
+            href="https://github.com/cjpaulphd/Naturalist-Nurturer"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-green-700 transition-colors"
+          >
+            NaturalistNurturer
+          </a>
+          {" by "}
+          <a
+            href="https://github.com/cjpaulphd"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-green-700 transition-colors"
+          >
+            cjpaulphd
+          </a>
+        </p>
+        <p className="text-xs text-stone-400">
+          Made for{" "}
+          <a
+            href="https://www.greenriverpreserve.org"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-green-700 underline hover:text-green-800 transition-colors"
+          >
+            Green River Preserve
+          </a>
+          , a 3,400 acre nature camp in the Blue Ridge Mountains of North
+          Carolina, and all who want to better know their neighbors.
+        </p>
+
+        {/* Data attribution */}
+        <p className="text-xs text-stone-400">
+          Data:{" "}
+          <a href="https://www.inaturalist.org" target="_blank" rel="noopener noreferrer" className="hover:text-green-700 transition-colors">iNaturalist</a>
+          {" · "}
+          <a href="https://xeno-canto.org" target="_blank" rel="noopener noreferrer" className="hover:text-green-700 transition-colors">Xeno-canto</a>
+        </p>
+
+        {/* License / Open Source / Feedback */}
+        <p className="text-xs text-stone-400">
+          <a
+            href="https://github.com/cjpaulphd/Naturalist-Nurturer/blob/main/LICENSE"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-green-700 transition-colors"
+          >
+            MIT License
+          </a>
+          {" · "}
+          <a
+            href="https://github.com/cjpaulphd/Naturalist-Nurturer"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-green-700 transition-colors"
+          >
+            Open Source
+          </a>
+          {" · "}
+          <a
+            href="https://github.com/cjpaulphd/Naturalist-Nurturer/issues"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-green-700 transition-colors"
+          >
+            Feedback
+          </a>
+        </p>
+      </footer>
     </div>
   );
 }
