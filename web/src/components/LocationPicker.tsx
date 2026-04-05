@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   getUserLocation,
   fetchSpeciesForLocation,
@@ -8,6 +8,7 @@ import {
   LocationCoords,
 } from "@/lib/inat";
 import { Species } from "@/lib/types";
+import { getStudyLocations, StudyLocation } from "@/lib/location-tracker";
 import LocationDisambiguator, {
   GeocodedLocation,
 } from "./LocationDisambiguator";
@@ -50,13 +51,28 @@ export default function LocationPicker({
   const [searching, setSearching] = useState(false);
   const [candidates, setCandidates] = useState<GeocodedLocation[] | null>(null);
   const [pendingQuery, setPendingQuery] = useState("");
+  const [studyLocations, setStudyLocations] = useState<StudyLocation[]>([]);
+  const [showPastLocations, setShowPastLocations] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const last = getLastLocation();
     if (last?.name) {
       setLocationName(last.name);
     }
+    setStudyLocations(getStudyLocations());
   }, []);
+
+  useEffect(() => {
+    if (!showPastLocations) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowPastLocations(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showPastLocations]);
 
   const loadSpeciesForLocation = async (loc: GeocodedLocation) => {
     setSearching(true);
@@ -240,15 +256,44 @@ export default function LocationPicker({
           )}
         </button>
 
-        <button
-          onClick={() =>
-            handleUseCoordinates({ lat: 35.25, lng: -82.61, name: "Green River Preserve, NC" })
-          }
-          disabled={isLoading}
-          className="px-3 py-2 bg-stone-100 text-stone-700 rounded-lg text-sm font-medium hover:bg-stone-200 transition-colors disabled:opacity-50"
-        >
-          Green River Preserve
-        </button>
+        {studyLocations.length > 0 && (
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setShowPastLocations(!showPastLocations)}
+              disabled={isLoading}
+              className="flex items-center gap-2 px-3 py-2 bg-stone-100 text-stone-700 rounded-lg text-sm font-medium hover:bg-stone-200 transition-colors disabled:opacity-50"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Past Locations
+              <svg className={`w-3 h-3 transition-transform ${showPastLocations ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {showPastLocations && (
+              <div className="absolute top-full left-0 mt-1 w-64 bg-white border border-stone-200 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
+                {studyLocations
+                  .sort((a, b) => b.lastStudied - a.lastStudied)
+                  .map((loc, i) => (
+                    <button
+                      key={i}
+                      onClick={() => {
+                        setShowPastLocations(false);
+                        handleUseCoordinates({ lat: loc.lat, lng: loc.lng, name: loc.name });
+                      }}
+                      className="w-full text-left px-3 py-2 hover:bg-green-50 text-sm text-stone-700 border-b border-stone-100 last:border-b-0 transition-colors"
+                    >
+                      <div className="font-medium">{loc.name}</div>
+                      <div className="text-xs text-stone-400">
+                        {loc.speciesIds.length} species studied
+                      </div>
+                    </button>
+                  ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {error && (
