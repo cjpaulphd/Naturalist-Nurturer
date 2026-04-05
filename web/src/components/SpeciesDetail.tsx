@@ -56,7 +56,7 @@ export default function SpeciesDetail({ species, allSpecies = [], onClose }: Spe
             </span>
           )}
           <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-xs">
-            #{species.prevalenceRank} most common {species.category} nearby
+            #{species.prevalenceRank} iNaturalist Reported {species.category.charAt(0).toUpperCase() + species.category.slice(1)}
           </span>
           <span className="px-2 py-0.5 bg-stone-50 text-stone-500 rounded text-xs">
             {species.observationCount.toLocaleString()} observations
