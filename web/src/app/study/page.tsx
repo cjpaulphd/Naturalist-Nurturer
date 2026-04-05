@@ -23,6 +23,8 @@ import {
 import PhotoGallery from "@/components/PhotoGallery";
 import SoundPlayer from "@/components/SoundPlayer";
 import TaxonomyChart from "@/components/TaxonomyChart";
+import FallingLeaves from "@/components/FallingLeaves";
+import { getStorage } from "@/lib/storage";
 
 const LEARN_COUNT = 10;
 const QUIZ_COUNT = 15;
@@ -422,8 +424,10 @@ function StudyContent() {
 
   if (sessionComplete) {
     const showQuizStats = quizMode !== "flashcard";
+    const animationsEnabled = getStorage("animations", true);
     return (
       <div className="max-w-lg mx-auto px-4 py-12 text-center">
+        {animationsEnabled && <FallingLeaves />}
         <p className="text-4xl mb-4">🎉</p>
         <h2 className="text-xl font-bold text-stone-800 mb-4">
           Session Complete!

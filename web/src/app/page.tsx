@@ -7,11 +7,11 @@ import { loadSpeciesData } from "@/lib/species";
 import { getCachedLocationSpecies } from "@/lib/inat";
 import { getNewCards, getDueCards, getAllLearnedCards } from "@/lib/srs";
 import { CATEGORIES } from "@/lib/categories";
+import { getStorage, setStorage } from "@/lib/storage";
 import CategorySelector from "@/components/CategorySelector";
 import LocationPicker from "@/components/LocationPicker";
 import QuizSettingsModal from "@/components/QuizSettingsModal";
 import WelcomePopup from "@/components/WelcomePopup";
-import { getStorage, setStorage } from "@/lib/storage";
 
 export default function HomePage() {
   const router = useRouter();
@@ -22,11 +22,13 @@ export default function HomePage() {
   const [locationName, setLocationName] = useState<string | null>(null);
   const [showQuizSettings, setShowQuizSettings] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [animations, setAnimations] = useState(true);
 
   useEffect(() => {
     if (!getStorage<boolean>("welcome_seen", false)) {
       setShowWelcome(true);
     }
+    setAnimations(getStorage("animations", true));
   }, []);
 
   useEffect(() => {
@@ -270,6 +272,18 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="text-center pt-4 pb-2 border-t border-stone-200 space-y-2">
+        {/* Animations Toggle */}
+        <button
+          onClick={() => {
+            const next = !animations;
+            setAnimations(next);
+            setStorage("animations", next);
+          }}
+          className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-stone-100 hover:bg-stone-200 rounded-full text-xs text-stone-600 transition-colors"
+        >
+          🍂 Celebrations {animations ? "On" : "Off"}
+        </button>
+
         {/* Share Button */}
         <button
           onClick={() => {
