@@ -107,6 +107,13 @@ function BrowseContent() {
     }
   }, [selectedIndex, filteredSpecies]);
 
+  const goToPreviousSpecies = useCallback(() => {
+    if (selectedIndex > 0) {
+      setSelectedSpecies(filteredSpecies[selectedIndex - 1]);
+      window.scrollTo(0, 0);
+    }
+  }, [selectedIndex, filteredSpecies]);
+
   const handleDetailTouchStart = useCallback((e: React.TouchEvent) => {
     setTouchStartX(e.touches[0].clientX);
     setTouchDeltaX(0);
@@ -115,22 +122,22 @@ function BrowseContent() {
   const handleDetailTouchMove = useCallback((e: React.TouchEvent) => {
     if (touchStartX === null) return;
     const delta = e.touches[0].clientX - touchStartX;
-    // Only track leftward swipes
-    if (delta < 0) {
-      setTouchDeltaX(delta);
-    }
+    setTouchDeltaX(delta);
   }, [touchStartX]);
 
   const handleDetailTouchEnd = useCallback(() => {
     if (touchStartX === null) return;
     if (touchDeltaX < -SWIPE_THRESHOLD) {
       goToNextSpecies();
+    } else if (touchDeltaX > SWIPE_THRESHOLD) {
+      goToPreviousSpecies();
     }
     setTouchStartX(null);
     setTouchDeltaX(0);
-  }, [touchStartX, touchDeltaX, goToNextSpecies]);
+  }, [touchStartX, touchDeltaX, goToNextSpecies, goToPreviousSpecies]);
 
   const hasNextSpecies = selectedIndex >= 0 && selectedIndex < filteredSpecies.length - 1;
+  const hasPreviousSpecies = selectedIndex > 0;
 
   if (loading) {
     return (
@@ -150,8 +157,14 @@ function BrowseContent() {
           onTouchMove={handleDetailTouchMove}
           onTouchEnd={handleDetailTouchEnd}
           style={{
-            transform: touchDeltaX < 0 && hasNextSpecies ? `translateX(${touchDeltaX}px)` : undefined,
-            opacity: touchDeltaX < -SWIPE_THRESHOLD && hasNextSpecies ? 0.6 : 1,
+            transform:
+              (touchDeltaX < 0 && hasNextSpecies) || (touchDeltaX > 0 && hasPreviousSpecies)
+                ? `translateX(${touchDeltaX}px)`
+                : undefined,
+            opacity:
+              (touchDeltaX < -SWIPE_THRESHOLD && hasNextSpecies) || (touchDeltaX > SWIPE_THRESHOLD && hasPreviousSpecies)
+                ? 0.6
+                : 1,
             transition: touchStartX !== null ? 'none' : 'transform 0.3s ease, opacity 0.3s ease',
           }}
         >
@@ -161,9 +174,13 @@ function BrowseContent() {
             onClose={() => setSelectedSpecies(null)}
           />
         </div>
-        {hasNextSpecies && (
+        {(hasPreviousSpecies || hasNextSpecies) && (
           <p className="text-[10px] text-stone-300 text-center mt-2">
-            Swipe left for next species
+            {hasPreviousSpecies && hasNextSpecies
+              ? "Swipe left/right for next/previous species"
+              : hasNextSpecies
+                ? "Swipe left for next species"
+                : "Swipe right for previous species"}
           </p>
         )}
       </div>
