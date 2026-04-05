@@ -345,17 +345,34 @@ export async function fetchBirdSounds(
           if (recordings.length > 0) {
             // Take up to 2 best quality recordings
             const sounds: SpeciesSound[] = recordings.slice(0, 2).map((rec: {
+              id: string;
               file: string;
               rec: string;
               lic: string;
               length: string;
-            }) => ({
-              url: rec.file ? (rec.file.startsWith("//") ? "https:" + rec.file : rec.file) : "",
-              attribution: `${rec.rec || "Unknown"} (${rec.lic || "CC"}) via Xeno-canto`,
-              filename: "",
-              duration: parseXenoCantoDuration(rec.length),
-            }));
-            result.set(bird.id, sounds);
+            }) => {
+              // Build the direct Xeno-canto URL
+              let directUrl = rec.file
+                ? (rec.file.startsWith("//") ? "https:" + rec.file : rec.file)
+                : "";
+              // Fallback: construct download URL from recording id
+              if (!directUrl && rec.id) {
+                directUrl = `https://xeno-canto.org/${rec.id}/download`;
+              }
+              // Proxy all audio through our server to avoid 403 / hotlinking blocks
+              const url = directUrl
+                ? `/api/sounds/audio?url=${encodeURIComponent(directUrl)}`
+                : "";
+              return {
+                url,
+                attribution: `${rec.rec || "Unknown"} (${rec.lic || "CC"}) via Xeno-canto`,
+                filename: "",
+                duration: parseXenoCantoDuration(rec.length),
+              };
+            }).filter((s: SpeciesSound) => s.url !== "");
+            if (sounds.length > 0) {
+              result.set(bird.id, sounds);
+            }
           }
         } catch {
           // Skip this bird

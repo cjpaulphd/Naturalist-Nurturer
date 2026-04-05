@@ -174,6 +174,8 @@ function StudyContent() {
       : undefined;
 
   // Fetch bird sounds on-demand when a bird card is displayed
+  const [loadingSounds, setLoadingSounds] = useState(false);
+
   useEffect(() => {
     if (!currentSpecies) return;
     if (currentSpecies.category !== "bird") return;
@@ -181,6 +183,7 @@ function StudyContent() {
     if (soundFetchedRef.current.has(currentSpecies.id)) return;
 
     soundFetchedRef.current.add(currentSpecies.id);
+    setLoadingSounds(true);
 
     fetchBirdSounds([{ id: currentSpecies.id, scientificName: currentSpecies.scientificName }])
       .then((soundMap) => {
@@ -194,6 +197,9 @@ function StudyContent() {
       })
       .catch(() => {
         // Sounds are optional
+      })
+      .finally(() => {
+        setLoadingSounds(false);
       });
   }, [currentSpecies]);
 
@@ -515,10 +521,10 @@ function StudyContent() {
 
   if (!currentSpecies) return null;
 
-  // Fall back to photo mode if sound mode but species has no sounds
+  // Fall back to photo mode if sound mode but species has no sounds AND we're done loading
   const rawMode = studyMode === "mixed" ? currentMode : studyMode;
   const activeMode =
-    rawMode === "sound" && (!currentSpecies.sounds || currentSpecies.sounds.length === 0)
+    rawMode === "sound" && (!currentSpecies.sounds || currentSpecies.sounds.length === 0) && !loadingSounds
       ? "photo"
       : rawMode;
   const progress = ((currentIndex + 1) / cardIds.length) * 100;
@@ -674,7 +680,12 @@ function StudyContent() {
                   <p className="text-lg font-semibold text-stone-700 mb-4">
                     Who is this?
                   </p>
-                  {currentSpecies.sounds.length > 0 ? (
+                  {loadingSounds ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="w-6 h-6 border-2 border-green-700 border-t-transparent rounded-full animate-spin" />
+                      <p className="text-sm text-stone-400">Loading birdsong...</p>
+                    </div>
+                  ) : currentSpecies.sounds.length > 0 ? (
                     <SoundPlayer
                       speciesId={currentSpecies.id}
                       sounds={currentSpecies.sounds}
