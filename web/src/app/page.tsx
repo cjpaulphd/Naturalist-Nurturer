@@ -257,7 +257,7 @@ export default function HomePage() {
             if (navigator.share) {
               navigator.share({
                 title: "Naturalist Nurturer",
-                text: "Learn the species where you are!",
+                text: "Try Naturalist Nurturer, a fun app to learn the species where you are!",
                 url: window.location.href,
               });
             } else {
