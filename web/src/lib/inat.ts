@@ -449,7 +449,7 @@ function parseXenoCantoDuration(length: string): number | null {
 function convertToSpecies(
   results: { count: number; taxon: Record<string, unknown> }[],
   iconicTaxa: string,
-  taxonomyMap: Map<number, { order: string; family: string; genus: string; native: boolean; wikipediaSummary: string }>,
+  taxonomyMap: Map<number, { order: string; family: string; genus: string; nativeStatus: string; wikipediaSummary: string }>,
   seasonMap: Map<number, Season[]>,
   soundMap: Map<number, SpeciesSound[]> = new Map()
 ): Species[] {
