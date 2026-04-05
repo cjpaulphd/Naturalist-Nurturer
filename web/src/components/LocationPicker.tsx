@@ -59,6 +59,8 @@ export default function LocationPicker({
     const last = getLastLocation();
     if (last?.name) {
       setLocationName(last.name);
+    } else {
+      setLocationName("Green River Preserve, NC");
     }
     setStudyLocations(getStudyLocations());
   }, []);
@@ -256,7 +258,7 @@ export default function LocationPicker({
           )}
         </button>
 
-        {studyLocations.length > 0 ? (
+        {studyLocations.length > 0 && (
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setShowPastLocations(!showPastLocations)}
@@ -293,16 +295,6 @@ export default function LocationPicker({
               </div>
             )}
           </div>
-        ) : (
-          <button
-            onClick={() =>
-              handleUseCoordinates({ lat: 35.25, lng: -82.61, name: "Green River Preserve, NC" })
-            }
-            disabled={isLoading}
-            className="px-3 py-2 bg-stone-100 text-stone-700 rounded-lg text-sm font-medium hover:bg-stone-200 transition-colors disabled:opacity-50"
-          >
-            Try It Out
-          </button>
         )}
       </div>
 
