@@ -247,8 +247,8 @@ async function fetchSpeciesCounts(
  */
 async function fetchTaxonDetails(
   taxonIds: number[]
-): Promise<Map<number, { order: string; family: string; genus: string; native: boolean; wikipediaSummary: string }>> {
-  const result = new Map<number, { order: string; family: string; genus: string; native: boolean; wikipediaSummary: string }>();
+): Promise<Map<number, { order: string; family: string; genus: string; nativeStatus: string; wikipediaSummary: string }>> {
+  const result = new Map<number, { order: string; family: string; genus: string; nativeStatus: string; wikipediaSummary: string }>();
   if (taxonIds.length === 0) return result;
 
   // Batch in groups of 30 (API limit)
@@ -266,15 +266,19 @@ async function fetchTaxonDetails(
         let order = "";
         let family = "";
         let genus = "";
-        // With preferred_place_id=1, iNaturalist returns establishment_means
-        // for the US (e.g. "native", "introduced", "endemic").
-        // Also check the conservation_statuses and listed_taxa for more detail.
-        let native = true;
+        // Only label native/introduced when iNaturalist provides explicit
+        // establishment_means data. The API's native/introduced booleans are
+        // unreliable (e.g. White-breasted Nuthatch, American sweetgum show as
+        // "introduced" despite being clearly native to eastern US). Default to
+        // "unknown" so we don't show incorrect labels.
+        let nativeStatus = "unknown";
         if (taxon.establishment_means) {
-          // establishment_means includes: "native", "endemic", "introduced"
-          native = taxon.establishment_means === "native" || taxon.establishment_means === "endemic";
-        } else if (taxon.native === false || taxon.introduced === true) {
-          native = false;
+          const em = taxon.establishment_means as string;
+          if (em === "native" || em === "endemic") {
+            nativeStatus = "native";
+          } else if (em === "introduced") {
+            nativeStatus = "introduced";
+          }
         }
 
         // Extract from ancestors array
@@ -291,7 +295,7 @@ async function fetchTaxonDetails(
         }
 
         const wikipediaSummary = (taxon.wikipedia_summary as string) || "";
-        result.set(taxon.id, { order, family, genus, native, wikipediaSummary });
+        result.set(taxon.id, { order, family, genus, nativeStatus, wikipediaSummary });
       }
     } catch {
       // Continue with what we have
@@ -371,7 +375,7 @@ function parseXenoCantoDuration(length: string): number | null {
 function convertToSpecies(
   results: { count: number; taxon: Record<string, unknown> }[],
   iconicTaxa: string,
-  taxonomyMap: Map<number, { order: string; family: string; genus: string; native: boolean; wikipediaSummary: string }>,
+  taxonomyMap: Map<number, { order: string; family: string; genus: string; nativeStatus: string; wikipediaSummary: string }>,
   seasonMap: Map<number, Season[]>,
   soundMap: Map<number, SpeciesSound[]> = new Map()
 ): Species[] {
@@ -393,7 +397,7 @@ function convertToSpecies(
     const family = taxonomy?.family || "";
     const order = taxonomy?.order || "";
     const genus = taxonomy?.genus || scientificName.split(" ")[0] || "";
-    const isNative = taxonomy?.native ?? true;
+    const nativeStatus = taxonomy?.nativeStatus ?? "unknown";
 
     const category = mapIconicTaxaToCategory(iconicTaxa, family, commonName);
 
@@ -436,7 +440,7 @@ function convertToSpecies(
       genus,
       observationCount: item.count,
       prevalenceRank: 0,
-      nativeStatus: isNative ? "native" : "introduced",
+      nativeStatus,
       seasons,
       photos,
       sounds: soundMap.get(taxonId) || [],
