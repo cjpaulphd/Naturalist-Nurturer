@@ -13,6 +13,7 @@ import LocationPicker from "@/components/LocationPicker";
 import QuizSettingsModal from "@/components/QuizSettingsModal";
 import WelcomePopup from "@/components/WelcomePopup";
 import InstallPrompt from "@/components/InstallPrompt";
+import ShareButton from "@/components/ShareButton";
 
 export default function HomePage() {
   const router = useRouter();
@@ -300,25 +301,7 @@ export default function HomePage() {
         <InstallPrompt />
 
         {/* Share Button */}
-        <div className="flex justify-center">
-          <button
-            onClick={() => {
-              if (navigator.share) {
-                navigator.share({
-                  title: "Naturalist Nurturer",
-                  text: "Try Naturalist Nurturer, a fun app to learn the species where you are!",
-                  url: window.location.href,
-                });
-              } else {
-                navigator.clipboard.writeText(window.location.href);
-                alert("Link copied to clipboard!");
-              }
-            }}
-            className="inline-flex items-center gap-2 px-6 py-2.5 bg-stone-100 hover:bg-stone-200 rounded-full text-sm text-stone-600 transition-colors"
-          >
-            💚 Share This App ⬆️
-          </button>
-        </div>
+        <ShareButton />
 
         {/* App attribution */}
         <p className="text-xs text-stone-400">

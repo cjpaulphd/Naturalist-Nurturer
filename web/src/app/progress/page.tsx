@@ -9,6 +9,7 @@ import { getCachedLocationSpecies } from "@/lib/inat";
 import { getDueCards, getAllLearnedCards } from "@/lib/srs";
 import ProgressDashboard from "@/components/ProgressDashboard";
 import CategorySelector from "@/components/CategorySelector";
+import ShareButton from "@/components/ShareButton";
 
 const StudyLocationMap = dynamic(
   () => import("@/components/StudyLocationMap"),
@@ -106,25 +107,7 @@ export default function ProgressPage() {
       {/* Footer */}
       <footer className="text-center pt-4 pb-2 border-t border-stone-200 space-y-2">
         {/* Share Button */}
-        <div className="flex justify-center">
-          <button
-            onClick={() => {
-              if (navigator.share) {
-                navigator.share({
-                  title: "Naturalist Nurturer",
-                  text: "Try Naturalist Nurturer, a fun app to learn the species where you are!",
-                  url: window.location.href,
-                });
-              } else {
-                navigator.clipboard.writeText(window.location.href);
-                alert("Link copied to clipboard!");
-              }
-            }}
-            className="inline-flex items-center gap-2 px-6 py-2.5 bg-stone-100 hover:bg-stone-200 rounded-full text-sm text-stone-600 transition-colors"
-          >
-            💚 Share This App ⬆️
-          </button>
-        </div>
+        <ShareButton />
 
         {/* App attribution */}
         <p className="text-xs text-stone-400">
