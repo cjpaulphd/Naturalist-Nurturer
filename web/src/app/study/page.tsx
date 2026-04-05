@@ -589,7 +589,7 @@ function StudyContent() {
               onClick={handleFlip}
               className="w-full py-3 bg-green-700 text-white font-medium hover:bg-green-800 transition-colors rounded-lg"
             >
-              Show Answer
+              Reveal
             </button>
           )
         ) : (
