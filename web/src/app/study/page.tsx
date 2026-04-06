@@ -225,6 +225,9 @@ function StudyContent() {
   // Swipe gesture state
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchDeltaX, setTouchDeltaX] = useState(0);
+  const [touchStartY, setTouchStartY] = useState<number | null>(null);
+  const [touchDeltaY, setTouchDeltaY] = useState(0);
+  const [swipeDirection, setSwipeDirection] = useState<"horizontal" | "vertical" | null>(null);
 
   const [sessionStats, setSessionStats] = useState({
     total: 0,
@@ -449,26 +452,46 @@ function StudyContent() {
 
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     setTouchStartX(e.touches[0].clientX);
+    setTouchStartY(e.touches[0].clientY);
     setTouchDeltaX(0);
+    setTouchDeltaY(0);
+    setSwipeDirection(null);
   };
 
   const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (touchStartX === null) return;
-    const delta = e.touches[0].clientX - touchStartX;
-    // Only track leftward swipes (negative delta) when card is flipped
-    if (flipped) {
-      setTouchDeltaX(delta);
+    if (touchStartX === null || touchStartY === null) return;
+    const deltaX = e.touches[0].clientX - touchStartX;
+    const deltaY = e.touches[0].clientY - touchStartY;
+
+    // Lock swipe direction once movement exceeds 10px
+    if (swipeDirection === null && (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10)) {
+      setSwipeDirection(Math.abs(deltaX) > Math.abs(deltaY) ? "horizontal" : "vertical");
+    }
+
+    if (flipped && (swipeDirection === "horizontal" || swipeDirection === null)) {
+      setTouchDeltaX(deltaX);
+    }
+    if (!flipped && (swipeDirection === "vertical" || swipeDirection === null)) {
+      // Only track upward swipes (negative deltaY) when card is not flipped
+      setTouchDeltaY(deltaY);
     }
   };
 
   const handleTouchEnd = () => {
-    if (touchStartX === null) return;
+    if (touchStartX === null && touchStartY === null) return;
     if (flipped && touchDeltaX < -SWIPE_THRESHOLD) {
       // Swiped left while viewing answer → advance with "good" rating
       handleNext();
     }
+    if (!flipped && touchDeltaY < -SWIPE_THRESHOLD && (!isHardMode || activeMode === "name")) {
+      // Swiped up while viewing question → reveal answer
+      handleFlip();
+    }
     setTouchStartX(null);
+    setTouchStartY(null);
     setTouchDeltaX(0);
+    setTouchDeltaY(0);
+    setSwipeDirection(null);
   };
 
   if (loading) {
@@ -725,9 +748,26 @@ function StudyContent() {
           (!isHardMode || activeMode === "name") && (
             <button
               onClick={handleFlip}
-              className="w-full py-3 bg-green-700 text-white font-medium hover:bg-green-800 transition-colors rounded-lg"
+              className="w-full py-3 bg-green-700 text-white font-medium hover:bg-green-800 transition-colors rounded-lg relative overflow-hidden"
+              style={{
+                opacity: touchDeltaY < 0 ? Math.max(0.4, 1 - Math.abs(touchDeltaY) / (SWIPE_THRESHOLD * 2)) : 1,
+              }}
             >
-              Reveal
+              <span className="flex items-center justify-center gap-2">
+                {touchDeltaY < -10 ? (
+                  <>
+                    <svg className="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                    </svg>
+                    Revealing...
+                  </>
+                ) : (
+                  <>
+                    Reveal
+                    <span className="text-green-200 text-xs ml-1">swipe up</span>
+                  </>
+                )}
+              </span>
             </button>
           )
         ) : (
@@ -778,9 +818,17 @@ function StudyContent() {
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
         style={{
-          transform: touchDeltaX < 0 && flipped ? `translateX(${touchDeltaX}px)` : undefined,
-          opacity: touchDeltaX < -SWIPE_THRESHOLD && flipped ? 0.6 : 1,
-          transition: touchStartX !== null ? 'none' : 'transform 0.3s ease, opacity 0.3s ease',
+          transform: touchDeltaX < 0 && flipped
+            ? `translateX(${touchDeltaX}px)`
+            : touchDeltaY < 0 && !flipped
+            ? `translateY(${touchDeltaY * 0.3}px)`
+            : undefined,
+          opacity: touchDeltaX < -SWIPE_THRESHOLD && flipped
+            ? 0.6
+            : touchDeltaY < -SWIPE_THRESHOLD && !flipped
+            ? 0.6
+            : 1,
+          transition: (touchStartX !== null || touchStartY !== null) ? 'none' : 'transform 0.3s ease, opacity 0.3s ease',
         }}
       >
         <div className={`card-flip-inner ${flipped ? "flipped" : ""}`}>
