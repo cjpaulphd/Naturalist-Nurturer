@@ -204,6 +204,7 @@ function StudyContent() {
     : [];
 
   const [showFallbackBanner, setShowFallbackBanner] = useState(isFallbackReview);
+  const [fallbackType, setFallbackType] = useState<SessionType | null>(null);
 
   const [allSpecies, setAllSpecies] = useState<Species[]>([]);
   const [cardIds, setCardIds] = useState<number[]>([]);
@@ -263,6 +264,26 @@ function StudyContent() {
           break;
         default:
           ids = getNewCards(data, categories, LEARN_COUNT);
+      }
+
+      // Auto-fallback: if no cards found for the requested type, try alternatives
+      // so the user never hits a dead-end empty state
+      if (ids.length === 0 && sessionType !== "quiz") {
+        // Try all session types in priority order
+        const fallbacks: { type: SessionType; getter: () => number[] }[] = [
+          { type: "review", getter: () => getDueCards(data, categories) },
+          { type: "learn", getter: () => getNewCards(data, categories, LEARN_COUNT) },
+          { type: "review-all", getter: () => getAllLearnedCards(data, categories) },
+        ];
+        for (const fb of fallbacks) {
+          if (fb.type === sessionType) continue; // already tried
+          ids = fb.getter();
+          if (ids.length > 0) {
+            setShowFallbackBanner(true);
+            setFallbackType(fb.type);
+            break;
+          }
+        }
       }
 
       setCardIds(ids);
@@ -689,8 +710,12 @@ function StudyContent() {
       {showFallbackBanner && (
         <div className="flex items-center justify-between gap-2 mb-3 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg">
           <p className="text-xs text-amber-700">
-            {sessionType === "review"
+            {fallbackType === "learn"
+              ? "No cards due for revisit \u2014 learning new species instead."
+              : fallbackType === "review"
               ? "No new species to learn \u2014 revisiting due cards instead."
+              : fallbackType === "review-all"
+              ? "Revisiting all species you've learned so far."
               : "No new species to learn \u2014 revisiting what you know."}
           </p>
           <button
