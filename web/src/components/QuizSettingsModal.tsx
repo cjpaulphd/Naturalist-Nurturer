@@ -11,13 +11,11 @@ interface QuizSettingsModalProps {
 }
 
 export default function QuizSettingsModal({
-  hasBirds,
   onStart,
   onClose,
 }: QuizSettingsModalProps) {
   const [quizMode, setQuizMode] = useState<QuizMode>(() => getStorage<QuizMode>("quiz_mode", "multiple-choice"));
   const [nameDisplay, setNameDisplay] = useState<NameDisplay>(() => getStorage<NameDisplay>("quiz_name_display", "both"));
-  const [studyMode, setStudyMode] = useState<StudyMode>(() => getStorage<StudyMode>("quiz_study_mode", "photo"));
   const [difficulty, setDifficulty] = useState<QuizDifficulty>(() => getStorage<QuizDifficulty>("quiz_difficulty", "medium"));
 
   return (
@@ -73,10 +71,14 @@ export default function QuizSettingsModal({
                 ["easy", "Easy", "Random choices"],
                 ["medium", "Medium", "Same order"],
                 ["hard", "Hard", "Look-alikes"],
+                ["hardest", "Hardest", "Look-alikes + scientific names"],
               ] as [QuizDifficulty, string, string][]).map(([level, label, desc]) => (
                 <button
                   key={level}
-                  onClick={() => setDifficulty(level)}
+                  onClick={() => {
+                    setDifficulty(level);
+                    if (level === "hardest") setNameDisplay("scientific");
+                  }}
                   className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                     difficulty === level
                       ? "bg-green-700 text-white"
@@ -93,6 +95,7 @@ export default function QuizSettingsModal({
               {difficulty === "easy" && "Random species from category"}
               {difficulty === "medium" && "Species from same taxonomic order"}
               {difficulty === "hard" && "Closely related species (same family/genus)"}
+              {difficulty === "hardest" && "Look-alikes with scientific names only"}
             </p>
           </div>
         )}
@@ -104,8 +107,8 @@ export default function QuizSettingsModal({
           <div className="inline-flex gap-1 bg-stone-100 p-1 rounded-lg">
             {([
               ["common", "Common"],
-              ["scientific", "Scientific"],
               ["both", "Both"],
+              ["scientific", "Scientific"],
             ] as [NameDisplay, string][]).map(([mode, label]) => (
               <button
                 key={mode}
@@ -123,56 +126,13 @@ export default function QuizSettingsModal({
           </div>
         </div>
 
-        {/* Study Mode */}
-        <div>
-          <h4 className="text-sm font-semibold text-stone-600 mb-2 text-center">Study Mode</h4>
-          <div className={`grid gap-2 ${hasBirds ? "grid-cols-3" : "grid-cols-2"}`}>
-            <button
-              onClick={() => setStudyMode("photo")}
-              className={`p-2.5 rounded-lg text-center transition-colors border ${
-                studyMode === "photo"
-                  ? "bg-green-50 border-green-400"
-                  : "bg-white border-stone-200 hover:border-green-300"
-              }`}
-            >
-              <div className="text-xl mb-0.5">📷</div>
-              <div className={`text-xs ${studyMode === "photo" ? "text-green-800 font-medium" : "text-stone-600"}`}>Photo ID</div>
-            </button>
-            <button
-              onClick={() => setStudyMode("name")}
-              className={`p-2.5 rounded-lg text-center transition-colors border ${
-                studyMode === "name"
-                  ? "bg-green-50 border-green-400"
-                  : "bg-white border-stone-200 hover:border-green-300"
-              }`}
-            >
-              <div className="text-xl mb-0.5">📝</div>
-              <div className={`text-xs ${studyMode === "name" ? "text-green-800 font-medium" : "text-stone-600"}`}>Name Recall</div>
-            </button>
-            {hasBirds && (
-              <button
-                onClick={() => setStudyMode("sound")}
-                className={`p-2.5 rounded-lg text-center transition-colors border ${
-                  studyMode === "sound"
-                    ? "bg-green-50 border-green-400"
-                    : "bg-white border-stone-200 hover:border-green-300"
-                }`}
-              >
-                <div className="text-xl mb-0.5">🔊</div>
-                <div className={`text-xs ${studyMode === "sound" ? "text-green-800 font-medium" : "text-stone-600"}`}>Sound ID</div>
-              </button>
-            )}
-          </div>
-        </div>
-
         {/* Start Challenge — at the bottom */}
         <button
           onClick={() => {
             setStorage("quiz_mode", quizMode);
             setStorage("quiz_name_display", nameDisplay);
-            setStorage("quiz_study_mode", studyMode);
             setStorage("quiz_difficulty", difficulty);
-            onStart(quizMode, nameDisplay, studyMode, difficulty);
+            onStart(quizMode, nameDisplay, "photo", difficulty);
           }}
           className="w-full py-3 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors"
         >

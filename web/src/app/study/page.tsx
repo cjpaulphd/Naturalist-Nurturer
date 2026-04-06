@@ -154,7 +154,7 @@ function generateChoices(
   const shuffle = (arr: Species[]) => [...arr].sort(() => Math.random() - 0.5);
 
   let pool: Species[];
-  if (difficulty === "hard") {
+  if (difficulty === "hard" || difficulty === "hardest") {
     // Prioritize: same genus > same family > same order > rest
     pool = [
       ...shuffle(sameGenus),

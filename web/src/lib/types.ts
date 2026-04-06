@@ -19,7 +19,7 @@ export type Season = "spring" | "summer" | "fall" | "winter";
 
 export type QuizMode = "flashcard" | "multiple-choice" | "dropdown" | "free-response";
 
-export type QuizDifficulty = "easy" | "medium" | "hard";
+export type QuizDifficulty = "easy" | "medium" | "hard" | "hardest";
 
 export type NameDisplay = "common" | "scientific" | "both";
 
