@@ -195,16 +195,29 @@ export function getQuizCards(
   categories: Category[],
   count: number
 ): number[] {
+  const states = getAllCardStates();
   const filtered = allSpecies.filter(
     (s) => categories.length === 0 || categories.includes(s.category)
   );
 
-  // Deprioritize confirmed introduced species; native and unknown are equal
-  const notIntroduced = filtered.filter((s) => s.nativeStatus !== "introduced");
-  const introduced = filtered.filter((s) => s.nativeStatus === "introduced");
-  const shuffledMain = [...notIntroduced].sort(() => Math.random() - 0.5);
-  const shuffledIntroduced = [...introduced].sort(() => Math.random() - 0.5);
-  const combined = [...shuffledMain, ...shuffledIntroduced];
+  // Split into new (unlearned) and learned species
+  const newSpecies = filtered.filter((s) => !states[String(s.id)]);
+  const learnedSpecies = filtered.filter((s) => !!states[String(s.id)]);
+
+  // Within each group, deprioritize confirmed introduced species
+  const shuffleWithNativePriority = (species: Species[]): Species[] => {
+    const notIntroduced = species.filter((s) => s.nativeStatus !== "introduced");
+    const introduced = species.filter((s) => s.nativeStatus === "introduced");
+    const shuffledMain = [...notIntroduced].sort(() => Math.random() - 0.5);
+    const shuffledIntroduced = [...introduced].sort(() => Math.random() - 0.5);
+    return [...shuffledMain, ...shuffledIntroduced];
+  };
+
+  // Prioritize new species, then fill remaining slots with learned species
+  const combined = [
+    ...shuffleWithNativePriority(newSpecies),
+    ...shuffleWithNativePriority(learnedSpecies),
+  ];
   return combined.slice(0, count).map((s) => s.id);
 }
 
