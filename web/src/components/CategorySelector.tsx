@@ -8,12 +8,18 @@ interface CategorySelectorProps {
   onChange: (categories: Category[]) => void;
   /** Optional map of category → count of new (unlearned) species */
   newCounts?: Record<Category, number>;
+  /** Optional map of category → learned count */
+  learnedCounts?: Record<Category, number>;
+  /** Optional map of category → total species count */
+  totalCounts?: Record<Category, number>;
 }
 
 export default function CategorySelector({
   selected,
   onChange,
   newCounts,
+  learnedCounts,
+  totalCounts,
 }: CategorySelectorProps) {
   const isAll = selected.length === 0;
 
@@ -58,9 +64,13 @@ export default function CategorySelector({
           >
             <span className="mr-1">{cat.icon}</span>
             {cat.label}
-            {count !== undefined && (
+            {learnedCounts && totalCounts ? (
+              <span className="ml-1 text-xs opacity-75">
+                ({learnedCounts[cat.value]}/{totalCounts[cat.value]})
+              </span>
+            ) : count !== undefined ? (
               <span className="ml-1 text-xs opacity-75">({count})</span>
-            )}
+            ) : null}
           </button>
         );
       })}
