@@ -603,12 +603,25 @@ function StudyContent() {
                   const pct = Math.round((learned / total) * 100);
                   const highlighted = studiedCategories.has(cat.value);
                   return (
-                    <div
+                    <button
                       key={cat.value}
-                      className={`text-center rounded-lg p-1.5 transition-colors ${
+                      onClick={() => {
+                        const hasNew = getNewCards(allSpecies, [cat.value], 1).length > 0;
+                        const params = new URLSearchParams();
+                        params.set("mode", "photo");
+                        params.set("categories", cat.value);
+                        if (hasNew) {
+                          params.set("type", "learn");
+                        } else {
+                          const hasDue = getDueCards(allSpecies, [cat.value]).length > 0;
+                          params.set("type", hasDue ? "review" : "review-all");
+                        }
+                        router.push(`/study?${params.toString()}`);
+                      }}
+                      className={`text-center rounded-lg p-1.5 transition-colors cursor-pointer hover:bg-green-100 active:scale-95 ${
                         highlighted
                           ? "ring-2 ring-green-500 bg-green-50"
-                          : "opacity-60"
+                          : "opacity-60 hover:opacity-100"
                       }`}
                     >
                       <div className="text-lg mb-0.5">{cat.icon}</div>
@@ -622,7 +635,7 @@ function StudyContent() {
                       <div className="text-[10px] text-stone-600 mt-0.5">
                         {learned}/{total}
                       </div>
-                    </div>
+                    </button>
                   );
                 })}
               </div>
