@@ -23,24 +23,26 @@ export default function PhotoGallery({
   const SWIPE_THRESHOLD = 50;
 
   const handleTouchStart = (e: React.TouchEvent) => {
+    // Stop propagation to prevent card-level swipe from tracking photo swipes
+    e.stopPropagation();
     touchStartX.current = e.touches[0].clientX;
     touchDeltaX.current = 0;
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
+    e.stopPropagation();
     if (touchStartX.current === null) return;
     touchDeltaX.current = e.touches[0].clientX - touchStartX.current;
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
+    e.stopPropagation();
     if (touchStartX.current === null || photos.length <= 1) {
       touchStartX.current = null;
       return;
     }
     const delta = touchDeltaX.current;
     if (Math.abs(delta) > SWIPE_THRESHOLD) {
-      // Stop propagation to prevent card-level swipe from firing
-      e.stopPropagation();
       if (delta < 0) {
         setCurrentIndex((currentIndex + 1) % photos.length);
       } else {
