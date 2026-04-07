@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Species } from "@/lib/types";
 import PhotoGallery from "./PhotoGallery";
 import SoundPlayer from "./SoundPlayer";
@@ -12,6 +13,8 @@ interface SpeciesDetailProps {
 }
 
 export default function SpeciesDetail({ species, allSpecies = [], onClose }: SpeciesDetailProps) {
+  const [showLearnMore, setShowLearnMore] = useState(false);
+
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden max-w-lg mx-auto">
       <PhotoGallery speciesId={species.id} photos={species.photos} />
@@ -104,6 +107,28 @@ export default function SpeciesDetail({ species, allSpecies = [], onClose }: Spe
                 </li>
               ))}
             </ul>
+          </div>
+        )}
+
+        {species.extendedFacts && species.extendedFacts.length > 0 && (
+          <div>
+            <button
+              onClick={() => setShowLearnMore(!showLearnMore)}
+              className="flex items-center gap-1.5 text-sm font-medium text-green-700 hover:text-green-800 transition-colors"
+            >
+              <span className={`transition-transform duration-200 ${showLearnMore ? "rotate-90" : ""}`}>&#9654;</span>
+              Learn More
+            </button>
+            {showLearnMore && (
+              <ul className="mt-2 text-sm text-stone-600 space-y-1">
+                {species.extendedFacts.map((fact, i) => (
+                  <li key={i} className="flex gap-2">
+                    <span className="text-green-600 flex-shrink-0">&#8226;</span>
+                    <span>{fact}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         )}
 

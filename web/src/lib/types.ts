@@ -44,6 +44,7 @@ export interface Species {
   photos: SpeciesPhoto[];
   sounds: SpeciesSound[];
   keyFacts: string[];
+  extendedFacts: string[];
   habitat: string;
   identificationTips: string;
   indigenousNames?: IndigenousName[];

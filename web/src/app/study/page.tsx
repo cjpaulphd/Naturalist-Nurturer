@@ -224,6 +224,8 @@ function StudyContent() {
   const [cardResults, setCardResults] = useState<Map<number, "correct" | "partial" | "incorrect">>(new Map());
   // Tips overlay state
   const [showTips, setShowTips] = useState(false);
+  // Learn More expanded state
+  const [showLearnMore, setShowLearnMore] = useState(false);
 
   // Swipe gesture state
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
@@ -433,6 +435,7 @@ function StudyContent() {
       setCurrentIndex(nextIndex);
       setFlipped(false);
       setShowTips(false);
+      setShowLearnMore(false);
       resetQuizState();
       if (studyMode === "mixed") {
         setCurrentMode(pickRandomMode(allSpecies, cardIds[nextIndex]));
@@ -474,6 +477,7 @@ function StudyContent() {
     setCurrentIndex(prevIndex);
     setFlipped(false);
     setShowTips(false);
+    setShowLearnMore(false);
     resetQuizState();
     if (studyMode === "mixed") {
       setCurrentMode(pickRandomMode(allSpecies, cardIds[prevIndex]));
@@ -1278,6 +1282,28 @@ function StudyContent() {
                       </li>
                     ))}
                   </ul>
+                )}
+
+                {currentSpecies.extendedFacts && currentSpecies.extendedFacts.length > 0 && (
+                  <div className="text-left">
+                    <button
+                      onClick={() => setShowLearnMore(!showLearnMore)}
+                      className="flex items-center gap-1.5 text-sm font-medium text-green-700 hover:text-green-800 transition-colors"
+                    >
+                      <span className={`transition-transform duration-200 ${showLearnMore ? "rotate-90" : ""}`}>&#9654;</span>
+                      Learn More
+                    </button>
+                    {showLearnMore && (
+                      <ul className="mt-2 text-sm text-stone-600 space-y-1 animate-in">
+                        {currentSpecies.extendedFacts.map((fact, i) => (
+                          <li key={i} className="flex gap-2">
+                            <span className="text-green-600 flex-shrink-0">&#8226;</span>
+                            <span>{fact}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
                 )}
 
                 {currentSpecies.identificationTips && (

@@ -517,20 +517,22 @@ function convertToSpecies(
         ]
       : [];
 
-    // Extract key facts from Wikipedia summary if available
+    // Extract key facts and extended facts from Wikipedia summary if available
     // Prefer the summary from the /taxa endpoint (via taxonomyMap) as the species_counts
     // endpoint often omits wikipedia_summary
-    const keyFacts: string[] = [];
+    const allFacts: string[] = [];
     const summary = taxonomy?.wikipediaSummary || (taxon.wikipedia_summary as string | undefined);
     if (summary) {
       const clean = summary.replace(/<[^>]+>/g, "").trim();
       const sentences = clean.split(/(?<=[.!?])\s+/);
       for (const s of sentences) {
-        if (s.length > 20 && s.length < 500 && keyFacts.length < 3) {
-          keyFacts.push(s.trim());
+        if (s.length > 20 && s.length < 500 && allFacts.length < 10) {
+          allFacts.push(s.trim());
         }
       }
     }
+    const keyFacts = allFacts.slice(0, 3);
+    const extendedFacts = allFacts.slice(3);
 
     // Get seasonal data, default to all seasons if not available
     const seasons = seasonMap.get(taxonId) || ["spring", "summer", "fall", "winter"];
@@ -552,6 +554,7 @@ function convertToSpecies(
       photos,
       sounds: soundMap.get(taxonId) || [],
       keyFacts,
+      extendedFacts,
       habitat: "",
       identificationTips: "",
       ...(indigenousNames.length > 0 ? { indigenousNames } : {}),

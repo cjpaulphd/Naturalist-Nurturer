@@ -27,33 +27,40 @@ def load_taxon_data(taxon_id):
     return None
 
 
-def extract_key_facts(taxon_data):
-    """Extract key facts from the wikipedia_summary field."""
+def extract_facts(taxon_data):
+    """Extract key facts and extended facts from the wikipedia_summary field.
+
+    Returns a tuple of (key_facts, extended_facts) where key_facts are the
+    first 3 informative sentences and extended_facts are up to 7 more.
+    """
     if not taxon_data:
-        return []
+        return [], []
 
     summary = taxon_data.get("wikipedia_summary", "")
     if not summary:
-        return []
+        return [], []
 
     # Clean HTML tags
     clean = re.sub(r"<[^>]+>", "", summary)
     clean = clean.strip()
 
     if not clean:
-        return []
+        return [], []
 
-    # Split into sentences and take the most informative ones
+    # Split into sentences and collect informative ones
     sentences = re.split(r"(?<=[.!?])\s+", clean)
     facts = []
     for s in sentences:
         s = s.strip()
         if len(s) > 20 and len(s) < 500:
             facts.append(s)
-        if len(facts) >= 3:
+        if len(facts) >= 10:
             break
 
-    return facts
+    key_facts = facts[:3]
+    extended_facts = facts[3:]
+
+    return key_facts, extended_facts
 
 
 def get_native_status(taxon_data):
@@ -217,6 +224,8 @@ def build_species_data():
                     for s in sounds_raw
                 ]
 
+            key_facts, extended_facts = extract_facts(taxon_data)
+
             species_entry = {
                 "id": taxon_id,
                 "category": category,
@@ -228,7 +237,8 @@ def build_species_data():
                 "nativeStatus": get_native_status(taxon_data),
                 "photos": photos,
                 "sounds": sounds,
-                "keyFacts": extract_key_facts(taxon_data),
+                "keyFacts": key_facts,
+                "extendedFacts": extended_facts,
                 "habitat": get_habitat(taxon_data),
                 "identificationTips": get_identification_tips(taxon_data),
             }
