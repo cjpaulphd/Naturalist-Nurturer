@@ -220,6 +220,8 @@ function StudyContent() {
   const [freeResponseInput, setFreeResponseInput] = useState("");
   const [dropdownValue, setDropdownValue] = useState("");
   const [isCorrect, setIsCorrect] = useState<"correct" | "partial" | "incorrect" | null>(null);
+  // Per-card result tracking for segmented progress bar
+  const [cardResults, setCardResults] = useState<Map<number, "correct" | "partial" | "incorrect">>(new Map());
   // Tips overlay state
   const [showTips, setShowTips] = useState(false);
 
@@ -413,6 +415,7 @@ function StudyContent() {
     setIsCorrect(result);
     setAnswerSubmitted(true);
     setFlipped(true);
+    setCardResults((prev) => new Map(prev).set(currentIndex, result));
 
     setSessionStats((s) => ({
       ...s,
@@ -463,6 +466,18 @@ function StudyContent() {
     rateCard(currentSpecies.id, "good", currentSpecies.category);
     setSessionStats((s) => ({ ...s, good: s.good + 1 }));
     advanceToNext();
+  };
+
+  const handlePrevious = () => {
+    if (currentIndex <= 0) return;
+    const prevIndex = currentIndex - 1;
+    setCurrentIndex(prevIndex);
+    setFlipped(false);
+    setShowTips(false);
+    resetQuizState();
+    if (studyMode === "mixed") {
+      setCurrentMode(pickRandomMode(allSpecies, cardIds[prevIndex]));
+    }
   };
 
   // Swipe gesture handlers
@@ -708,12 +723,38 @@ function StudyContent() {
         >
           ✕
         </button>
-        <div className="flex-1 h-2 bg-stone-200 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-green-600 rounded-full transition-all duration-300"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
+        {isHardMode ? (
+          <div className="flex-1 h-2 bg-stone-200 rounded-full overflow-hidden flex">
+            {cardIds.map((_, i) => {
+              const result = cardResults.get(i);
+              const widthPct = 100 / cardIds.length;
+              return (
+                <div
+                  key={i}
+                  className={`h-full transition-colors duration-300 ${
+                    result === "correct"
+                      ? "bg-green-500"
+                      : result === "partial"
+                      ? "bg-yellow-400"
+                      : result === "incorrect"
+                      ? "bg-red-400"
+                      : i <= currentIndex
+                      ? "bg-green-600"
+                      : "bg-transparent"
+                  }`}
+                  style={{ width: `${widthPct}%` }}
+                />
+              );
+            })}
+          </div>
+        ) : (
+          <div className="flex-1 h-2 bg-stone-200 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-green-600 rounded-full transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        )}
         <span className="text-xs text-stone-500">
           {currentIndex + 1}/{cardIds.length}
         </span>
@@ -982,6 +1023,7 @@ function StudyContent() {
                             setIsCorrect(result);
                             setAnswerSubmitted(true);
                             setFlipped(true);
+                            setCardResults((prev) => new Map(prev).set(currentIndex, result));
                             setSessionStats((s) => ({
                               ...s,
                               correct: result === "correct" ? s.correct + 1 : s.correct,
@@ -1067,6 +1109,43 @@ function StudyContent() {
                 </div>
               )}
 
+              {/* Front-of-card chevron navigation */}
+              <div className="flex items-center justify-between px-6 py-3 border-t border-stone-100">
+                <button
+                  onClick={handlePrevious}
+                  disabled={currentIndex <= 0}
+                  className="text-teal-500 hover:text-teal-700 disabled:opacity-20 disabled:cursor-default transition-colors"
+                  aria-label="Previous card"
+                >
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => {
+                    if (isHardMode && activeMode !== "name" && !answerSubmitted) {
+                      // Reveal answer without submitting — count as incorrect
+                      setIsCorrect("incorrect");
+                      setAnswerSubmitted(true);
+                      setFlipped(true);
+                      setCardResults((prev) => new Map(prev).set(currentIndex, "incorrect"));
+                      setSessionStats((s) => ({
+                        ...s,
+                        incorrect: s.incorrect + 1,
+                      }));
+                    } else {
+                      handleFlip();
+                    }
+                  }}
+                  className="text-teal-500 hover:text-teal-700 transition-colors"
+                  aria-label="Reveal answer"
+                >
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+
             </div>
           </div>
 
@@ -1107,24 +1186,54 @@ function StudyContent() {
               )}
 
               <div className="p-4 space-y-3 text-center">
-                <div>
-                  <h3 className="text-xl font-bold text-stone-800">
-                    {currentSpecies.commonName}
-                  </h3>
-                  {currentSpecies.indigenousNames && currentSpecies.indigenousNames.length > 0 && (
-                    <p className="text-sm font-medium text-amber-700">
-                      {currentSpecies.indigenousNames.map((n, i) => (
-                        <span key={i}>
-                          {i > 0 && " · "}
-                          {n.name}
-                          <span className="text-xs font-normal text-amber-500 ml-1">({n.language})</span>
-                        </span>
-                      ))}
+                <div className="flex items-center justify-center gap-3">
+                  {/* Previous chevron */}
+                  <button
+                    onClick={handlePrevious}
+                    disabled={currentIndex <= 0}
+                    className="flex-shrink-0 text-teal-500 hover:text-teal-700 disabled:opacity-20 disabled:cursor-default transition-colors"
+                    aria-label="Previous card"
+                  >
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+
+                  <div className="min-w-0">
+                    <h3 className="text-xl font-bold text-stone-800">
+                      {currentSpecies.commonName}
+                    </h3>
+                    {currentSpecies.indigenousNames && currentSpecies.indigenousNames.length > 0 && (
+                      <p className="text-sm font-medium text-amber-700">
+                        {currentSpecies.indigenousNames.map((n, i) => (
+                          <span key={i}>
+                            {i > 0 && " · "}
+                            {n.name}
+                            <span className="text-xs font-normal text-amber-500 ml-1">({n.language})</span>
+                          </span>
+                        ))}
+                      </p>
+                    )}
+                    <p className="text-sm italic text-stone-500">
+                      {currentSpecies.scientificName}
                     </p>
-                  )}
-                  <p className="text-sm italic text-stone-500">
-                    {currentSpecies.scientificName}
-                  </p>
+                  </div>
+
+                  {/* Next chevron */}
+                  <button
+                    onClick={
+                      isHardMode && activeMode !== "name"
+                        ? () => handleRate(isCorrect === "correct" ? "good" : isCorrect === "partial" ? "hard" : "again")
+                        : handleNext
+                    }
+                    disabled={currentIndex >= cardIds.length - 1 && sessionComplete}
+                    className="flex-shrink-0 text-teal-500 hover:text-teal-700 disabled:opacity-20 disabled:cursor-default transition-colors"
+                    aria-label="Next card"
+                  >
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
                 </div>
 
                 <div className="flex gap-2 flex-wrap justify-center">
