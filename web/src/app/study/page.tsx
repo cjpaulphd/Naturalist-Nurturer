@@ -621,15 +621,29 @@ function StudyContent() {
                     <button
                       key={cat.value}
                       onClick={() => {
-                        const hasNew = getNewCards(allSpecies, [cat.value], 1).length > 0;
                         const params = new URLSearchParams();
-                        params.set("mode", "photo");
                         params.set("categories", cat.value);
-                        if (hasNew) {
-                          params.set("type", "learn");
+                        if (sessionType === "quiz") {
+                          params.set("type", "quiz");
+                          params.set("mode", studyMode);
+                          if (quizMode !== "flashcard") {
+                            params.set("quizMode", quizMode);
+                          }
+                          if (nameDisplay !== "both") {
+                            params.set("nameDisplay", nameDisplay);
+                          }
+                          if (difficulty !== "medium") {
+                            params.set("difficulty", difficulty);
+                          }
                         } else {
-                          const hasDue = getDueCards(allSpecies, [cat.value]).length > 0;
-                          params.set("type", hasDue ? "review" : "review-all");
+                          const hasNew = getNewCards(allSpecies, [cat.value], 1).length > 0;
+                          params.set("mode", "photo");
+                          if (hasNew) {
+                            params.set("type", "learn");
+                          } else {
+                            const hasDue = getDueCards(allSpecies, [cat.value]).length > 0;
+                            params.set("type", hasDue ? "review" : "review-all");
+                          }
                         }
                         router.push(`/study?${params.toString()}`);
                       }}
