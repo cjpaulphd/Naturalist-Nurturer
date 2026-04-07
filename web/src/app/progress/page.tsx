@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Species, Category } from "@/lib/types";
 import { loadSpeciesData } from "@/lib/species";
-import { getCachedLocationSpecies, fetchMoreSpecies } from "@/lib/inat";
+import { getCachedLocationSpecies, fetchMoreSpecies, getLastLocation } from "@/lib/inat";
 import { getDueCards, getAllLearnedCards } from "@/lib/srs";
 import ProgressDashboard from "@/components/ProgressDashboard";
 import CategorySelector from "@/components/CategorySelector";
@@ -23,6 +23,7 @@ export default function ProgressPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loadingMore, setLoadingMore] = useState(false);
   const [loadMoreMessage, setLoadMoreMessage] = useState<string | null>(null);
+  const [locationName, setLocationName] = useState<string | null>(null);
 
   useEffect(() => {
     const cached = getCachedLocationSpecies();
@@ -34,6 +35,10 @@ export default function ProgressPage() {
         setSpecies(data);
         setLoading(false);
       });
+    }
+    const loc = getLastLocation();
+    if (loc?.name) {
+      setLocationName(loc.name);
     }
   }, []);
 
@@ -110,7 +115,7 @@ export default function ProgressPage() {
               <p className="text-xs text-stone-500">{loadMoreMessage}</p>
             )}
             <p className="text-xs text-stone-400">
-              {species.length} species loaded
+              {species.length} species loaded{locationName ? ` near ${locationName}` : ""}
             </p>
           </div>
 
