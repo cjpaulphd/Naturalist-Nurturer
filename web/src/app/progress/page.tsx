@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Species, Category } from "@/lib/types";
 import { loadSpeciesData } from "@/lib/species";
-import { getCachedLocationSpecies } from "@/lib/inat";
+import { getCachedLocationSpecies, fetchMoreSpecies } from "@/lib/inat";
 import { getDueCards, getAllLearnedCards } from "@/lib/srs";
 import ProgressDashboard from "@/components/ProgressDashboard";
 import CategorySelector from "@/components/CategorySelector";
@@ -21,6 +21,8 @@ export default function ProgressPage() {
   const [species, setSpecies] = useState<Species[]>([]);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [loadMoreMessage, setLoadMoreMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const cached = getCachedLocationSpecies();
@@ -37,6 +39,24 @@ export default function ProgressPage() {
 
   const dueCount = species.length > 0 ? getDueCards(species, categories).length : 0;
   const learnedCount = species.length > 0 ? getAllLearnedCards(species, categories).length : 0;
+
+  const handleLoadMore = async () => {
+    setLoadingMore(true);
+    setLoadMoreMessage(null);
+    try {
+      const result = await fetchMoreSpecies();
+      if (result && result.newCount > 0) {
+        setSpecies(result.species);
+        setLoadMoreMessage(`Added ${result.newCount} new species!`);
+      } else {
+        setLoadMoreMessage("No additional species found for this area.");
+      }
+    } catch {
+      setLoadMoreMessage("Failed to load more species. Please try again.");
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   const startReview = () => {
     const params = new URLSearchParams();
@@ -70,6 +90,29 @@ export default function ProgressPage() {
           <ProgressDashboard species={species} />
 
           <StudyLocationMap />
+
+          <div className="text-center space-y-2">
+            <button
+              onClick={handleLoadMore}
+              disabled={loadingMore}
+              className="px-5 py-2.5 bg-green-700 text-white rounded-xl text-sm hover:bg-green-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+            >
+              {loadingMore ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                "Discover More Species"
+              )}
+            </button>
+            {loadMoreMessage && (
+              <p className="text-xs text-stone-500">{loadMoreMessage}</p>
+            )}
+            <p className="text-xs text-stone-400">
+              {species.length} species loaded
+            </p>
+          </div>
 
           <div className="text-center space-y-3">
             <h3 className="text-sm font-semibold text-stone-600">
