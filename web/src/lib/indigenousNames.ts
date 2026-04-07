@@ -13,6 +13,30 @@
 
 import { IndigenousName } from "./types";
 
+/**
+ * Map language codes to approximate geographic bounding boxes.
+ * Indigenous names are only shown when the user's quiz location
+ * falls within the corresponding region.
+ */
+const LANGUAGE_REGIONS: Record<string, { latMin: number; latMax: number; lngMin: number; lngMax: number }> = {
+  mi:  { latMin: -48, latMax: -34, lngMin: 165, lngMax: 179 },  // New Zealand
+  haw: { latMin: 18,  latMax: 23,  lngMin: -161, lngMax: -154 }, // Hawaiʻi
+  wrh: { latMin: -44, latMax: -10, lngMin: 112, lngMax: 154 },   // Australia
+  pjt: { latMin: -44, latMax: -10, lngMin: 112, lngMax: 154 },   // Australia
+};
+
+function isInRegion(
+  coords: { lat: number; lng: number },
+  region: { latMin: number; latMax: number; lngMin: number; lngMax: number }
+): boolean {
+  return (
+    coords.lat >= region.latMin &&
+    coords.lat <= region.latMax &&
+    coords.lng >= region.lngMin &&
+    coords.lng <= region.lngMax
+  );
+}
+
 // Lookup table keyed by lowercase scientific name
 const INDIGENOUS_NAMES: Record<string, IndigenousName[]> = {
   // ── Aotearoa / New Zealand — Te Reo Māori ──────────────────────────
@@ -239,17 +263,35 @@ const INDIGENOUS_NAMES: Record<string, IndigenousName[]> = {
 
 /**
  * Look up indigenous names for a species by its scientific name.
+ * When coords are provided, only returns names whose language region
+ * contains the given location — so Te Reo Māori names only appear
+ * when the user is quizzing in New Zealand, etc.
  */
-export function getIndigenousNames(scientificName: string): IndigenousName[] {
-  return INDIGENOUS_NAMES[scientificName.toLowerCase()] || [];
+export function getIndigenousNames(
+  scientificName: string,
+  coords?: { lat: number; lng: number } | null
+): IndigenousName[] {
+  const all = INDIGENOUS_NAMES[scientificName.toLowerCase()] || [];
+  if (!coords || all.length === 0) return all;
+  return all.filter((n) => {
+    const code = n.languageCode;
+    if (!code) return true; // no code → always show
+    const region = LANGUAGE_REGIONS[code];
+    if (!region) return true; // unknown region → always show
+    return isInRegion(coords, region);
+  });
 }
 
 /**
  * Attach indigenous names to a species array (mutates in place for efficiency).
+ * When coords are provided, filters to only region-appropriate names.
  */
-export function attachIndigenousNames(species: Species[]): void {
+export function attachIndigenousNames(
+  species: Species[],
+  coords?: { lat: number; lng: number } | null
+): void {
   for (const s of species) {
-    const names = getIndigenousNames(s.scientificName);
+    const names = getIndigenousNames(s.scientificName, coords);
     if (names.length > 0) {
       s.indigenousNames = names;
     }

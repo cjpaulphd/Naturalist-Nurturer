@@ -1,5 +1,6 @@
 import { Species, Category, Season } from "./types";
 import { attachIndigenousNames } from "./indigenousNames";
+import { getStorage } from "./storage";
 
 let speciesCache: Species[] | null = null;
 
@@ -10,7 +11,8 @@ export async function loadSpeciesData(): Promise<Species[]> {
     const res = await fetch("/data/species_data.json");
     if (!res.ok) throw new Error(`Failed to load species data: ${res.status}`);
     const data: Species[] = await res.json();
-    attachIndigenousNames(data);
+    const coords = getStorage<{ lat: number; lng: number } | null>("nn_last_location", null);
+    attachIndigenousNames(data, coords);
     speciesCache = data;
     return data;
   } catch (err) {

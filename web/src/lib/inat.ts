@@ -481,7 +481,8 @@ function convertToSpecies(
   iconicTaxa: string,
   taxonomyMap: Map<number, { order: string; family: string; genus: string; nativeStatus: string; wikipediaSummary: string }>,
   seasonMap: Map<number, Season[]>,
-  soundMap: Map<number, SpeciesSound[]> = new Map()
+  soundMap: Map<number, SpeciesSound[]> = new Map(),
+  coords?: LocationCoords | null
 ): Species[] {
   return results.map((item, index) => {
     const taxon = item.taxon as {
@@ -534,7 +535,7 @@ function convertToSpecies(
     // Get seasonal data, default to all seasons if not available
     const seasons = seasonMap.get(taxonId) || ["spring", "summer", "fall", "winter"];
 
-    const indigenousNames = getIndigenousNames(scientificName);
+    const indigenousNames = getIndigenousNames(scientificName, coords);
 
     return {
       id: taxonId,
@@ -615,7 +616,7 @@ export async function fetchSpeciesForLocation(
   const emptySeasonMap = new Map<number, Season[]>();
   const allSpecies: Species[] = [];
   for (const group of taxaResults) {
-    const species = convertToSpecies(group.results, group.iconicTaxa, taxonomyMap, emptySeasonMap);
+    const species = convertToSpecies(group.results, group.iconicTaxa, taxonomyMap, emptySeasonMap, new Map(), coords);
     allSpecies.push(...species);
   }
 
