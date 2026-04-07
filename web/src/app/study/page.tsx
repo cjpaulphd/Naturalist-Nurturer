@@ -220,6 +220,8 @@ function StudyContent() {
   const [freeResponseInput, setFreeResponseInput] = useState("");
   const [dropdownValue, setDropdownValue] = useState("");
   const [isCorrect, setIsCorrect] = useState<"correct" | "partial" | "incorrect" | null>(null);
+  // Per-card result tracking for segmented progress bar
+  const [cardResults, setCardResults] = useState<Map<number, "correct" | "partial" | "incorrect">>(new Map());
   // Tips overlay state
   const [showTips, setShowTips] = useState(false);
 
@@ -413,6 +415,7 @@ function StudyContent() {
     setIsCorrect(result);
     setAnswerSubmitted(true);
     setFlipped(true);
+    setCardResults((prev) => new Map(prev).set(currentIndex, result));
 
     setSessionStats((s) => ({
       ...s,
@@ -720,12 +723,38 @@ function StudyContent() {
         >
           ✕
         </button>
-        <div className="flex-1 h-2 bg-stone-200 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-green-600 rounded-full transition-all duration-300"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
+        {isHardMode ? (
+          <div className="flex-1 h-2 bg-stone-200 rounded-full overflow-hidden flex">
+            {cardIds.map((_, i) => {
+              const result = cardResults.get(i);
+              const widthPct = 100 / cardIds.length;
+              return (
+                <div
+                  key={i}
+                  className={`h-full transition-colors duration-300 ${
+                    result === "correct"
+                      ? "bg-green-500"
+                      : result === "partial"
+                      ? "bg-yellow-400"
+                      : result === "incorrect"
+                      ? "bg-red-400"
+                      : i <= currentIndex
+                      ? "bg-green-600"
+                      : "bg-transparent"
+                  }`}
+                  style={{ width: `${widthPct}%` }}
+                />
+              );
+            })}
+          </div>
+        ) : (
+          <div className="flex-1 h-2 bg-stone-200 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-green-600 rounded-full transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        )}
         <span className="text-xs text-stone-500">
           {currentIndex + 1}/{cardIds.length}
         </span>
@@ -994,6 +1023,7 @@ function StudyContent() {
                             setIsCorrect(result);
                             setAnswerSubmitted(true);
                             setFlipped(true);
+                            setCardResults((prev) => new Map(prev).set(currentIndex, result));
                             setSessionStats((s) => ({
                               ...s,
                               correct: result === "correct" ? s.correct + 1 : s.correct,
@@ -1098,6 +1128,7 @@ function StudyContent() {
                       setIsCorrect("incorrect");
                       setAnswerSubmitted(true);
                       setFlipped(true);
+                      setCardResults((prev) => new Map(prev).set(currentIndex, "incorrect"));
                       setSessionStats((s) => ({
                         ...s,
                         incorrect: s.incorrect + 1,
