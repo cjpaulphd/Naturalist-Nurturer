@@ -373,6 +373,8 @@ export default function HomePage() {
           Data:{" "}
           <a href="https://www.inaturalist.org" target="_blank" rel="noopener noreferrer" className="hover:text-green-700 transition-colors">iNaturalist</a>
           {" · "}
+          <a href="https://www.wikipedia.org" target="_blank" rel="noopener noreferrer" className="hover:text-green-700 transition-colors">Wikipedia</a>
+          {" · "}
           <a href="https://xeno-canto.org" target="_blank" rel="noopener noreferrer" className="hover:text-green-700 transition-colors">Xeno-canto</a>
         </p>
 

@@ -161,6 +161,7 @@ web/
 This app is built on the following open data and APIs:
 
 - **[iNaturalist](https://www.inaturalist.org)** — Species observations, taxonomy, and photos (CC-BY-NC). iNaturalist is a joint initiative of the California Academy of Sciences and the National Geographic Society.
+- **[Wikipedia](https://www.wikipedia.org)** — Species descriptions and key facts (CC BY-SA 3.0). Facts are sourced from Wikipedia summaries via the iNaturalist API.
 - **[Xeno-canto](https://xeno-canto.org)** — Bird sound recordings (CC-BY-NC 4.0). Xeno-canto is a citizen science project for sharing bird sounds from around the world.
 - **[OpenStreetMap Nominatim](https://nominatim.openstreetmap.org)** — Geocoding and location search (ODbL).
 

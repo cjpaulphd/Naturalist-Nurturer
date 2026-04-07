@@ -1308,14 +1308,19 @@ function StudyContent() {
                       Learn More
                     </button>
                     {showLearnMore && (
-                      <ul className="mt-2 text-sm text-stone-600 space-y-1 animate-in">
-                        {currentSpecies.extendedFacts.map((fact, i) => (
-                          <li key={i} className="flex gap-2">
-                            <span className="text-green-600 flex-shrink-0">&#8226;</span>
-                            <span>{fact}</span>
-                          </li>
-                        ))}
-                      </ul>
+                      <div className="mt-2 space-y-2 animate-in">
+                        <ul className="text-sm text-stone-600 space-y-1">
+                          {currentSpecies.extendedFacts.map((fact, i) => (
+                            <li key={i} className="flex gap-2">
+                              <span className="text-green-600 flex-shrink-0">&#8226;</span>
+                              <span>{fact}</span>
+                            </li>
+                          ))}
+                        </ul>
+                        <p className="text-xs text-stone-400">
+                          Source: <a href={`https://en.wikipedia.org/wiki/${encodeURIComponent(currentSpecies.scientificName)}`} target="_blank" rel="noopener noreferrer" className="underline hover:text-stone-500 transition-colors">Wikipedia</a> (CC BY-SA 3.0)
+                        </p>
+                      </div>
                     )}
                   </div>
                 )}
