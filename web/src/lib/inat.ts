@@ -77,6 +77,8 @@ interface CachedLocationData {
   coords: LocationCoords;
   species: Species[];
   timestamp: number;
+  /** The last page fetched per iconic taxa group (1-indexed). */
+  pageLoaded?: Record<string, number>;
 }
 
 /**
@@ -223,7 +225,8 @@ function getPhotoUrl(defaultPhoto: { medium_url?: string; url?: string } | null)
 async function fetchSpeciesCounts(
   coords: LocationCoords,
   iconicTaxa: string,
-  perPage: number = 100
+  perPage: number = 100,
+  page: number = 1
 ): Promise<
   {
     count: number;
@@ -240,6 +243,7 @@ async function fetchSpeciesCounts(
     quality_grade: "research",
     rank: "species",
     per_page: perPage.toString(),
+    page: page.toString(),
     order_by: "count",
     order: "desc",
   });
@@ -670,12 +674,19 @@ export async function fetchSpeciesForLocation(
     return a.prevalenceRank - b.prevalenceRank;
   });
 
+  // Build initial page map (all groups start at page 1)
+  const pageLoaded: Record<string, number> = {};
+  for (const cfg of ICONIC_TAXA_CONFIGS) {
+    pageLoaded[cfg.iconicTaxa] = 1;
+  }
+
   // Cache
   const coordsWithName = { ...coords, name: locationName };
   setStorage<CachedLocationData>(CACHE_KEY, {
     coords: coordsWithName,
     species: allSpecies,
     timestamp: Date.now(),
+    pageLoaded,
   });
 
   setStorage(CACHE_LOCATION_KEY, coordsWithName);
@@ -718,4 +729,124 @@ export function getCachedLocationSpecies(): Species[] | null {
     return cached.species;
   }
   return null;
+}
+
+/**
+ * Fetch the next page of species for each taxa group at the cached location.
+ * Merges new species into the cache and returns the full updated list.
+ * Returns null if there is no cached location or no new species were found.
+ */
+export async function fetchMoreSpecies(): Promise<{
+  species: Species[];
+  newCount: number;
+} | null> {
+  const cached = getStorage<CachedLocationData | null>(CACHE_KEY, null);
+  if (!cached) return null;
+
+  const coords = cached.coords;
+  const pageLoaded = cached.pageLoaded ?? {};
+  const existingIds = new Set(cached.species.map((sp) => sp.id));
+
+  // Fetch the next page for each taxa group in parallel
+  const nextPage = Math.max(...Object.values(pageLoaded), 1) + 1;
+
+  const taxaFetches = ICONIC_TAXA_CONFIGS.map((cfg) => {
+    const page = (pageLoaded[cfg.iconicTaxa] ?? 1) + 1;
+    return fetchSpeciesCounts(coords, cfg.iconicTaxa, cfg.perPage, page).then(
+      (results) => ({
+        iconicTaxa: cfg.iconicTaxa,
+        results,
+        page,
+      })
+    );
+  });
+
+  const placeIdPromise = findNearestPlaceId(coords);
+
+  const [placeIdResult, ...taxaResults] = await Promise.all([
+    placeIdPromise,
+    ...taxaFetches.map((p) => p.catch(() => null)),
+  ]);
+
+  const placeId = (placeIdResult as number | null) ?? 1;
+  const validResults = (
+    taxaResults as (({ iconicTaxa: string; results: { count: number; taxon: Record<string, unknown> }[]; page: number }) | null)[]
+  ).filter(
+    (r): r is { iconicTaxa: string; results: { count: number; taxon: Record<string, unknown> }[]; page: number } =>
+      r !== null && r.results.length > 0
+  );
+
+  if (validResults.length === 0) return null;
+
+  // Collect new taxon IDs (skip already-known species)
+  const newResults = validResults.map((group) => ({
+    ...group,
+    results: group.results.filter((r) => {
+      const id = (r.taxon as { id?: number }).id;
+      return id !== undefined && !existingIds.has(id);
+    }),
+  }));
+
+  const allNewResults = newResults.flatMap((t) => t.results);
+  if (allNewResults.length === 0) return null;
+
+  const taxonIds = allNewResults
+    .map((r) => (r.taxon as { id?: number }).id)
+    .filter((id): id is number => id !== undefined);
+
+  const taxonomyMap = await fetchTaxonDetails(taxonIds, placeId);
+
+  const emptySeasonMap = new Map<number, Season[]>();
+  const newSpecies: Species[] = [];
+  for (const group of newResults) {
+    const species = convertToSpecies(
+      group.results,
+      group.iconicTaxa,
+      taxonomyMap,
+      emptySeasonMap,
+      new Map(),
+      coords
+    );
+    newSpecies.push(...species);
+  }
+
+  if (newSpecies.length === 0) return null;
+
+  // Merge into existing species list
+  const allSpecies = [...cached.species, ...newSpecies];
+
+  // Re-rank prevalence within each category
+  const byCategory: Record<string, Species[]> = {};
+  for (const sp of allSpecies) {
+    if (!byCategory[sp.category]) byCategory[sp.category] = [];
+    byCategory[sp.category].push(sp);
+  }
+  for (const catSpecies of Object.values(byCategory)) {
+    catSpecies.sort((a, b) => b.observationCount - a.observationCount);
+    catSpecies.forEach((sp, i) => {
+      sp.prevalenceRank = i + 1;
+    });
+  }
+
+  // Sort final list
+  allSpecies.sort((a, b) => {
+    const catDiff = CATEGORY_ORDER[a.category] - CATEGORY_ORDER[b.category];
+    if (catDiff !== 0) return catDiff;
+    return a.prevalenceRank - b.prevalenceRank;
+  });
+
+  // Update page tracking
+  const updatedPages = { ...pageLoaded };
+  for (const group of validResults) {
+    updatedPages[group.iconicTaxa] = group.page;
+  }
+
+  // Update cache
+  setStorage<CachedLocationData>(CACHE_KEY, {
+    ...cached,
+    species: allSpecies,
+    pageLoaded: updatedPages,
+  });
+
+  return { species: allSpecies, newCount: newSpecies.length };
 }
