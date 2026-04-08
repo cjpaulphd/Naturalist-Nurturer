@@ -13,7 +13,7 @@ import {
   Rating,
 } from "@/lib/types";
 import { loadSpeciesData, getSpeciesById } from "@/lib/species";
-import { getCachedLocationSpecies, fetchBirdSounds, updateCachedSpeciesSounds } from "@/lib/inat";
+import { getCachedLocationSpecies, fetchBirdSounds, updateCachedSpeciesSounds, fetchSimilarSpeciesForQuiz, getLastLocation } from "@/lib/inat";
 import {
   getNewCards,
   getDueCards,
@@ -120,15 +120,21 @@ function getCategoryTips(category: Category): string[] {
   }
 }
 
-// Generate multiple-choice options with taxonomy-aware distractor selection
+// Generate multiple-choice options with taxonomy-aware distractor selection.
+// `extraDistractors` are additional similar species fetched from iNaturalist
+// for hard/hardest modes — species present in the geography but not in the
+// user's downloaded list.
 function generateChoices(
   correctSpecies: Species,
   allSpecies: Species[],
   difficulty: QuizDifficulty = "medium",
-  count: number = 4
+  count: number = 4,
+  extraDistractors: Species[] = []
 ): Species[] {
   const needed = count - 1;
-  const sameCategory = allSpecies.filter(
+  // Merge local species with extra API-fetched distractors for the pool
+  const combined = [...allSpecies, ...extraDistractors];
+  const sameCategory = combined.filter(
     (s) => s.category === correctSpecies.category && s.id !== correctSpecies.id
   );
 
@@ -226,6 +232,9 @@ function StudyContent() {
   const [showTips, setShowTips] = useState(false);
   // Learn More expanded state
   const [showLearnMore, setShowLearnMore] = useState(false);
+  // Extra distractors fetched from iNaturalist for hard/hardest quiz modes
+  const [extraDistractors, setExtraDistractors] = useState<Species[]>([]);
+  const similarFetchedRef = useRef<Set<number>>(new Set());
 
   // Swipe gesture state
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
@@ -353,11 +362,39 @@ function StudyContent() {
       });
   }, [currentSpecies]);
 
+  // Fetch similar species from iNaturalist for hard/hardest quiz distractors
+  useEffect(() => {
+    if (!currentSpecies) return;
+    if (difficulty !== "hard" && difficulty !== "hardest") return;
+    if (quizMode === "flashcard") return;
+    if (similarFetchedRef.current.has(currentSpecies.id)) return;
+
+    similarFetchedRef.current.add(currentSpecies.id);
+    const coords = getLastLocation();
+    if (!coords) return;
+
+    const existingIds = new Set(allSpecies.map((s) => s.id));
+    fetchSimilarSpeciesForQuiz(currentSpecies, coords, existingIds)
+      .then((similar) => {
+        if (similar.length > 0) {
+          setExtraDistractors((prev) => {
+            // Merge new species, avoiding duplicates
+            const ids = new Set(prev.map((s) => s.id));
+            const fresh = similar.filter((s) => !ids.has(s.id));
+            return fresh.length > 0 ? [...prev, ...fresh] : prev;
+          });
+        }
+      })
+      .catch(() => {
+        // Similar species are optional — quiz still works with local pool
+      });
+  }, [currentSpecies, difficulty, quizMode, allSpecies]);
+
   // Generate choices for current card with taxonomy-aware difficulty
   const choices = useMemo(() => {
     if (!currentSpecies || quizMode === "flashcard") return [];
-    return generateChoices(currentSpecies, allSpecies, difficulty);
-  }, [currentSpecies, allSpecies, quizMode, difficulty]);
+    return generateChoices(currentSpecies, allSpecies, difficulty, 4, extraDistractors);
+  }, [currentSpecies, allSpecies, quizMode, difficulty, extraDistractors]);
 
   // Dropdown options - same category only, sorted
   const dropdownOptions = useMemo(() => {

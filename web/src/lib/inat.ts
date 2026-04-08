@@ -716,6 +716,110 @@ export function updateCachedSpeciesSounds(soundMap: Map<number, SpeciesSound[]>)
   }
 }
 
+// In-memory cache for similar species lookups (family+bbox → species)
+const similarSpeciesCache = new Map<string, { species: Species[]; timestamp: number }>();
+const SIMILAR_CACHE_TTL = 60 * 60 * 1000; // 1 hour
+
+/**
+ * Fetch similar species from iNaturalist for quiz distractors.
+ * Given a species and location, finds other species in the same family
+ * that have been observed at that location — even if they aren't in
+ * the user's downloaded species list.
+ */
+export async function fetchSimilarSpeciesForQuiz(
+  species: Species,
+  coords: LocationCoords,
+  existingIds: Set<number>
+): Promise<Species[]> {
+  if (!species.family) return [];
+
+  const bbox = buildBBox(coords);
+  const cacheKey = `${species.family}|${bbox.swlat},${bbox.swlng},${bbox.nelat},${bbox.nelng}`;
+
+  // Check in-memory cache
+  const cached = similarSpeciesCache.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < SIMILAR_CACHE_TTL) {
+    return cached.species.filter((s) => s.id !== species.id && !existingIds.has(s.id));
+  }
+
+  try {
+    // Step 1: Look up the family taxon ID via autocomplete
+    const autoRes = await fetch(
+      `${INAT_API}/taxa/autocomplete?q=${encodeURIComponent(species.family)}&rank=family&per_page=1`,
+      { headers: { "User-Agent": "NaturalistNurturer/1.0" } }
+    );
+    if (!autoRes.ok) return [];
+    const autoData = await autoRes.json();
+    const familyTaxonId = autoData.results?.[0]?.id;
+    if (!familyTaxonId) return [];
+
+    // Step 2: Fetch species in that family observed at this location
+    const params = new URLSearchParams({
+      taxon_id: familyTaxonId.toString(),
+      swlat: bbox.swlat.toString(),
+      swlng: bbox.swlng.toString(),
+      nelat: bbox.nelat.toString(),
+      nelng: bbox.nelng.toString(),
+      quality_grade: "research",
+      rank: "species",
+      per_page: "30",
+      order_by: "count",
+      order: "desc",
+    });
+    const countRes = await fetch(
+      `${INAT_API}/observations/species_counts?${params}`,
+      { headers: { "User-Agent": "NaturalistNurturer/1.0" } }
+    );
+    if (!countRes.ok) return [];
+    const countData = await countRes.json();
+    const results: { count: number; taxon: Record<string, unknown> }[] = countData.results || [];
+    if (results.length === 0) return [];
+
+    // Step 3: Fetch taxonomy details for the new species
+    const taxonIds = results
+      .map((r) => (r.taxon as { id?: number }).id)
+      .filter((id): id is number => id !== undefined);
+
+    const placeId = (await findNearestPlaceId(coords)) ?? 1;
+    const taxonomyMap = await fetchTaxonDetails(taxonIds, placeId);
+
+    // Step 4: Determine the iconic taxa from the species category
+    const categoryToIconicTaxa: Record<string, string> = {
+      tree: "Plantae",
+      plant: "Plantae",
+      bird: "Aves",
+      fungus: "Fungi",
+      insect: "Insecta",
+      mammal: "Mammalia",
+      reptile: "Reptilia",
+      amphibian: "Amphibia",
+    };
+    const iconicTaxa = categoryToIconicTaxa[species.category] || "Plantae";
+
+    // Step 5: Convert to Species objects
+    const emptySeasonMap = new Map<number, Season[]>();
+    const similarSpecies = convertToSpecies(
+      results,
+      iconicTaxa,
+      taxonomyMap,
+      emptySeasonMap,
+      new Map(),
+      coords
+    );
+
+    // Cache the full result set
+    similarSpeciesCache.set(cacheKey, {
+      species: similarSpecies,
+      timestamp: Date.now(),
+    });
+
+    // Return only species not already in the user's list
+    return similarSpecies.filter((s) => s.id !== species.id && !existingIds.has(s.id));
+  } catch {
+    return [];
+  }
+}
+
 /**
  * Get the last used location from cache.
  */
