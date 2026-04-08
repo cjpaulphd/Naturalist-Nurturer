@@ -2,7 +2,7 @@
 
 **Know Your Neighbors. Learn the Species Where You Are.**
 
-A mobile-first web app for learning species identification through flashcards, spaced repetition, and interactive quizzes. Built for naturalists at <a href="https://www.greenriverpreserve.org">Green River Preserve</a> and beyond.
+A mobile-first web app interactive field guide for learning identification through flashcards, spaced repetition, and interactive quizzes. Built for naturalists at <a href="https://www.greenriverpreserve.org">Green River Preserve</a> and beyond.
 
 ## Features
 
@@ -81,7 +81,7 @@ Each species includes:
 - Common and scientific names
 - Full taxonomy: Order, Family, Genus
 - Observation count and local prevalence rank (sourced from iNaturalist)
-- Key facts, habitat, and identification tips (sourced from [Wikipedia](https://www.wikipedia.org), CC BY-SA 3.0)
+- Key facts, habitat, and identification tips, sourced from [Wikipedia](https://www.wikipedia.org) (CC-BY-SA 3.0)
 - Photos from [iNaturalist](https://www.inaturalist.org) (CC-BY-NC) with attribution displayed
 - Bird sounds from [Xeno-canto](https://xeno-canto.org) (CC-BY-NC 4.0) via server-side proxy
 
