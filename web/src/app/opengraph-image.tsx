@@ -1,7 +1,8 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "Naturalist Nurturer - Know Your Neighbors";
+export const alt =
+  "Naturalist Nurturer - Know Your Neighbors. Learn the Species Where You Are.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -16,61 +17,112 @@ export default function OGImage() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background: "linear-gradient(135deg, #faf8f5 0%, #e8f5e9 50%, #c8e6c9 100%)",
+          background:
+            "linear-gradient(150deg, #072b1e 0%, #0f4a2e 25%, #14532d 50%, #166534 75%, #1a7a3e 100%)",
           fontFamily: "Arial, Helvetica, sans-serif",
           position: "relative",
           overflow: "hidden",
         }}
       >
-        {/* Decorative leaf circles */}
+        {/* Top accent bar */}
         <div
           style={{
             position: "absolute",
-            top: -60,
-            right: -60,
-            width: 300,
-            height: 300,
-            borderRadius: "50%",
-            background: "rgba(22, 101, 52, 0.08)",
-            display: "flex",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            bottom: -80,
-            left: -80,
-            width: 350,
-            height: 350,
-            borderRadius: "50%",
-            background: "rgba(22, 101, 52, 0.06)",
-            display: "flex",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            top: 100,
-            left: -40,
-            width: 200,
-            height: 200,
-            borderRadius: "50%",
-            background: "rgba(22, 101, 52, 0.04)",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 5,
+            background:
+              "linear-gradient(90deg, #22c55e 0%, #86efac 30%, #4ade80 60%, #22c55e 100%)",
             display: "flex",
           }}
         />
 
-        {/* Leaf emoji */}
-        <div style={{ fontSize: 80, marginBottom: 16, display: "flex" }}>
+        {/* Background decorative circles for depth */}
+        <div
+          style={{
+            position: "absolute",
+            top: -100,
+            right: -80,
+            width: 420,
+            height: 420,
+            borderRadius: "50%",
+            background: "rgba(255, 255, 255, 0.035)",
+            display: "flex",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            top: 40,
+            right: 80,
+            width: 220,
+            height: 220,
+            borderRadius: "50%",
+            background: "rgba(255, 255, 255, 0.025)",
+            display: "flex",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            bottom: -120,
+            left: -80,
+            width: 480,
+            height: 480,
+            borderRadius: "50%",
+            background: "rgba(255, 255, 255, 0.035)",
+            display: "flex",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            bottom: 30,
+            left: 140,
+            width: 160,
+            height: 160,
+            borderRadius: "50%",
+            background: "rgba(255, 255, 255, 0.025)",
+            display: "flex",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            top: 20,
+            left: 50,
+            width: 110,
+            height: 110,
+            borderRadius: "50%",
+            background: "rgba(255, 255, 255, 0.03)",
+            display: "flex",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            top: 260,
+            right: -30,
+            width: 180,
+            height: 180,
+            borderRadius: "50%",
+            background: "rgba(255, 255, 255, 0.02)",
+            display: "flex",
+          }}
+        />
+
+        {/* Leaf icon */}
+        <div style={{ fontSize: 76, marginBottom: 6, display: "flex" }}>
           🌿
         </div>
 
         {/* App name */}
         <div
           style={{
-            fontSize: 64,
-            fontWeight: 700,
-            color: "#1c1917",
+            fontSize: 72,
+            fontWeight: 800,
+            color: "white",
             lineHeight: 1.1,
             display: "flex",
           }}
@@ -81,35 +133,61 @@ export default function OGImage() {
         {/* Tagline */}
         <div
           style={{
-            fontSize: 28,
-            color: "#166534",
-            marginTop: 16,
-            fontWeight: 600,
+            fontSize: 27,
+            color: "rgba(255, 255, 255, 0.82)",
+            marginTop: 18,
+            fontWeight: 500,
             display: "flex",
           }}
         >
           Know Your Neighbors. Learn the Species Where You Are.
         </div>
 
-        {/* Feature pills */}
+        {/* Decorative divider */}
+        <div
+          style={{
+            width: 80,
+            height: 3,
+            background:
+              "linear-gradient(90deg, rgba(134,239,172,0), rgba(134,239,172,0.6), rgba(134,239,172,0))",
+            borderRadius: 2,
+            marginTop: 30,
+            marginBottom: 30,
+            display: "flex",
+          }}
+        />
+
+        {/* Feature category pills - all 8 taxa */}
         <div
           style={{
             display: "flex",
-            gap: 16,
-            marginTop: 40,
+            gap: 12,
+            flexWrap: "wrap",
+            justifyContent: "center",
+            maxWidth: 820,
           }}
         >
-          {["🌳 Trees", "🌱 Plants", "🐦 Birds"].map((label) => (
+          {[
+            "🌳 Trees",
+            "🌸 Plants",
+            "🐦 Birds",
+            "🍄 Fungi",
+            "🦋 Insects",
+            "🦌 Mammals",
+            "🦎 Reptiles",
+            "🐸 Amphibians",
+          ].map((label) => (
             <div
               key={label}
               style={{
-                background: "rgba(22, 101, 52, 0.12)",
-                color: "#166534",
-                padding: "10px 24px",
+                background: "rgba(255, 255, 255, 0.11)",
+                color: "rgba(255, 255, 255, 0.92)",
+                padding: "8px 22px",
                 borderRadius: 50,
-                fontSize: 22,
+                fontSize: 19,
                 fontWeight: 600,
                 display: "flex",
+                border: "1px solid rgba(255, 255, 255, 0.15)",
               }}
             >
               {label}
@@ -121,16 +199,31 @@ export default function OGImage() {
         <div
           style={{
             position: "absolute",
-            bottom: 30,
-            fontSize: 20,
-            color: "#78716c",
+            bottom: 22,
+            fontSize: 17,
+            color: "rgba(255, 255, 255, 0.4)",
             display: "flex",
+            letterSpacing: 2,
           }}
         >
           natnurturer.org
         </div>
+
+        {/* Bottom accent bar */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 5,
+            background:
+              "linear-gradient(90deg, #22c55e 0%, #86efac 30%, #4ade80 60%, #22c55e 100%)",
+            display: "flex",
+          }}
+        />
       </div>
     ),
-    { ...size }
+    { ...size },
   );
 }
