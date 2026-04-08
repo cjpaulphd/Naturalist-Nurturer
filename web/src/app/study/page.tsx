@@ -235,6 +235,7 @@ function StudyContent() {
   // Extra distractors fetched from iNaturalist for hard/hardest quiz modes
   const [extraDistractors, setExtraDistractors] = useState<Species[]>([]);
   const similarFetchedRef = useRef<Set<number>>(new Set());
+  const lockedChoicesRef = useRef<{ speciesId: number; choices: Species[] } | null>(null);
 
   // Swipe gesture state
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
@@ -390,10 +391,17 @@ function StudyContent() {
       });
   }, [currentSpecies, difficulty, quizMode, allSpecies]);
 
-  // Generate choices for current card with taxonomy-aware difficulty
+  // Generate choices for current card with taxonomy-aware difficulty.
+  // Lock in choices per species so late-arriving extraDistractors don't
+  // cause the visible option-switch bug in hardest mode.
   const choices = useMemo(() => {
     if (!currentSpecies || quizMode === "flashcard") return [];
-    return generateChoices(currentSpecies, allSpecies, difficulty, 4, extraDistractors);
+    if (lockedChoicesRef.current?.speciesId === currentSpecies.id) {
+      return lockedChoicesRef.current.choices;
+    }
+    const newChoices = generateChoices(currentSpecies, allSpecies, difficulty, 4, extraDistractors);
+    lockedChoicesRef.current = { speciesId: currentSpecies.id, choices: newChoices };
+    return newChoices;
   }, [currentSpecies, allSpecies, quizMode, difficulty, extraDistractors]);
 
   // Dropdown options - same category only, sorted
@@ -710,7 +718,7 @@ function StudyContent() {
                 })}
               </div>
               <div className="text-xs text-stone-500 text-center">
-                {sessionStats.total} card{sessionStats.total !== 1 ? "s" : ""} studied this session
+                {sessionStats.total} species studied this session
               </div>
             </div>
           );
