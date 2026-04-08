@@ -302,11 +302,41 @@ function StudyContent() {
 
       setCardIds(ids);
       setSessionStats((s) => ({ ...s, total: ids.length }));
-      setLoading(false);
 
       if (studyMode === "mixed" && ids.length > 0) {
         setCurrentMode(pickRandomMode(data, ids[0]));
       }
+
+      // For hard/hardest quiz modes, prefetch similar species for the first
+      // card BEFORE clearing the loading state. This ensures extra distractors
+      // are in the pool when choices are first generated. A 3-second timeout
+      // prevents the spinner from hanging if the API is slow.
+      if (
+        ids.length > 0 &&
+        (difficulty === "hard" || difficulty === "hardest") &&
+        quizMode !== "flashcard"
+      ) {
+        const firstSpecies = getSpeciesById(data, ids[0]);
+        const coords = firstSpecies?.family ? getLastLocation() : null;
+        if (firstSpecies && coords) {
+          similarFetchedRef.current.add(firstSpecies.id);
+          const existingIds = new Set(data.map((s) => s.id));
+          const timeout = new Promise<void>((resolve) => setTimeout(resolve, 3000));
+          Promise.race([
+            fetchSimilarSpeciesForQuiz(firstSpecies, coords, existingIds)
+              .then((similar) => {
+                if (similar.length > 0) {
+                  setExtraDistractors(similar);
+                }
+              })
+              .catch(() => {}),
+            timeout,
+          ]).then(() => setLoading(false));
+          return; // setLoading(false) handled above
+        }
+      }
+
+      setLoading(false);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -363,33 +393,53 @@ function StudyContent() {
       });
   }, [currentSpecies]);
 
-  // Fetch similar species from iNaturalist for hard/hardest quiz distractors
+  // Prefetch similar species for a given species, merging results into extraDistractors.
+  // Returns a promise so callers can chain (e.g. prefetch card 0 then generate choices).
+  const prefetchDistractors = useCallback(
+    (species: Species, speciesList: Species[]): Promise<void> => {
+      if (!species.family) return Promise.resolve();
+      if (similarFetchedRef.current.has(species.id)) return Promise.resolve();
+      similarFetchedRef.current.add(species.id);
+
+      const coords = getLastLocation();
+      if (!coords) return Promise.resolve();
+
+      const existingIds = new Set(speciesList.map((s) => s.id));
+      return fetchSimilarSpeciesForQuiz(species, coords, existingIds)
+        .then((similar) => {
+          if (similar.length > 0) {
+            setExtraDistractors((prev) => {
+              const ids = new Set(prev.map((s) => s.id));
+              const fresh = similar.filter((s) => !ids.has(s.id));
+              return fresh.length > 0 ? [...prev, ...fresh] : prev;
+            });
+          }
+        })
+        .catch(() => {
+          // Similar species are optional — quiz still works with local pool
+        });
+    },
+    []
+  );
+
+  // Fetch similar species for the current card + look-ahead prefetch for the next card
   useEffect(() => {
     if (!currentSpecies) return;
     if (difficulty !== "hard" && difficulty !== "hardest") return;
     if (quizMode === "flashcard") return;
-    if (similarFetchedRef.current.has(currentSpecies.id)) return;
 
-    similarFetchedRef.current.add(currentSpecies.id);
-    const coords = getLastLocation();
-    if (!coords) return;
+    // Fetch for current card
+    prefetchDistractors(currentSpecies, allSpecies);
 
-    const existingIds = new Set(allSpecies.map((s) => s.id));
-    fetchSimilarSpeciesForQuiz(currentSpecies, coords, existingIds)
-      .then((similar) => {
-        if (similar.length > 0) {
-          setExtraDistractors((prev) => {
-            // Merge new species, avoiding duplicates
-            const ids = new Set(prev.map((s) => s.id));
-            const fresh = similar.filter((s) => !ids.has(s.id));
-            return fresh.length > 0 ? [...prev, ...fresh] : prev;
-          });
-        }
-      })
-      .catch(() => {
-        // Similar species are optional — quiz still works with local pool
-      });
-  }, [currentSpecies, difficulty, quizMode, allSpecies]);
+    // Look-ahead: prefetch for the next card so distractors are ready when user advances
+    const nextIndex = currentIndex + 1;
+    if (nextIndex < cardIds.length) {
+      const nextSpecies = getSpeciesById(allSpecies, cardIds[nextIndex]);
+      if (nextSpecies) {
+        prefetchDistractors(nextSpecies, allSpecies);
+      }
+    }
+  }, [currentSpecies, difficulty, quizMode, allSpecies, currentIndex, cardIds, prefetchDistractors]);
 
   // Generate choices for current card with taxonomy-aware difficulty.
   // Lock in choices per species so late-arriving extraDistractors don't
