@@ -855,8 +855,6 @@ export async function fetchMoreSpecies(): Promise<{
   const existingIds = new Set(cached.species.map((sp) => sp.id));
 
   // Fetch the next page for each taxa group in parallel
-  const nextPage = Math.max(...Object.values(pageLoaded), 1) + 1;
-
   const taxaFetches = ICONIC_TAXA_CONFIGS.map((cfg) => {
     const page = (pageLoaded[cfg.iconicTaxa] ?? 1) + 1;
     return fetchSpeciesCounts(coords, cfg.iconicTaxa, cfg.perPage, page).then(

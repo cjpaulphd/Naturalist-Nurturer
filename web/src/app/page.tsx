@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Species, Category, SessionType, StudyMode, QuizMode, QuizDifficulty, NameDisplay } from "@/lib/types";
 import { loadSpeciesData } from "@/lib/species";
 import { getCachedLocationSpecies, getLastLocation } from "@/lib/inat";
-import { getNewCards, getDueCards, getAllLearnedCards, getLearnedCount } from "@/lib/srs";
+import { getNewCards, getNewCardCount, getDueCards, getAllLearnedCards, getLearnedCount } from "@/lib/srs";
 import { CATEGORIES } from "@/lib/categories";
 import { getStorage, setStorage } from "@/lib/storage";
 import CategorySelector from "@/components/CategorySelector";
@@ -49,18 +49,20 @@ export default function HomePage() {
     }
   }, []);
 
-  // Preload species photos so Learn/Quiz work instantly
+  // Preload the first photo for the top species the user is most likely to study.
+  // Avoids firing hundreds of requests for all species on page load.
   useEffect(() => {
     if (species.length === 0) return;
-    for (const sp of species) {
-      for (const photo of sp.photos) {
-        const src = photo.filename
-          ? `/data/photos/${sp.id}/${photo.filename}`
-          : photo.url;
-        if (src) {
-          const img = new Image();
-          img.src = src;
-        }
+    const PRELOAD_LIMIT = 15;
+    for (const sp of species.slice(0, PRELOAD_LIMIT)) {
+      const photo = sp.photos[0];
+      if (!photo) continue;
+      const src = photo.filename
+        ? `/data/photos/${sp.id}/${photo.filename}`
+        : photo.url;
+      if (src) {
+        const img = new Image();
+        img.src = src;
       }
     }
   }, [species]);
@@ -79,7 +81,7 @@ export default function HomePage() {
     if (species.length === 0) return undefined;
     const counts = {} as Record<Category, number>;
     for (const cat of CATEGORIES) {
-      counts[cat.value] = getNewCards(species, [cat.value], Infinity).length;
+      counts[cat.value] = getNewCardCount(species, [cat.value]);
     }
     return counts;
   }, [species]);

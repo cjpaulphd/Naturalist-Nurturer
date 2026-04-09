@@ -50,6 +50,16 @@ function formatNameSecondary(species: Species, display: NameDisplay): string | n
   return null;
 }
 
+/** Fisher-Yates shuffle — produces a uniformly random permutation. */
+function shuffleArray<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 // General identification tips by category
 function getCategoryTips(category: Category): string[] {
   switch (category) {
@@ -140,9 +150,9 @@ function generateChoices(
 
   if (difficulty === "easy") {
     // Random from same category (original behavior)
-    const shuffled = [...sameCategory].sort(() => Math.random() - 0.5);
+    const shuffled = shuffleArray(sameCategory);
     const distractors = shuffled.slice(0, needed);
-    return [correctSpecies, ...distractors].sort(() => Math.random() - 0.5);
+    return shuffleArray([correctSpecies, ...distractors]);
   }
 
   // For medium/hard: prefer taxonomically similar species
@@ -157,24 +167,22 @@ function generateChoices(
     (s) => s.order !== correctSpecies.order
   );
 
-  const shuffle = (arr: Species[]) => [...arr].sort(() => Math.random() - 0.5);
-
   let pool: Species[];
   if (difficulty === "hard" || difficulty === "hardest") {
     // Prioritize: same genus > same family > same order > rest
     pool = [
-      ...shuffle(sameGenus),
-      ...shuffle(sameFamily),
-      ...shuffle(sameOrder),
-      ...shuffle(rest),
+      ...shuffleArray(sameGenus),
+      ...shuffleArray(sameFamily),
+      ...shuffleArray(sameOrder),
+      ...shuffleArray(rest),
     ];
   } else {
     // Medium: prioritize same order > same family > rest
     pool = [
-      ...shuffle(sameOrder),
-      ...shuffle(sameFamily),
-      ...shuffle(sameGenus),
-      ...shuffle(rest),
+      ...shuffleArray(sameOrder),
+      ...shuffleArray(sameFamily),
+      ...shuffleArray(sameGenus),
+      ...shuffleArray(rest),
     ];
   }
 
@@ -184,11 +192,11 @@ function generateChoices(
   if (distractors.length < needed) {
     const usedIds = new Set([correctSpecies.id, ...distractors.map((d) => d.id)]);
     const remaining = sameCategory.filter((s) => !usedIds.has(s.id));
-    const extra = shuffle(remaining).slice(0, needed - distractors.length);
+    const extra = shuffleArray(remaining).slice(0, needed - distractors.length);
     distractors.push(...extra);
   }
 
-  return [correctSpecies, ...distractors].sort(() => Math.random() - 0.5);
+  return shuffleArray([correctSpecies, ...distractors]);
 }
 
 function StudyContent() {

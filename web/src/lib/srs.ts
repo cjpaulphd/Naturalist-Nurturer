@@ -12,6 +12,16 @@ import { recordStudyLocation } from "./location-tracker";
 const CARD_STATE_KEY = "nn_card_states";
 const PROGRESS_KEY = "nn_progress";
 
+/** Fisher-Yates shuffle — produces a uniformly random permutation. */
+function shuffleArray<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 // Rating quality mappings for SM-2 (0-5 scale)
 const RATING_QUALITY: Record<Rating, number> = {
   again: 0,
@@ -24,8 +34,14 @@ const RATING_QUALITY: Record<Rating, number> = {
 const INITIAL_INTERVAL = 1;
 const SECOND_INTERVAL = 6;
 
+// In-memory cache to avoid re-parsing localStorage JSON on every call.
+// Invalidated whenever saveCardState writes new data.
+let _cardStatesCache: Record<string, CardState> | null = null;
+
 export function getAllCardStates(): Record<string, CardState> {
-  return getStorage<Record<string, CardState>>(CARD_STATE_KEY, {});
+  if (_cardStatesCache) return _cardStatesCache;
+  _cardStatesCache = getStorage<Record<string, CardState>>(CARD_STATE_KEY, {});
+  return _cardStatesCache;
 }
 
 export function getCardState(speciesId: number): CardState | null {
@@ -37,6 +53,7 @@ export function saveCardState(state: CardState): void {
   const states = getAllCardStates();
   states[String(state.speciesId)] = state;
   setStorage(CARD_STATE_KEY, states);
+  _cardStatesCache = states; // keep in-memory cache in sync
 }
 
 export function createNewCardState(speciesId: number): CardState {
@@ -208,9 +225,7 @@ export function getQuizCards(
   const shuffleWithNativePriority = (species: Species[]): Species[] => {
     const notIntroduced = species.filter((s) => s.nativeStatus !== "introduced");
     const introduced = species.filter((s) => s.nativeStatus === "introduced");
-    const shuffledMain = [...notIntroduced].sort(() => Math.random() - 0.5);
-    const shuffledIntroduced = [...introduced].sort(() => Math.random() - 0.5);
-    return [...shuffledMain, ...shuffledIntroduced];
+    return [...shuffleArray(notIntroduced), ...shuffleArray(introduced)];
   };
 
   // Prioritize new species, then fill remaining slots with learned species
@@ -219,6 +234,22 @@ export function getQuizCards(
     ...shuffleWithNativePriority(learnedSpecies),
   ];
   return combined.slice(0, count).map((s) => s.id);
+}
+
+/**
+ * Count unlearned (new) cards per category without building full arrays.
+ */
+export function getNewCardCount(
+  allSpecies: Species[],
+  categories: Category[]
+): number {
+  const states = getAllCardStates();
+  let count = 0;
+  for (const s of allSpecies) {
+    if (categories.length > 0 && !categories.includes(s.category)) continue;
+    if (!states[String(s.id)]) count++;
+  }
+  return count;
 }
 
 /**

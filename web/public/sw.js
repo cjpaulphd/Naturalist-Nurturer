@@ -1,4 +1,8 @@
-const CACHE_NAME = "naturalist-nurturer-v1";
+// Bump this version string on each deploy so the activate handler
+// can evict stale caches. Without this, users stay on old cached
+// assets indefinitely.
+const CACHE_VERSION = "v2";
+const CACHE_NAME = "naturalist-nurturer-" + CACHE_VERSION;
 const STATIC_ASSETS = [
   "/",
   "/study",
@@ -67,11 +71,13 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Default: network with cache fallback
+  // Default: network with cache fallback.
+  // Only cache same-origin requests to avoid caching API responses
+  // or cross-origin resources that may serve stale/dynamic data.
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        if (response.ok) {
+        if (response.ok && url.origin === self.location.origin) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, clone);
