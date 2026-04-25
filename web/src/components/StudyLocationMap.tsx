@@ -92,12 +92,15 @@ export default function StudyLocationMap() {
     const map = L.map(mapRef.current, {
       scrollWheelZoom: false,
       attributionControl: true,
+      worldCopyJump: false,
+      maxBoundsViscosity: 1.0,
     });
     mapInstanceRef.current = map;
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: "&copy; OpenStreetMap contributors",
       maxZoom: 18,
+      noWrap: true,
     }).addTo(map);
 
     // Custom marker icon using a nature-themed circle
@@ -132,15 +135,40 @@ export default function StudyLocationMap() {
       markers.push(marker);
     }
 
-    // Fit map to show all markers
+    // Fit map to show all markers, capturing the initial bounds so we can
+    // lock zoom-out and pan range to a meaningful region.
+    let initialBounds: L.LatLngBounds;
     if (markers.length === 1) {
+      const center = L.latLng(locations[0].lat, locations[0].lng);
+      initialBounds = center.toBounds(80000);
       map.setView([locations[0].lat, locations[0].lng], 12);
     } else {
-      const group = L.featureGroup(markers);
-      map.fitBounds(group.getBounds().pad(0.2));
+      initialBounds = L.featureGroup(markers).getBounds().pad(0.2);
+      map.fitBounds(initialBounds);
     }
 
+    // Prevent zooming out past the default view (no empty-world panning) and
+    // keep panning constrained to a region around the user's actual markers.
+    const minZoom = map.getZoom();
+    map.setMinZoom(minZoom);
+    map.setMaxBounds(initialBounds.pad(0.5));
+
+    // At the default fully-fit view there is nothing meaningful to pan to,
+    // so disable dragging — this lets touch events pass through to native
+    // page scroll on mobile. Re-enable dragging when the user explicitly
+    // zooms in.
+    const updateDragForZoom = () => {
+      if (map.getZoom() <= minZoom) {
+        map.dragging.disable();
+      } else {
+        map.dragging.enable();
+      }
+    };
+    updateDragForZoom();
+    map.on("zoomend", updateDragForZoom);
+
     return () => {
+      map.off("zoomend", updateDragForZoom);
       map.remove();
       mapInstanceRef.current = null;
     };
