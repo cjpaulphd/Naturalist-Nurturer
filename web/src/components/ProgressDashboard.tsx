@@ -1,9 +1,10 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Species } from "@/lib/types";
 import { CATEGORIES } from "@/lib/categories";
 import { getLearnedCount, getUserProgress } from "@/lib/srs";
+import { buildStudyUrlForCategory, getLastStudyFormat } from "@/lib/studyFormat";
 
 interface ProgressDashboardProps {
   species: Species[];
@@ -11,6 +12,7 @@ interface ProgressDashboardProps {
 
 export default function ProgressDashboard({ species }: ProgressDashboardProps) {
   const progress = getUserProgress();
+  const router = useRouter();
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-4">
@@ -25,10 +27,13 @@ export default function ProgressDashboard({ species }: ProgressDashboardProps) {
           const pct = total > 0 ? Math.round((learned / total) * 100) : 0;
 
           return (
-            <Link
+            <button
               key={cat.value}
-              href={`/study?type=review&mode=photo&categories=${cat.value}`}
-              className="text-center block rounded-lg p-1 hover:bg-stone-50 transition-colors"
+              type="button"
+              onClick={() => {
+                router.push(buildStudyUrlForCategory(getLastStudyFormat(), cat.value));
+              }}
+              className="text-center block w-full rounded-lg p-1 hover:bg-stone-50 transition-colors"
             >
               <div className="text-lg mb-1">{cat.icon}</div>
               <div className="text-xs text-stone-500 mb-1">{cat.label}</div>
@@ -41,7 +46,7 @@ export default function ProgressDashboard({ species }: ProgressDashboardProps) {
               <div className="text-xs text-stone-600 mt-1">
                 {learned}/{total}
               </div>
-            </Link>
+            </button>
           );
         })}
       </div>

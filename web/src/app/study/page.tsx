@@ -28,6 +28,7 @@ import SoundPlayer from "@/components/SoundPlayer";
 import TaxonomyChart from "@/components/TaxonomyChart";
 import FallingLeaves from "@/components/FallingLeaves";
 import { getStorage } from "@/lib/storage";
+import { setLastStudyFormat } from "@/lib/studyFormat";
 
 const LEARN_COUNT = 10;
 const QUIZ_COUNT = 15;
@@ -219,6 +220,19 @@ function StudyContent() {
 
   const [showFallbackBanner, setShowFallbackBanner] = useState(isFallbackReview);
   const [fallbackType, setFallbackType] = useState<SessionType | null>(null);
+
+  // Remember the format so the Grow page category buttons can resume it.
+  // Skip when this load was an auto-fallback so the user's original intent persists.
+  useEffect(() => {
+    if (isFallbackReview) return;
+    setLastStudyFormat({
+      sessionType,
+      studyMode,
+      quizMode,
+      difficulty,
+      nameDisplay,
+    });
+  }, [sessionType, studyMode, quizMode, difficulty, nameDisplay, isFallbackReview]);
 
   const [allSpecies, setAllSpecies] = useState<Species[]>([]);
   const [cardIds, setCardIds] = useState<number[]>([]);
