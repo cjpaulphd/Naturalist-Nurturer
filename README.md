@@ -84,7 +84,7 @@ Each species includes:
 - Observation count and local prevalence rank (sourced from iNaturalist)
 - Key facts, habitat, and identification tips, sourced from [Wikipedia](https://www.wikipedia.org) (CC-BY-SA 3.0)
 - Photos from [iNaturalist](https://www.inaturalist.org) (CC-BY-NC) with attribution displayed
-- Bird sounds from [Xeno-canto](https://xeno-canto.org) (CC-BY-NC 4.0) via server-side proxy
+- Bird sounds from [iNaturalist](https://www.inaturalist.org) observation recordings (Creative Commons, with attribution), or [Xeno-canto](https://xeno-canto.org) when an API key is configured
 
 ## Tech Stack
 
@@ -96,7 +96,8 @@ Each species includes:
 - **Vercel** hosting with Web Analytics
 - **[iNaturalist API](https://www.inaturalist.org)** for species data and taxonomy
 - **[OpenStreetMap Nominatim](https://nominatim.openstreetmap.org)** for geocoding
-- **[Xeno-canto API](https://xeno-canto.org)** for bird sounds (proxied server-side)
+- **[iNaturalist API](https://www.inaturalist.org)** for bird sounds (CC-licensed observation recordings)
+- **[Xeno-canto API](https://xeno-canto.org)** for bird sounds, used when `XENO_CANTO_API_KEY` is set (v3 API requires a free key)
 
 ## Getting Started
 
@@ -128,7 +129,7 @@ web/
 │   │   ├── study/        # Flashcard study sessions
 │   │   ├── browse/       # Field guide / species browser
 │   │   ├── progress/     # Growth tracking & location map
-│   │   └── api/          # Server-side API routes (Xeno-canto proxy)
+│   │   └── api/          # Server-side API routes (bird sound search & audio proxy)
 │   ├── components/
 │   │   ├── CategorySelector.tsx
 │   │   ├── FallingLeaves.tsx
@@ -163,7 +164,7 @@ This app is built on the following open data and APIs:
 
 - **[iNaturalist](https://www.inaturalist.org)** — Species observations, taxonomy, and photos (CC-BY-NC). iNaturalist is a joint initiative of the California Academy of Sciences and the National Geographic Society.
 - **[Wikipedia](https://www.wikipedia.org)** — Species descriptions and key facts (CC BY-SA 3.0). Facts are sourced from Wikipedia summaries via the iNaturalist API.
-- **[Xeno-canto](https://xeno-canto.org)** — Bird sound recordings (CC-BY-NC 4.0). Xeno-canto is a citizen science project for sharing bird sounds from around the world.
+- **[Xeno-canto](https://xeno-canto.org)** — Optional bird sound source (CC-licensed). Xeno-canto is a citizen science project for sharing bird sounds from around the world. Its v3 API requires a free key (`XENO_CANTO_API_KEY`); without one, bird sounds come from iNaturalist observation recordings.
 - **[OpenStreetMap Nominatim](https://nominatim.openstreetmap.org)** — Geocoding and location search (ODbL).
 
 ## License

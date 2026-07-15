@@ -12,6 +12,9 @@ const ALLOWED_HOSTS = [
   "xc-s3.s3.amazonaws.com",
   "xc-s3.s3.eu-west-1.amazonaws.com",
   "cdn.xeno-canto.org",
+  // iNaturalist sound hosts (usually played directly, allowed as fallback)
+  "static.inaturalist.org",
+  "inaturalist-open-data.s3.amazonaws.com",
 ];
 
 function isAllowedHost(hostname: string): boolean {

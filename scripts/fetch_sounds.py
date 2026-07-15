@@ -11,6 +11,9 @@ DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
 RAW_DIR = os.path.join(DATA_DIR, "raw")
 SOUNDS_DIR = os.path.join(DATA_DIR, "sounds")
 XENO_CANTO_URL = "https://xeno-canto.org/api/3/recordings"
+# Xeno-canto API v3 requires a (free) API key. Register at
+# https://xeno-canto.org/account and export XENO_CANTO_API_KEY before running.
+API_KEY = os.environ.get("XENO_CANTO_API_KEY", "")
 HEADERS = {
     "User-Agent": "NaturalistNurturer/1.0 (species flashcard app; Green River Preserve)"
 }
@@ -43,14 +46,14 @@ def load_bird_species():
 
 def search_xenocanto(scientific_name):
     """Search Xeno-canto for recordings of a species."""
-    # Xeno-canto v3 query format: name + location filter
-    query = f'{scientific_name} loc:"North Carolina"'
+    # Xeno-canto v3 query format: quoted species tag
+    query = f'sp:"{scientific_name}"'
 
     for attempt in range(MAX_RETRIES):
         try:
             resp = requests.get(
                 XENO_CANTO_URL,
-                params={"query": query},
+                params={"query": query, "key": API_KEY},
                 headers=HEADERS,
                 timeout=30,
             )
@@ -169,6 +172,12 @@ def process_bird(bird_info):
 
 
 def main():
+    if not API_KEY:
+        print("Error: Xeno-canto API v3 requires an API key.")
+        print("Register for a free key at https://xeno-canto.org/account,")
+        print("then run: XENO_CANTO_API_KEY=<your key> python3 scripts/fetch_sounds.py")
+        return
+
     os.makedirs(SOUNDS_DIR, exist_ok=True)
 
     birds = load_bird_species()

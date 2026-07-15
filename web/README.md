@@ -26,7 +26,8 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 | `/study` | Flashcard study sessions |
 | `/browse` | Field guide / species browser |
 | `/progress` | Growth tracking & location map |
-| `/api/xeno-canto` | Server-side proxy for bird sounds |
+| `/api/sounds` | Bird sound search (iNaturalist sounds; Xeno-canto when `XENO_CANTO_API_KEY` is set) |
+| `/api/sounds/audio` | Server-side audio proxy for hosts that block hotlinking |
 
 ## Deployment
 
