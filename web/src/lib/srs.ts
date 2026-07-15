@@ -272,6 +272,8 @@ export function getLearnedCount(
 interface Progress {
   totalReviewed: number;
   streakDays: number;
+  /** Longest streak ever reached; never decreases (used by streak badges) */
+  longestStreak?: number;
   lastStudyDate: string | null;
 }
 
@@ -279,6 +281,7 @@ function getProgress(): Progress {
   return getStorage<Progress>(PROGRESS_KEY, {
     totalReviewed: 0,
     streakDays: 0,
+    longestStreak: 0,
     lastStudyDate: null,
   });
 }
@@ -300,6 +303,8 @@ function updateProgress(speciesId: number): void {
     }
     progress.lastStudyDate = today;
   }
+
+  progress.longestStreak = Math.max(progress.longestStreak ?? 0, progress.streakDays);
 
   setStorage(PROGRESS_KEY, progress);
 }

@@ -62,6 +62,7 @@ Visual Order > Family > Genus > Species hierarchy shown on every card back and i
 - Progress dashboard with per-category stats
 - **Location tracking map** showing where you've studied
 - Streak counter and cards-learned totals
+- **Field Notes badges** — earn naturalist specialty badges (Herpetologist, Ornithologist, Botanist, and more) with Sprout → Sapling → Old-Growth tiers, plus streak, effort, and explorer badges; toggleable via the **🏆 Badges** footer pill for those who prefer a badge-free experience
 - Shareable progress with inviting share text
 
 ### Field Guide / Browse

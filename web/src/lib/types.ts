@@ -78,6 +78,7 @@ export interface StudySession {
 export interface UserProgress {
   totalReviewed: number;
   streakDays: number;
+  longestStreak?: number; // never decreases; powers streak badges
   lastStudyDate: string | null; // ISO date string
   learned: Record<string, number[]>; // category -> species IDs
 }
