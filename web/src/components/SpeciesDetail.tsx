@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { Species } from "@/lib/types";
+import { useState, useEffect } from "react";
+import { Species, SpeciesSound } from "@/lib/types";
+import { fetchBirdSounds, updateCachedSpeciesSounds } from "@/lib/inat";
 import PhotoGallery from "./PhotoGallery";
 import SoundPlayer from "./SoundPlayer";
 import TaxonomyChart from "./TaxonomyChart";
@@ -14,6 +15,31 @@ interface SpeciesDetailProps {
 
 export default function SpeciesDetail({ species, allSpecies = [], onClose }: SpeciesDetailProps) {
   const [showLearnMore, setShowLearnMore] = useState(false);
+  const [sounds, setSounds] = useState<SpeciesSound[]>(species.sounds || []);
+
+  // Fetch bird sounds on-demand when viewing a bird that has none yet
+  useEffect(() => {
+    setSounds(species.sounds || []);
+    if (species.category !== "bird") return;
+    if (species.sounds && species.sounds.length > 0) return;
+
+    let cancelled = false;
+    fetchBirdSounds([{ id: species.id, scientificName: species.scientificName }])
+      .then((soundMap) => {
+        const fetched = soundMap.get(species.id);
+        if (!cancelled && fetched && fetched.length > 0) {
+          setSounds(fetched);
+          updateCachedSpeciesSounds(soundMap);
+        }
+      })
+      .catch(() => {
+        // Sounds are optional
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [species.id]);
 
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden max-w-lg mx-auto">
@@ -157,12 +183,12 @@ export default function SpeciesDetail({ species, allSpecies = [], onClose }: Spe
           </div>
         )}
 
-        {species.sounds.length > 0 && (
+        {sounds.length > 0 && (
           <div>
             <h3 className="text-sm font-semibold text-stone-700 mb-1">
               Sounds
             </h3>
-            <SoundPlayer speciesId={species.id} sounds={species.sounds} />
+            <SoundPlayer speciesId={species.id} sounds={sounds} />
           </div>
         )}
 

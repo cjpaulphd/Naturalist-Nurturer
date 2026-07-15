@@ -366,54 +366,15 @@ async function fetchTaxonDetails(
 }
 
 /**
- * Build an audio URL for a Xeno-canto recording, trying multiple strategies.
- * Returns a proxied URL through /api/sounds/audio, or empty string if none works.
- */
-function buildAudioUrl(rec: {
-  id: string;
-  file: string;
-  fileName: string;
-  sonoSmall: string;
-}): string {
-  let audioUrl = "";
-
-  // Strategy 1: Download endpoint from recording id (most reliable)
-  if (rec.id) {
-    audioUrl = `https://xeno-canto.org/${rec.id}/download`;
-  }
-
-  // Strategy 2: Direct file URL
-  if (!audioUrl && rec.file) {
-    audioUrl = rec.file.startsWith("//") ? "https:" + rec.file : rec.file;
-  }
-
-  // Strategy 3: Construct from sonogram URL + filename
-  if (!audioUrl && rec.sonoSmall && rec.fileName) {
-    const sonoUrl = rec.sonoSmall.startsWith("//")
-      ? "https:" + rec.sonoSmall
-      : rec.sonoSmall;
-    const baseMatch = sonoUrl.match(/^(.*?)ffts\//);
-    if (baseMatch) {
-      audioUrl = baseMatch[1] + rec.fileName;
-    }
-  }
-
-  if (!audioUrl) return "";
-
-  // Proxy all audio through our server to avoid 403 / hotlinking blocks
-  return `/api/sounds/audio?url=${encodeURIComponent(audioUrl)}`;
-}
-
-/**
- * Fetch bird sounds from Xeno-canto API.
- * Returns a map of species id -> sounds array.
+ * Fetch bird sounds via the /api/sounds endpoint, which sources recordings
+ * from iNaturalist observation sounds (or Xeno-canto when the server has an
+ * API key configured). Returns a map of species id -> sounds array.
  */
 export async function fetchBirdSounds(
   birdNames: { id: number; scientificName: string }[]
 ): Promise<Map<number, SpeciesSound[]>> {
   const result = new Map<number, SpeciesSound[]>();
 
-  // Use local API proxy to avoid CORS/403 from Xeno-canto
   const SOUNDS_API = "/api/sounds";
 
   // Fetch in parallel batches of 10 to balance speed and rate limits
@@ -424,36 +385,17 @@ export async function fetchBirdSounds(
     await Promise.all(
       batch.map(async (bird) => {
         try {
-          // Search without quality filter for broader results
           const res = await fetch(
-            `${SOUNDS_API}?query=${encodeURIComponent(bird.scientificName)}`
+            `${SOUNDS_API}?taxonId=${bird.id}&query=${encodeURIComponent(bird.scientificName)}`
           );
           if (!res.ok) return;
           const data = await res.json();
-          const recordings = data.recordings || [];
-
-          if (recordings.length > 0) {
-            const sounds: SpeciesSound[] = recordings.slice(0, 2).map((rec: {
-              id: string;
-              file: string;
-              fileName: string;
-              sonoSmall: string;
-              rec: string;
-              lic: string;
-              length: string;
-            }) => {
-              const url = buildAudioUrl(rec);
-              if (!url) return null;
-              return {
-                url,
-                attribution: `${rec.rec || "Unknown"} (${rec.lic || "CC"}) via Xeno-canto`,
-                filename: "",
-                duration: parseXenoCantoDuration(rec.length),
-              };
-            }).filter((s: SpeciesSound | null): s is SpeciesSound => s !== null);
-            if (sounds.length > 0) {
-              result.set(bird.id, sounds);
-            }
+          const sounds: SpeciesSound[] = (data.sounds || []).filter(
+            (s: SpeciesSound | null) =>
+              s && typeof s.url === "string" && s.url.length > 0
+          );
+          if (sounds.length > 0) {
+            result.set(bird.id, sounds);
           }
         } catch {
           // Skip this bird
@@ -463,18 +405,6 @@ export async function fetchBirdSounds(
   }
 
   return result;
-}
-
-/**
- * Parse Xeno-canto duration string (e.g. "0:15" or "1:30") to seconds.
- */
-function parseXenoCantoDuration(length: string): number | null {
-  if (!length) return null;
-  const parts = length.split(":");
-  if (parts.length === 2) {
-    return parseInt(parts[0]) * 60 + parseInt(parts[1]);
-  }
-  return null;
 }
 
 /**

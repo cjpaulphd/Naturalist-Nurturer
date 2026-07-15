@@ -57,7 +57,14 @@ export default function SoundPlayer({ speciesId, sounds }: SoundPlayerProps) {
 
   const handleError = () => {
     setIsPlaying(false);
-    setError(true);
+    // Auto-advance to the next track if this one fails to load;
+    // only surface an error once every track has failed.
+    if (currentIndex < sounds.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+      setProgress(0);
+    } else {
+      setError(true);
+    }
   };
 
   const switchTrack = (index: number) => {
@@ -89,7 +96,7 @@ export default function SoundPlayer({ speciesId, sounds }: SoundPlayerProps) {
       />
 
       {error ? (
-        <p className="text-sm text-red-500 py-2">Unable to load audio. Try another track.</p>
+        <p className="text-sm text-red-500 py-2">Unable to load audio for this species.</p>
       ) : (
         <div className="flex items-center gap-3">
           <button
