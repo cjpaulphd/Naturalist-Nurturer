@@ -8,6 +8,7 @@ import { getCachedLocationSpecies, getLastLocation } from "@/lib/inat";
 import { getNewCards, getNewCardCount, getDueCards, getAllLearnedCards, getLearnedCount } from "@/lib/srs";
 import { CATEGORIES } from "@/lib/categories";
 import { getStorage, setStorage } from "@/lib/storage";
+import { isGamificationEnabled, setGamificationEnabled } from "@/lib/badges";
 import CategorySelector from "@/components/CategorySelector";
 import LocationPicker from "@/components/LocationPicker";
 import QuizSettingsModal from "@/components/QuizSettingsModal";
@@ -25,12 +26,14 @@ export default function HomePage() {
   const [showQuizSettings, setShowQuizSettings] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [animations, setAnimations] = useState(true);
+  const [gamification, setGamification] = useState(true);
 
   useEffect(() => {
     if (!getStorage<boolean>("welcome_seen", false)) {
       setShowWelcome(true);
     }
     setAnimations(getStorage("animations", true));
+    setGamification(isGamificationEnabled());
   }, []);
 
   useEffect(() => {
@@ -318,17 +321,29 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="text-center pt-4 pb-2 border-t border-stone-200 space-y-2">
-        {/* Animations Toggle */}
-        <button
-          onClick={() => {
-            const next = !animations;
-            setAnimations(next);
-            setStorage("animations", next);
-          }}
-          className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-stone-100 hover:bg-stone-200 rounded-full text-xs text-stone-600 transition-colors"
-        >
-          🍂 Animations {animations ? "On" : "Off"}
-        </button>
+        {/* Animations & Badges Toggles */}
+        <div className="flex justify-center gap-2">
+          <button
+            onClick={() => {
+              const next = !animations;
+              setAnimations(next);
+              setStorage("animations", next);
+            }}
+            className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-stone-100 hover:bg-stone-200 rounded-full text-xs text-stone-600 transition-colors"
+          >
+            🍂 Animations {animations ? "On" : "Off"}
+          </button>
+          <button
+            onClick={() => {
+              const next = !gamification;
+              setGamification(next);
+              setGamificationEnabled(next);
+            }}
+            className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-stone-100 hover:bg-stone-200 rounded-full text-xs text-stone-600 transition-colors"
+          >
+            🏆 Badges {gamification ? "On" : "Off"}
+          </button>
+        </div>
 
         {/* Add to Home Screen */}
         <InstallPrompt />

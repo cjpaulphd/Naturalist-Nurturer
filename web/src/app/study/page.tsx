@@ -21,7 +21,15 @@ import {
   getQuizCards,
   rateCard,
   getLearnedCount,
+  getUserProgress,
 } from "@/lib/srs";
+import {
+  BadgeDef,
+  TIER_NAMES,
+  buildBadgeContext,
+  evaluateBadges,
+  isGamificationEnabled,
+} from "@/lib/badges";
 import { CATEGORIES } from "@/lib/categories";
 import PhotoGallery from "@/components/PhotoGallery";
 import SoundPlayer from "@/components/SoundPlayer";
@@ -240,6 +248,7 @@ function StudyContent() {
   const [flipped, setFlipped] = useState(false);
   const [loading, setLoading] = useState(true);
   const [sessionComplete, setSessionComplete] = useState(false);
+  const [newBadges, setNewBadges] = useState<BadgeDef[]>([]);
   const [currentMode, setCurrentMode] = useState<StudyMode>(studyMode);
 
   // Quiz mode state
@@ -547,6 +556,9 @@ function StudyContent() {
   const advanceToNext = useCallback(() => {
     const nextIndex = currentIndex + 1;
     if (nextIndex >= cardIds.length) {
+      // Evaluation runs even with gamification off (display is gated later),
+      // so badges earned while it's off are waiting when it's re-enabled.
+      setNewBadges(evaluateBadges(buildBadgeContext(allSpecies)));
       setSessionComplete(true);
     } else {
       setCurrentIndex(nextIndex);
@@ -710,6 +722,8 @@ function StudyContent() {
   if (sessionComplete) {
     const showQuizStats = quizMode !== "flashcard";
     const animationsEnabled = getStorage("animations", true);
+    const gamificationEnabled = isGamificationEnabled();
+    const streakDays = getUserProgress().streakDays;
     return (
       <div className="max-w-lg mx-auto px-4 py-12 text-center">
         {animationsEnabled && <FallingLeaves />}
@@ -795,6 +809,38 @@ function StudyContent() {
             </div>
           );
         })()}
+
+        {/* New badge reveal — the only place badges celebrate */}
+        {gamificationEnabled && newBadges.length > 0 && (
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-stone-200 mb-6">
+            <h3 className="text-sm font-semibold text-stone-700 mb-2">
+              {newBadges.length === 1 ? "Badge earned!" : "Badges earned!"}
+            </h3>
+            <div className="space-y-1">
+              {newBadges.map((b) => (
+                <div key={b.id} className="flex items-center justify-center gap-2.5">
+                  <span className="text-2xl">{b.icon}</span>
+                  <div className="text-left">
+                    <div className="text-sm font-medium text-stone-800">
+                      {b.name}
+                      {b.tier ? ` · ${TIER_NAMES[b.tier]}` : ""}
+                    </div>
+                    <div className="text-xs text-stone-500">{b.description}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Streak line — one quiet sentence, no guilt mechanics */}
+        {gamificationEnabled && (
+          <p className="text-xs text-stone-500 mb-6">
+            {streakDays >= 2
+              ? `🔥 ${streakDays}-day streak`
+              : "🌱 Streak started — come back tomorrow!"}
+          </p>
+        )}
 
         <div className="flex gap-3 justify-center flex-wrap">
           <button
