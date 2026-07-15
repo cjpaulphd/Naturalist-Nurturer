@@ -11,12 +11,19 @@ interface QuizSettingsModalProps {
 }
 
 export default function QuizSettingsModal({
+  hasBirds,
   onStart,
   onClose,
 }: QuizSettingsModalProps) {
   const [quizMode, setQuizMode] = useState<QuizMode>(() => getStorage<QuizMode>("quiz_mode", "multiple-choice"));
   const [nameDisplay, setNameDisplay] = useState<NameDisplay>(() => getStorage<NameDisplay>("quiz_name_display", "both"));
   const [difficulty, setDifficulty] = useState<QuizDifficulty>(() => getStorage<QuizDifficulty>("quiz_difficulty", "medium"));
+  // "Song ID" is only meaningful when the current area has birds; fall back
+  // to Photo ID if a stored sound preference can't be satisfied.
+  const [studyMode, setStudyMode] = useState<StudyMode>(() => {
+    const stored = getStorage<StudyMode>("quiz_study_mode", "photo");
+    return stored === "sound" && !hasBirds ? "photo" : stored;
+  });
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
@@ -32,6 +39,41 @@ export default function QuizSettingsModal({
         >
           ✕
         </button>
+
+        {/* Quiz Type — identify by photo or by bird song */}
+        <div>
+          <h4 className="text-sm font-semibold text-stone-600 mb-2 text-center">Quiz Type</h4>
+          <div className="grid grid-cols-2 gap-2">
+            {([
+              ["photo", "📷", "Photo ID", "See a photo", true],
+              ["sound", "🔊", "Song ID", hasBirds ? "Hear a bird song" : "Birds only", hasBirds],
+            ] as [StudyMode, string, string, string, boolean][]).map(
+              ([mode, icon, label, desc, enabled]) => (
+                <button
+                  key={mode}
+                  onClick={() => enabled && setStudyMode(mode)}
+                  disabled={!enabled}
+                  className={`p-2.5 rounded-lg text-center transition-colors border ${
+                    studyMode === mode
+                      ? "bg-green-50 border-green-400"
+                      : "bg-white border-stone-200 hover:border-green-300"
+                  }${!enabled ? " opacity-40 cursor-not-allowed hover:border-stone-200" : ""}`}
+                >
+                  <div className="text-lg leading-none mb-0.5">{icon}</div>
+                  <div className={`text-sm font-medium ${studyMode === mode ? "text-green-800" : "text-stone-700"}`}>
+                    {label}
+                  </div>
+                  <div className="text-xs text-stone-500 mt-0.5">{desc}</div>
+                </button>
+              )
+            )}
+          </div>
+          {studyMode === "sound" && (
+            <p className="text-xs text-stone-400 text-center mt-1.5">
+              Plays only the bird song — identify the species by ear. Birds only.
+            </p>
+          )}
+        </div>
 
         {/* Quiz Difficulty */}
         <div>
@@ -132,7 +174,8 @@ export default function QuizSettingsModal({
             setStorage("quiz_mode", quizMode);
             setStorage("quiz_name_display", nameDisplay);
             setStorage("quiz_difficulty", difficulty);
-            onStart(quizMode, nameDisplay, "photo", difficulty);
+            setStorage("quiz_study_mode", studyMode);
+            onStart(quizMode, nameDisplay, studyMode, difficulty);
           }}
           className="w-full py-3 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors"
         >
