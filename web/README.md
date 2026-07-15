@@ -11,6 +11,17 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+## Environment Variables
+
+| Variable | Required | Purpose |
+|----------|----------|---------|
+| `XENO_CANTO_API_KEY` | Optional | Enables [Xeno-canto](https://xeno-canto.org) as the primary bird-sound source. Their v3 API (and audio downloads, since Oct 2025) require a free key — register at [xeno-canto.org/account](https://xeno-canto.org/account). Without it, bird sounds fall back to iNaturalist observation recordings. |
+
+The key is used **server-side only** (in `/api/sounds` and `/api/sounds/audio`) and is never sent to the browser.
+
+- **Local dev:** copy `.env.example` to `.env.local` and fill in the key (`.env.local` is gitignored).
+- **Vercel:** add `XENO_CANTO_API_KEY` under Project → Settings → Environment Variables, then redeploy.
+
 ## Scripts
 
 - `npm run dev` — Start development server

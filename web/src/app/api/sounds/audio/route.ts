@@ -50,8 +50,20 @@ export async function GET(request: NextRequest) {
     return new Response("Host not allowed", { status: 403 });
   }
 
+  // Xeno-canto downloads have required an API key since Oct 2025. Inject it
+  // here, server-side, so the key is never exposed to the browser. The key is
+  // only ever sent to xeno-canto.org hosts.
+  const isXenoCanto =
+    parsed.hostname === "xeno-canto.org" ||
+    parsed.hostname.endsWith(".xeno-canto.org");
+  const xcKey = process.env.XENO_CANTO_API_KEY;
+  if (isXenoCanto && xcKey && !parsed.searchParams.has("key")) {
+    parsed.searchParams.set("key", xcKey);
+  }
+  const upstreamUrl = parsed.toString();
+
   try {
-    const res = await fetch(url, {
+    const res = await fetch(upstreamUrl, {
       headers: {
         "User-Agent":
           "NaturalistNurturer/1.0 (species flashcard app; Green River Preserve)",

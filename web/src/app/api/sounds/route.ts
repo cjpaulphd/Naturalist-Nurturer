@@ -41,10 +41,13 @@ async function fetchFromINaturalist(taxonId: string): Promise<SpeciesSound[]> {
     taxon_id: taxonId,
     sounds: "true",
     sound_license: INAT_SOUND_LICENSES,
+    // research grade = community-verified species ID, so the recording is of
+    // the bird we think it is; captive=false keeps it to wild birdsong.
     quality_grade: "research",
+    captive: "false",
     order_by: "votes",
     order: "desc",
-    per_page: "20",
+    per_page: "30",
   });
 
   const res = await fetch(`${INAT_OBSERVATIONS_API}?${params}`, {
@@ -92,11 +95,14 @@ async function fetchFromINaturalist(taxonId: string): Promise<SpeciesSound[]> {
 
 interface XenoCantoRecording {
   id: string;
+  gen: string;
+  sp: string;
   file: string;
   rec: string;
   lic: string;
   length: string;
   q: string;
+  type: string;
 }
 
 function parseXenoCantoDuration(length: string): number | null {
@@ -112,10 +118,11 @@ async function fetchFromXenoCanto(
   scientificName: string,
   apiKey: string
 ): Promise<SpeciesSound[]> {
-  // v3 query syntax: sp:"Genus species" (quotes required for exact match)
+  // v3 query syntax: sp:"Genus species" (quotes required for exact match).
+  // Restrict to quality A/B recordings so we don't serve noisy/faint clips.
   const safeName = scientificName.replace(/"/g, "");
-  const query = `sp:"${safeName}"`;
-  const params = new URLSearchParams({ query, key: apiKey });
+  const query = `sp:"${safeName}" q:">C"`;
+  const params = new URLSearchParams({ query, key: apiKey, per_page: "100" });
 
   const res = await fetch(`${XENO_CANTO_API}?${params}`, {
     headers: { "User-Agent": USER_AGENT, Accept: "application/json" },
@@ -126,26 +133,45 @@ async function fetchFromXenoCanto(
   }
 
   const data = await res.json();
-  const recordings: XenoCantoRecording[] = data.recordings || [];
+  let recordings: XenoCantoRecording[] = data.recordings || [];
 
-  // Best quality first: A, then B, then everything else
+  // Guard against loose matches: keep only recordings whose genus+species
+  // actually match what we asked for (the API can return related taxa).
+  const wanted = safeName.toLowerCase();
+  const exact = recordings.filter(
+    (r) => `${r.gen || ""} ${r.sp || ""}`.trim().toLowerCase() === wanted
+  );
+  if (exact.length > 0) recordings = exact;
+
+  // Rank: quality A before B, and songs/calls before incidental recordings.
   const qualityRank = (q: string) => {
     const upper = (q || "").toUpperCase();
     if (upper === "A") return 0;
     if (upper === "B") return 1;
     return 2;
   };
-  recordings.sort((a, b) => qualityRank(a.q) - qualityRank(b.q));
+  const typeRank = (type: string) => {
+    const t = (type || "").toLowerCase();
+    if (t.includes("song")) return 0;
+    if (t.includes("call")) return 1;
+    return 2;
+  };
+  recordings.sort(
+    (a, b) =>
+      qualityRank(a.q) - qualityRank(b.q) || typeRank(a.type) - typeRank(b.type)
+  );
 
   return recordings.slice(0, MAX_SOUNDS).map((rec) => {
     const fileUrl =
       rec.file && rec.file.startsWith("//")
         ? "https:" + rec.file
         : rec.file || `https://xeno-canto.org/${rec.id}/download`;
+    const typeLabel = rec.type ? ` (${rec.type})` : "";
     return {
-      // Xeno-canto blocks hotlinking, so route through our audio proxy
+      // Route through our audio proxy: it injects the API key server-side
+      // (downloads have required a key since Oct 2025) and avoids hotlink blocks.
       url: `/api/sounds/audio?url=${encodeURIComponent(fileUrl)}`,
-      attribution: `${rec.rec || "Unknown"}, XC${rec.id}, xeno-canto.org, ${rec.lic || "CC"}`,
+      attribution: `${rec.rec || "Unknown"}, XC${rec.id}${typeLabel}, xeno-canto.org, ${rec.lic || "CC"}`,
       filename: "",
       duration: parseXenoCantoDuration(rec.length),
     };
