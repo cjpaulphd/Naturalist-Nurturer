@@ -963,15 +963,22 @@ function StudyContent() {
       )}
 
       {/* Quiz mode badge */}
-      {isHardMode && activeMode !== "name" && (
+      {((isHardMode && activeMode !== "name") || activeMode === "sound") && (
         <div className="flex items-center justify-center gap-2 mb-3">
-          <span className="px-2 py-0.5 bg-red-100 text-red-700 rounded text-xs font-medium">
-            {quizMode === "multiple-choice"
-              ? "Multiple Choice"
-              : quizMode === "dropdown"
-              ? "Dropdown"
-              : "Free Response"}
-          </span>
+          {activeMode === "sound" && (
+            <span className="px-2 py-0.5 bg-sky-100 text-sky-700 rounded text-xs font-medium">
+              🔊 Song ID
+            </span>
+          )}
+          {isHardMode && (
+            <span className="px-2 py-0.5 bg-red-100 text-red-700 rounded text-xs font-medium">
+              {quizMode === "multiple-choice"
+                ? "Multiple Choice"
+                : quizMode === "dropdown"
+                ? "Dropdown"
+                : "Free Response"}
+            </span>
+          )}
           {isHardMode && sessionStats.correct + sessionStats.partial + sessionStats.incorrect > 0 && (
             <span className="text-xs text-stone-400">
               {sessionStats.correct}/{sessionStats.correct + sessionStats.partial + sessionStats.incorrect} correct

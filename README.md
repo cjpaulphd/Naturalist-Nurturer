@@ -16,8 +16,8 @@ A mobile-first web app interactive field guide for learning identification throu
 
 ### Study Modes
 - **Photo ID** — Identify species from photos (default mode)
+- **Song ID** — Hear only a bird song and identify the species by ear (birds only); selectable as a Challenge quiz type and playable with any quiz format
 - **Name Recall** — Describe species from name prompts
-- **Sound ID** — Identify birds by their calls (birds only)
 - **Mixed Mode** — Random rotation of all modes
 
 ### Quiz Difficulty Levels
