@@ -54,7 +54,7 @@ export default function RootLayout({
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)]">
         <div
-          className="bg-green-800"
+          className="sticky top-0 z-50 bg-green-800"
           style={{ paddingTop: "env(safe-area-inset-top)" }}
         >
           <Header />
