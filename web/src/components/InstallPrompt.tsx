@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -27,6 +28,8 @@ export default function InstallPrompt() {
     useState<BeforeInstallPromptEvent | null>(null);
   const [showButton, setShowButton] = useState(false);
   const [showIOSModal, setShowIOSModal] = useState(false);
+
+  useBodyScrollLock(showIOSModal);
 
   useEffect(() => {
     if (isInStandaloneMode()) return;
@@ -77,11 +80,11 @@ export default function InstallPrompt() {
       {/* iOS Instructions Modal */}
       {showIOSModal && (
         <div
-          className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4"
           onClick={() => setShowIOSModal(false)}
         >
           <div
-            className="bg-white rounded-2xl shadow-xl w-[90%] max-w-sm p-6 relative text-center"
+            className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 relative text-center max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close button */}

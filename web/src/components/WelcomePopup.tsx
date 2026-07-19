@@ -1,17 +1,21 @@
 "use client";
 
+import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
+
 interface WelcomePopupProps {
   onClose: () => void;
 }
 
 export default function WelcomePopup({ onClose }: WelcomePopupProps) {
+  useBodyScrollLock();
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6 space-y-4 relative"
+        className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 space-y-4 relative max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
