@@ -53,8 +53,27 @@ function BrowseContent() {
   const [selectedSpecies, setSelectedSpecies] = useState<Species | null>(null);
   const [locationName, setLocationName] = useState<string | null>(null);
 
-  // Reset selected species when nav header is clicked (searchParams change)
+  // Remember where the user was in the list so closing a species detail
+  // returns them to the same spot instead of the top.
+  const listScrollY = useRef<number | null>(null);
+
+  const openSpecies = useCallback((species: Species) => {
+    listScrollY.current = window.scrollY;
+    setSelectedSpecies(species);
+  }, []);
+
   useEffect(() => {
+    if (selectedSpecies === null && listScrollY.current !== null) {
+      window.scrollTo(0, listScrollY.current);
+      listScrollY.current = null;
+    }
+  }, [selectedSpecies]);
+
+  // Reset selected species when nav header is clicked (searchParams change).
+  // Clearing the saved offset first means this lands at the top of the list
+  // rather than restoring the pre-detail scroll position.
+  useEffect(() => {
+    listScrollY.current = null;
     setSelectedSpecies(null);
   }, [searchParams]);
 
@@ -248,7 +267,7 @@ function BrowseContent() {
           <SpeciesListItem
             key={species.id}
             species={species}
-            onClick={() => setSelectedSpecies(species)}
+            onClick={() => openSpecies(species)}
           />
         ))}
       </div>

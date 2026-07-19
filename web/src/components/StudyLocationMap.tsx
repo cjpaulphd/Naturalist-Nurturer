@@ -167,7 +167,16 @@ export default function StudyLocationMap() {
     updateDragForZoom();
     map.on("zoomend", updateDragForZoom);
 
+    // Leaflet sizes itself from the container at init time; if the container
+    // is resized afterwards (fonts load, orientation change, responsive
+    // breakpoint) tiles only cover the old area. Recalculate on any resize.
+    const resizeObserver = new ResizeObserver(() => {
+      map.invalidateSize();
+    });
+    resizeObserver.observe(mapRef.current);
+
     return () => {
+      resizeObserver.disconnect();
       map.off("zoomend", updateDragForZoom);
       map.remove();
       mapInstanceRef.current = null;
@@ -188,7 +197,7 @@ export default function StudyLocationMap() {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+    <div className="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden isolate">
       <div className="px-4 pt-4 pb-2">
         <div className="flex items-start justify-between gap-2">
           <div>

@@ -389,6 +389,19 @@ function StudyContent() {
     []
   );
 
+  // Each card starts at the top of the page — without this, scroll position
+  // from reading the previous card's facts carries over to the next card.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentIndex]);
+
+  // When the card flips to the answer, the result banner and species name
+  // render at the top — bring them into view if the user had scrolled down
+  // (e.g. to reach the bottom of a multiple-choice list).
+  useEffect(() => {
+    if (flipped) window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [flipped]);
+
   const currentSpecies =
     cardIds.length > 0
       ? getSpeciesById(allSpecies, cardIds[currentIndex])

@@ -60,6 +60,16 @@ export default function RootLayout({
           <Header />
         </div>
         <main className="flex-1">{children}</main>
+        {/* Shown only on phone-sized touch screens in landscape (see globals.css) */}
+        <div className="rotate-overlay" role="status">
+          <span className="text-4xl" aria-hidden="true">
+            📱
+          </span>
+          <p className="font-semibold">Please rotate your device</p>
+          <p className="text-sm text-green-100">
+            Naturalist Nurturer is designed for portrait mode.
+          </p>
+        </div>
         <ServiceWorkerRegistrar />
         <Analytics />
       </body>

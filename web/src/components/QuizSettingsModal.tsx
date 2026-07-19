@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { QuizMode, QuizDifficulty, NameDisplay, StudyMode } from "@/lib/types";
 import { getStorage, setStorage } from "@/lib/storage";
+import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
 
 interface QuizSettingsModalProps {
   hasBirds: boolean;
@@ -25,10 +26,12 @@ export default function QuizSettingsModal({
     return stored === "sound" && !hasBirds ? "photo" : stored;
   });
 
+  useBodyScrollLock();
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
       <div
-        className="bg-white rounded-2xl shadow-xl max-w-sm w-full mx-4 p-5 space-y-5 relative"
+        className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-5 space-y-5 relative max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
