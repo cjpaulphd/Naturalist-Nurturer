@@ -85,7 +85,7 @@ export default function SoundPlayer({ speciesId, sounds }: SoundPlayerProps) {
   };
 
   return (
-    <div className="bg-stone-100 rounded-lg p-3">
+    <div className="bg-stone-100 rounded-lg p-3 w-full">
       <audio
         ref={audioRef}
         src={src}
@@ -133,7 +133,7 @@ export default function SoundPlayer({ speciesId, sounds }: SoundPlayerProps) {
       )}
 
       {sounds.length > 1 && (
-        <div className="flex gap-2 mt-2">
+        <div className="flex flex-wrap gap-2 mt-2">
           {sounds.map((s, i) => (
             <button
               key={i}
