@@ -101,10 +101,6 @@ export default function ProgressPage() {
         <>
           <ProgressDashboard species={species} />
 
-          {gamification && <BadgeShelf species={species} />}
-
-          <StudyLocationMap />
-
           <div className="text-center space-y-2">
             <button
               onClick={handleLoadMore}
@@ -127,6 +123,10 @@ export default function ProgressPage() {
               {species.length} species loaded{locationName ? ` near ${locationName}` : ""}
             </p>
           </div>
+
+          {gamification && <BadgeShelf species={species} />}
+
+          <StudyLocationMap />
 
           <div className="text-center space-y-3">
             <h3 className="text-sm font-semibold text-stone-600">
