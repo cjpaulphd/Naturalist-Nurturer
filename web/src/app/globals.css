@@ -21,6 +21,7 @@ body {
 /* Flashcard flip animation */
 .card-flip {
   perspective: 1000px;
+  overflow-x: hidden;
 }
 
 .card-flip-inner {

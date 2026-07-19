@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: "Naturalist Nurturer",
   },
 };
@@ -42,6 +42,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -52,7 +53,12 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)]">
-        <Header />
+        <div
+          className="sticky top-0 z-50 bg-green-800"
+          style={{ paddingTop: "env(safe-area-inset-top)" }}
+        >
+          <Header />
+        </div>
         <main className="flex-1">{children}</main>
         <ServiceWorkerRegistrar />
         <Analytics />
