@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import SettingsMenu from "@/components/SettingsMenu";
 
 const NAV_ITEMS = [
   { href: "/", label: "Learn" },
@@ -15,16 +16,18 @@ export default function Header() {
 
   return (
     <header className="bg-green-800 text-white shadow-md">
-      <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
+      <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
+        <Link href="/" className="flex items-center gap-2 min-w-0">
           <span className="text-2xl" role="img" aria-label="leaf">
             🌿
           </span>
-          <h1 className="text-lg font-bold tracking-tight">
+          {/* nn-header-title is hidden on narrow screens when a large text
+              size is active (globals.css) — the leaf remains the home link. */}
+          <h1 className="nn-header-title text-lg font-bold tracking-tight leading-tight">
             Naturalist Nurturer
           </h1>
         </Link>
-        <nav className="flex gap-1">
+        <nav className="flex items-center gap-1 shrink-0">
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.href}
@@ -35,7 +38,7 @@ export default function Header() {
                   router.push(item.href + "?t=" + Date.now());
                 }
               }}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+              className={`px-2 sm:px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 pathname === item.href
                   ? "bg-green-700 text-white"
                   : "text-green-100 hover:bg-green-700/50"
@@ -44,6 +47,7 @@ export default function Header() {
               {item.label}
             </Link>
           ))}
+          <SettingsMenu />
         </nav>
       </div>
     </header>

@@ -197,7 +197,7 @@ function BrowseContent() {
           />
         </div>
         {(hasPreviousSpecies || hasNextSpecies) && (
-          <p className="text-[10px] text-stone-300 text-center mt-2">
+          <p className="text-[0.625rem] text-stone-300 text-center mt-2">
             {hasPreviousSpecies && hasNextSpecies
               ? "Swipe left/right for next/previous species"
               : hasNextSpecies
@@ -235,7 +235,7 @@ function BrowseContent() {
       </div>
 
       {/* Sort */}
-      <div className="flex gap-2 justify-center">
+      <div className="flex flex-wrap gap-2 justify-center">
         {([
           ["prevalence", "By iNat Popularity"],
           ["alphabetical", "A\u2013Z Common"],
@@ -333,8 +333,8 @@ function SpeciesListItem({
           {species.scientificName}
         </div>
         <div className="flex gap-2 mt-0.5">
-          <span className="text-[10px] text-stone-400">{species.family}</span>
-          <span className="text-[10px] text-stone-400">
+          <span className="text-[0.625rem] text-stone-400">{species.family}</span>
+          <span className="text-[0.625rem] text-stone-400">
             #{species.prevalenceRank} &middot; {species.observationCount.toLocaleString()} obs
           </span>
         </div>

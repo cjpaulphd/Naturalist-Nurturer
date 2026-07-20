@@ -3,6 +3,7 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import Header from "@/components/Header";
 import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
+import { TEXT_SIZE_INIT_SCRIPT } from "@/lib/textSize";
 
 export const metadata: Metadata = {
   title: "Naturalist Nurturer",
@@ -53,6 +54,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)]">
+        {/* Re-apply the stored text-size preference before first paint so a
+            reload never flashes at the default size. */}
+        <script dangerouslySetInnerHTML={{ __html: TEXT_SIZE_INIT_SCRIPT }} />
         <div
           className="sticky top-0 z-50 bg-green-800"
           style={{ paddingTop: "env(safe-area-inset-top)" }}

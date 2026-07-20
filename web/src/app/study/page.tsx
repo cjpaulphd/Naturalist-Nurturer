@@ -28,7 +28,6 @@ import {
   TIER_NAMES,
   buildBadgeContext,
   evaluateBadges,
-  isGamificationEnabled,
 } from "@/lib/badges";
 import { CATEGORIES } from "@/lib/categories";
 import PhotoGallery from "@/components/PhotoGallery";
@@ -569,8 +568,6 @@ function StudyContent() {
   const advanceToNext = useCallback(() => {
     const nextIndex = currentIndex + 1;
     if (nextIndex >= cardIds.length) {
-      // Evaluation runs even with gamification off (display is gated later),
-      // so badges earned while it's off are waiting when it's re-enabled.
       setNewBadges(evaluateBadges(buildBadgeContext(allSpecies)));
       setSessionComplete(true);
     } else {
@@ -735,7 +732,6 @@ function StudyContent() {
   if (sessionComplete) {
     const showQuizStats = quizMode !== "flashcard";
     const animationsEnabled = getStorage("animations", true);
-    const gamificationEnabled = isGamificationEnabled();
     const streakDays = getUserProgress().streakDays;
     return (
       <div className="max-w-lg mx-auto px-4 py-12 text-center">
@@ -802,14 +798,14 @@ function StudyContent() {
                       }`}
                     >
                       <div className="text-lg mb-0.5">{cat.icon}</div>
-                      <div className="text-[10px] text-stone-500 mb-1">{cat.label}</div>
+                      <div className="text-[0.625rem] text-stone-500 mb-1">{cat.label}</div>
                       <div className="w-full h-2 bg-stone-200 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-green-600 rounded-full transition-all"
                           style={{ width: `${pct}%` }}
                         />
                       </div>
-                      <div className="text-[10px] text-stone-600 mt-0.5">
+                      <div className="text-[0.625rem] text-stone-600 mt-0.5">
                         {learned}/{total}
                       </div>
                     </button>
@@ -824,7 +820,7 @@ function StudyContent() {
         })()}
 
         {/* New badge reveal — the only place badges celebrate */}
-        {gamificationEnabled && newBadges.length > 0 && (
+        {newBadges.length > 0 && (
           <div className="bg-white rounded-xl p-4 shadow-sm border border-stone-200 mb-6">
             <h3 className="text-sm font-semibold text-stone-700 mb-2">
               {newBadges.length === 1 ? "Badge earned!" : "Badges earned!"}
@@ -847,13 +843,11 @@ function StudyContent() {
         )}
 
         {/* Streak line — one quiet sentence, no guilt mechanics */}
-        {gamificationEnabled && (
-          <p className="text-xs text-stone-500 mb-6">
-            {streakDays >= 2
-              ? `🔥 ${streakDays}-day streak`
-              : "🌱 Streak started — come back tomorrow!"}
-          </p>
-        )}
+        <p className="text-xs text-stone-500 mb-6">
+          {streakDays >= 2
+            ? `🔥 ${streakDays}-day streak`
+            : "🌱 Streak started — come back tomorrow!"}
+        </p>
 
         <div className="flex gap-3 justify-center flex-wrap">
           <button

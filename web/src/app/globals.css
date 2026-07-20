@@ -18,6 +18,28 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Large-text accessibility modes (set via the header "Aa" toggle, persisted
+   in localStorage). Scaling the root font-size scales every rem-based
+   Tailwind utility — type and spacing together — so layouts keep their
+   proportions, like the browser zoom the touch viewport disables.
+   Percentages compound with the user's browser font-size preference. */
+html[data-text-size="large"] {
+  font-size: 112.5%;
+}
+
+html[data-text-size="xl"] {
+  font-size: 125%;
+}
+
+/* In large text modes the header can't fit the wordmark plus nav on narrow
+   screens; drop the (redundant) wordmark and keep the leaf as the home link
+   so the nav stays fully visible and tappable. */
+@media (max-width: 640px) {
+  html[data-text-size] .nn-header-title {
+    display: none;
+  }
+}
+
 /* Flashcard flip animation */
 .card-flip {
   perspective: 1000px;

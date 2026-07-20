@@ -179,7 +179,7 @@ export default function PhotoGallery({
       )}
 
       {showAttribution && photo.attribution && (
-        <p className="text-[10px] text-stone-400 mt-1 text-center truncate">
+        <p className="text-[0.625rem] text-stone-400 mt-1 text-center truncate">
           {photo.attribution}
         </p>
       )}

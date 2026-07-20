@@ -103,7 +103,7 @@ export default function TaxonomyChart({ species, allSpecies }: TaxonomyChartProp
             {/* Content */}
             <div className="flex-1 pb-2 ml-2">
               <div className="flex items-baseline gap-2">
-                <span className="text-[10px] font-semibold uppercase text-stone-400 w-12">
+                <span className="text-[0.625rem] font-semibold uppercase text-stone-400 w-12">
                   {level.rank}
                 </span>
                 <a
@@ -118,7 +118,7 @@ export default function TaxonomyChart({ species, allSpecies }: TaxonomyChartProp
               {/* Show common names of related species at this level (capped) */}
               {level.related.length > 0 && (
                 <div className="ml-12 mt-0.5">
-                  <span className="text-[10px] text-stone-400">
+                  <span className="text-[0.625rem] text-stone-400">
                     Also:{" "}
                     {level.related.slice(0, MAX_RELATED).map((s, idx) => (
                       <span key={s.id}>
@@ -141,7 +141,7 @@ export default function TaxonomyChart({ species, allSpecies }: TaxonomyChartProp
               )}
               {level.rank === "Species" && (
                 <div className="ml-12 mt-0.5">
-                  <span className="text-[10px] text-stone-400 font-medium">
+                  <span className="text-[0.625rem] text-stone-400 font-medium">
                     = {species.commonName}
                   </span>
                 </div>

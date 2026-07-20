@@ -210,13 +210,13 @@ export default function LocationPicker({
             if (e.key === "Enter" && searchQuery.trim()) handleSearch();
           }}
           placeholder="Search any city worldwide..."
-          className="flex-1 px-3 py-2 rounded-lg border border-stone-300 bg-white text-stone-700 text-sm placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
+          className="flex-1 min-w-0 px-3 py-2 rounded-lg border border-stone-300 bg-white text-stone-700 text-sm placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
           disabled={isLoading}
         />
         <button
           onClick={handleSearch}
           disabled={isLoading || !searchQuery.trim()}
-          className="px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors disabled:opacity-50"
+          className="shrink-0 px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors disabled:opacity-50"
         >
           {searching ? (
             <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
