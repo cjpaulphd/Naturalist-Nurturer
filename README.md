@@ -36,6 +36,9 @@ Choose how species names appear during quizzes:
 - **Scientific** names only (e.g., *Thryothorus ludovicianus*)
 - **Both** common and scientific names
 
+### Text Size (Accessibility)
+The **Aa** menu in the header offers **Default**, **Large**, and **Extra Large** text sizes for users with vision limitations. The chosen size scales the whole interface proportionally, works in every study mode, and persists across visits.
+
 ### Taxonomy Chart
 Visual Order > Family > Genus > Species hierarchy shown on every card back and in the field guide, with:
 - Color-coded taxonomic levels

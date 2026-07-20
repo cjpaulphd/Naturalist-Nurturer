@@ -143,11 +143,11 @@ export default function ProgressPage() {
             >
               <span className="font-semibold">Revisit</span>
               {dueCount > 0 ? (
-                <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white px-1.5 py-0.5 rounded-full text-[10px] font-bold">
+                <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white px-1.5 py-0.5 rounded-full text-[0.625rem] font-bold">
                   {dueCount}
                 </span>
               ) : learnedCount > 0 ? (
-                <span className="absolute -top-1.5 -right-1.5 bg-amber-500 text-white px-1.5 py-0.5 rounded-full text-[10px] font-bold">
+                <span className="absolute -top-1.5 -right-1.5 bg-amber-500 text-white px-1.5 py-0.5 rounded-full text-[0.625rem] font-bold">
                   {learnedCount}
                 </span>
               ) : null}

@@ -802,14 +802,14 @@ function StudyContent() {
                       }`}
                     >
                       <div className="text-lg mb-0.5">{cat.icon}</div>
-                      <div className="text-[10px] text-stone-500 mb-1">{cat.label}</div>
+                      <div className="text-[0.625rem] text-stone-500 mb-1">{cat.label}</div>
                       <div className="w-full h-2 bg-stone-200 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-green-600 rounded-full transition-all"
                           style={{ width: `${pct}%` }}
                         />
                       </div>
-                      <div className="text-[10px] text-stone-600 mt-0.5">
+                      <div className="text-[0.625rem] text-stone-600 mt-0.5">
                         {learned}/{total}
                       </div>
                     </button>

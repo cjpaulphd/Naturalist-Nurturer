@@ -124,7 +124,7 @@ export default function SoundPlayer({ speciesId, sounds }: SoundPlayerProps) {
               />
             </div>
             {sound.duration && (
-              <span className="text-[10px] text-stone-500 mt-0.5 block">
+              <span className="text-[0.625rem] text-stone-500 mt-0.5 block">
                 {formatDuration(sound.duration)}
               </span>
             )}
@@ -151,7 +151,7 @@ export default function SoundPlayer({ speciesId, sounds }: SoundPlayerProps) {
       )}
 
       {sound.attribution && (
-        <p className="text-[10px] text-stone-400 mt-1.5 truncate">
+        <p className="text-[0.625rem] text-stone-400 mt-1.5 truncate">
           {sound.attribution}
         </p>
       )}
