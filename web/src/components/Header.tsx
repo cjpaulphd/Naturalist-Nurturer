@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import TextSizeToggle from "@/components/TextSizeToggle";
+import SettingsMenu from "@/components/SettingsMenu";
 
 const NAV_ITEMS = [
   { href: "/", label: "Learn" },
@@ -47,7 +47,7 @@ export default function Header() {
               {item.label}
             </Link>
           ))}
-          <TextSizeToggle />
+          <SettingsMenu />
         </nav>
       </div>
     </header>

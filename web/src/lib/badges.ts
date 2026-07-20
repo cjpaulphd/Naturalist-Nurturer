@@ -1,11 +1,9 @@
 /**
- * Badge definitions and evaluation for the optional gamification layer.
+ * Badge definitions and evaluation for the gamification layer.
  *
  * Badges are derived from data the app already stores (card states,
  * progress, study locations). Only earned-at timestamps are persisted,
  * so badges are never revoked and celebrations fire exactly once.
- * Evaluation always runs regardless of the gamification toggle — the
- * toggle only gates display, so turning it back on loses nothing.
  */
 
 import { Category, Species } from "./types";
@@ -15,7 +13,6 @@ import { getStudyLocations } from "./location-tracker";
 
 const BADGES_KEY = "badges";
 const SPECIES_CATEGORY_KEY = "species_categories";
-const GAMIFICATION_KEY = "gamification";
 
 export type BadgeTier = 1 | 2 | 3;
 
@@ -158,14 +155,6 @@ export const ALL_BADGES: BadgeDef[] = [
   ),
   ...SIMPLE_BADGES,
 ];
-
-export function isGamificationEnabled(): boolean {
-  return getStorage<boolean>(GAMIFICATION_KEY, true);
-}
-
-export function setGamificationEnabled(enabled: boolean): void {
-  setStorage(GAMIFICATION_KEY, enabled);
-}
 
 /** Earned badges: badge id -> earnedAt timestamp (ms). */
 export function getEarnedBadges(): Record<string, number> {

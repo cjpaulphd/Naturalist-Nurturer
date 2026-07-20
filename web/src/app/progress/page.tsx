@@ -7,7 +7,6 @@ import { Species, Category } from "@/lib/types";
 import { loadSpeciesData } from "@/lib/species";
 import { getCachedLocationSpecies, fetchMoreSpecies, getLastLocation } from "@/lib/inat";
 import { getDueCards, getAllLearnedCards } from "@/lib/srs";
-import { isGamificationEnabled, setGamificationEnabled } from "@/lib/badges";
 import ProgressDashboard from "@/components/ProgressDashboard";
 import BadgeShelf from "@/components/BadgeShelf";
 import CategorySelector from "@/components/CategorySelector";
@@ -26,11 +25,6 @@ export default function ProgressPage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [loadMoreMessage, setLoadMoreMessage] = useState<string | null>(null);
   const [locationName, setLocationName] = useState<string | null>(null);
-  const [gamification, setGamification] = useState(false);
-
-  useEffect(() => {
-    setGamification(isGamificationEnabled());
-  }, []);
 
   useEffect(() => {
     const cached = getCachedLocationSpecies();
@@ -124,7 +118,7 @@ export default function ProgressPage() {
             </p>
           </div>
 
-          {gamification && <BadgeShelf species={species} />}
+          <BadgeShelf species={species} />
 
           <StudyLocationMap />
 
@@ -163,18 +157,6 @@ export default function ProgressPage() {
       )}
       {/* Footer */}
       <footer className="text-center pt-4 pb-2 border-t border-stone-200 space-y-2">
-        {/* Badges Toggle */}
-        <button
-          onClick={() => {
-            const next = !gamification;
-            setGamification(next);
-            setGamificationEnabled(next);
-          }}
-          className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-stone-100 hover:bg-stone-200 rounded-full text-xs text-stone-600 transition-colors"
-        >
-          🏆 Badges {gamification ? "On" : "Off"}
-        </button>
-
         {/* Share Button */}
         <ShareButton />
 

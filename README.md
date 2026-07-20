@@ -36,8 +36,10 @@ Choose how species names appear during quizzes:
 - **Scientific** names only (e.g., *Thryothorus ludovicianus*)
 - **Both** common and scientific names
 
-### Text Size (Accessibility)
-The **Aa** menu in the header offers **Default**, **Large**, and **Extra Large** text sizes for users with vision limitations. The chosen size scales the whole interface proportionally, works in every study mode, and persists across visits.
+### Settings Menu
+The gear menu in the header collects app-wide preferences, persisted across visits:
+- **Text Size** — **Default**, **Large**, or **Extra Large** for users with vision limitations; the chosen size scales the whole interface proportionally and works in every study mode
+- **Animations** — toggle the falling-leaves session celebrations
 
 ### Taxonomy Chart
 Visual Order > Family > Genus > Species hierarchy shown on every card back and in the field guide, with:
@@ -65,7 +67,7 @@ Visual Order > Family > Genus > Species hierarchy shown on every card back and i
 - Progress dashboard with per-category stats
 - **Location tracking map** showing where you've studied
 - Streak counter and cards-learned totals
-- **Field Notes badges** — earn naturalist specialty badges (Herpetologist, Ornithologist, Botanist, and more) with Sprout → Sapling → Old-Growth tiers, plus streak, effort, and explorer badges; toggleable via the **🏆 Badges** footer pill for those who prefer a badge-free experience
+- **Field Notes badges** — earn naturalist specialty badges (Herpetologist, Ornithologist, Botanist, and more) with Sprout → Sapling → Old-Growth tiers, plus streak, effort, and explorer badges
 - Shareable progress with inviting share text
 
 ### Field Guide / Browse
