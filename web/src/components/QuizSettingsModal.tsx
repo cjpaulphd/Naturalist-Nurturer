@@ -19,12 +19,8 @@ export default function QuizSettingsModal({
   const [quizMode, setQuizMode] = useState<QuizMode>(() => getStorage<QuizMode>("quiz_mode", "multiple-choice"));
   const [nameDisplay, setNameDisplay] = useState<NameDisplay>(() => getStorage<NameDisplay>("quiz_name_display", "both"));
   const [difficulty, setDifficulty] = useState<QuizDifficulty>(() => getStorage<QuizDifficulty>("quiz_difficulty", "medium"));
-  // "Song ID" is only meaningful when the current area has birds; fall back
-  // to Photo ID if a stored sound preference can't be satisfied.
-  const [studyMode, setStudyMode] = useState<StudyMode>(() => {
-    const stored = getStorage<StudyMode>("quiz_study_mode", "photo");
-    return stored === "sound" && !hasBirds ? "photo" : stored;
-  });
+  // Quiz Type always defaults to Photo ID, regardless of past selections.
+  const [studyMode, setStudyMode] = useState<StudyMode>("photo");
 
   useBodyScrollLock();
 
@@ -177,7 +173,6 @@ export default function QuizSettingsModal({
             setStorage("quiz_mode", quizMode);
             setStorage("quiz_name_display", nameDisplay);
             setStorage("quiz_difficulty", difficulty);
-            setStorage("quiz_study_mode", studyMode);
             onStart(quizMode, nameDisplay, studyMode, difficulty);
           }}
           className="w-full py-3 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors"
